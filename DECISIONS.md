@@ -79,18 +79,18 @@ so a filename containing quotes, spaces or newlines is data and never syntax.
 
 ## 2026-08-29 — Pages publishes the artifact CI verified, and runs no code
 
-`.github/workflows/deploy-pages.yml` waits for the `CI` workflow to finish on a
-push to `main`, then downloads that run's own `web-build` artifact and hands it
-to GitHub Pages. It never checks the repository out, never installs anything,
-and never rebuilds — so what goes live is byte-for-byte what the tests ran
-against, not a second build that merely ought to match.
+`.github/workflows/deploy-pages.yml` accepts successful `CI` runs from both
+pull requests and pushes. A pull-request artifact is eligible only after that
+exact head was squash-merged by `github-actions[bot]`, its Git tree matches the
+merge commit, and that commit is still the head of `main`. This covers native
+auto-merges performed with `GITHUB_TOKEN`, which do not start another workflow.
+A push artifact covers reviewed manual merges and is eligible only while its
+commit is still the head of `main`.
 
-Keeping the deploy free of repository code also keeps it free of repository
-risk: the job holds `pages: write` and `id-token: write`, and nothing from the
-tree executes while it does.
+The workflow never checks the repository out, installs dependencies, rebuilds,
+or executes artifact contents. It fetches only the triggering run's `web-build`
+by `workflow_run.id`, verifies that it contains `index.html`, and hands it to
+GitHub Pages. A missing artifact fails the job.
 
-The artifact is fetched by the triggering run's `workflow_run.id`, so it cannot
-pick up another run's build, and a missing artifact fails the job. Before
-deploying, the run's `head_sha` is compared against the current `main`; if main
-has already moved on, the deployment is skipped rather than rolling the site
-back to an older build.
+The deployment rechecks `main` immediately before publishing, so a run cannot
+roll the site back if another merge lands while its artifact is being packaged.

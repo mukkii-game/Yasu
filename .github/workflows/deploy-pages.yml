@@ -2,29 +2,22 @@ name: Deploy Pages
 
 # Publishes the exact artifact CI already verified, and never rebuilds it.
 #
-# The pipeline is: an ordinary pull request merges to main, CI runs on that push
-# and uploads `web-build`, and only then does this workflow take that same
-# artifact and hand it to GitHub Pages.
-#
-# Nothing from the repository runs here. There is no checkout, no npm install,
-# no build and no test — this job only moves bytes that a green CI run produced,
-# so what goes live is what was tested.
+# Native auto-merges performed with GITHUB_TOKEN do not start a push workflow,
+# so this listens to both pull-request and push CI runs. A PR artifact is only
+# eligible after the PR is proven to be the bot-merged commit now at main.
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
-    branches: [main]
 
-# Only what publishing needs: read the triggering run's artifact, and deploy.
+# Only what publishing needs: read the triggering run and repository metadata,
+# read that run's artifact, and deploy it to Pages.
 permissions:
   contents: read
   actions: read
   pages: write
   id-token: write
 
-# One deployment at a time. In-progress deployments are allowed to finish rather
-# than being cancelled, and GitHub keeps only the newest queued run, so a slower
-# older deployment cannot land on top of a newer one.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -33,44 +26,118 @@ jobs:
   deploy:
     name: Publish the CI artifact to Pages
     runs-on: ubuntu-latest
-    # Only a successful CI run, and only one triggered by a push to main —
-    # never a pull request run, whose artifact was built from unmerged code.
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push'
+      (github.event.workflow_run.event == 'pull_request' ||
+       github.event.workflow_run.event == 'push')
 
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Confirm the build still matches main
-        id: freshness
+      - name: Authorize the triggering CI artifact
+        id: authorize
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          BUILD_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_EVENT: ${{ github.event.workflow_run.event }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           set -euo pipefail
 
-          # If main moved on while this run was queued, the artifact is already
-          # stale. Publishing it would roll the site back, so stand down and let
-          # the newer run's own deployment publish instead.
-          main_sha=$(gh api "repos/${REPO}/git/ref/heads/main" --jq '.object.sha')
-          echo "CI built ${BUILD_SHA}; main is now at ${main_sha}"
+          echo 'publish=false' >> "${GITHUB_OUTPUT}"
 
-          if [ "${BUILD_SHA}" = "${main_sha}" ]; then
-            echo 'current=true' >> "${GITHUB_OUTPUT}"
-          else
-            echo 'current=false' >> "${GITHUB_OUTPUT}"
-            echo "::notice::main has moved past ${BUILD_SHA}; skipping so the newer build publishes instead."
+          main_sha=$(gh api "repos/${REPO}/git/ref/heads/main" --jq '.object.sha')
+
+          if [ "${RUN_EVENT}" = 'push' ]; then
+            if [ "${RUN_BRANCH}" != 'main' ]; then
+              echo "::notice::Ignoring a successful push CI run for a branch other than main."
+              exit 0
+            fi
+            if [ "${RUN_SHA}" != "${main_sha}" ]; then
+              echo "::notice::main moved past push build ${RUN_SHA}; not publishing a stale artifact."
+              exit 0
+            fi
+
+            echo "main_sha=${main_sha}" >> "${GITHUB_OUTPUT}"
+            echo 'publish=true' >> "${GITHUB_OUTPUT}"
+            exit 0
           fi
 
-      # Pinned to the triggering run's id, so this can only ever fetch the
-      # artifact from the CI run that led here — never some other run's.
-      # A missing artifact fails the step, and so the job.
+          # The triggering workflow must name exactly one main-based PR whose
+          # tested head is the same commit reported by workflow_run.
+          jq -e --arg run_sha "${RUN_SHA}" '
+            .workflow_run.pull_requests
+            | length == 1
+              and .[0].base.ref == "main"
+              and .[0].head.sha == $run_sha
+          ' "${GITHUB_EVENT_PATH}" > /dev/null || {
+            echo "::error::The triggering run does not identify exactly one main-based PR at ${RUN_SHA}."
+            exit 1
+          }
+          pr_number=$(jq -r '.workflow_run.pull_requests[0].number' "${GITHUB_EVENT_PATH}")
+
+          # Merge Guard enables native squash auto-merge after CI starts. Give
+          # GitHub a short window to finish it, while rechecking immutable facts
+          # on every response. A protected .github/** PR simply remains open.
+          merged=false
+          for attempt in {1..12}; do
+            pr=$(gh api "repos/${REPO}/pulls/${pr_number}")
+
+            jq -e --arg repo "${REPO}" --arg run_sha "${RUN_SHA}" '
+              .base.ref == "main"
+              and .head.repo.full_name == $repo
+              and .head.sha == $run_sha
+            ' <<<"${pr}" > /dev/null || {
+              echo "::error::PR #${pr_number} no longer matches the triggering CI run."
+              exit 1
+            }
+
+            if [ "$(jq -r '.merged' <<<"${pr}")" = 'true' ]; then
+              merged=true
+              break
+            fi
+            if [ "${attempt}" -lt 12 ]; then sleep 5; fi
+          done
+
+          if [ "${merged}" != 'true' ]; then
+            echo "::notice::PR #${pr_number} is not merged; its artifact will not be published."
+            exit 0
+          fi
+
+          merged_by=$(jq -r '.merged_by.login // ""' <<<"${pr}")
+          merge_sha=$(jq -r '.merge_commit_sha // ""' <<<"${pr}")
+          if [ "${merged_by}" != 'github-actions[bot]' ]; then
+            echo "::error::PR #${pr_number} was not merged by github-actions[bot]; refusing the PR artifact."
+            exit 1
+          fi
+          if ! [[ "${merge_sha}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::PR #${pr_number} has no valid merge commit SHA."
+            exit 1
+          fi
+
+          main_sha=$(gh api "repos/${REPO}/git/ref/heads/main" --jq '.object.sha')
+          if [ "${main_sha}" != "${merge_sha}" ]; then
+            echo "::notice::main moved past merged PR #${pr_number}; not publishing a stale artifact."
+            exit 0
+          fi
+
+          head_tree=$(gh api "repos/${REPO}/git/commits/${RUN_SHA}" --jq '.tree.sha')
+          merge_tree=$(gh api "repos/${REPO}/git/commits/${merge_sha}" --jq '.tree.sha')
+          if [ "${head_tree}" != "${merge_tree}" ]; then
+            echo "::error::The tested PR tree differs from its merge commit; refusing to publish."
+            exit 1
+          fi
+
+          echo "main_sha=${main_sha}" >> "${GITHUB_OUTPUT}"
+          echo 'publish=true' >> "${GITHUB_OUTPUT}"
+
+      # This run id can only select the artifact produced by the CI run that
+      # triggered this deployment. A missing web-build artifact fails the step.
       - name: Download the artifact CI verified
-        if: steps.freshness.outputs.current == 'true'
+        if: steps.authorize.outputs.publish == 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: web-build
@@ -79,23 +146,39 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check the artifact holds a site
-        if: steps.freshness.outputs.current == 'true'
+        if: steps.authorize.outputs.publish == 'true'
         run: |
           set -euo pipefail
-          # Inspected, never executed.
+          # Inspected, never executed, and artifact filenames are not logged.
           test -f site/index.html
-          echo 'Publishing:'
-          find site -type f | sort
 
-      # Re-packages the downloaded directory in the tar layout Pages expects.
-      # It archives the directory and runs nothing inside it.
       - name: Package it for Pages
-        if: steps.freshness.outputs.current == 'true'
+        if: steps.authorize.outputs.publish == 'true'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: site
+
+      # main may move while the artifact is downloaded and packaged. Recheck
+      # immediately before the write-capable deployment action.
+      - name: Confirm main is still current
+        id: freshness
+        if: steps.authorize.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          EXPECTED_MAIN_SHA: ${{ steps.authorize.outputs.main_sha }}
+        run: |
+          set -euo pipefail
+          main_sha=$(gh api "repos/${REPO}/git/ref/heads/main" --jq '.object.sha')
+          if [ "${main_sha}" = "${EXPECTED_MAIN_SHA}" ]; then
+            echo 'current=true' >> "${GITHUB_OUTPUT}"
+          else
+            echo 'current=false' >> "${GITHUB_OUTPUT}"
+            echo "::notice::main moved during packaging; not publishing a stale artifact."
+          fi
 
       - name: Deploy to GitHub Pages
         id: deployment
         if: steps.freshness.outputs.current == 'true'
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+
