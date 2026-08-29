@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "npm run verify:workflows && vitest run",
+    "verify:workflows": "node scripts/verify-workflow-callers.mjs",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

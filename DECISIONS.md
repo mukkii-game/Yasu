@@ -94,3 +94,10 @@ GitHub Pages. A missing artifact fails the job.
 
 The deployment rechecks `main` immediately before publishing, so a run cannot
 roll the site back if another merge lands while its artifact is being packaged.
+
+## 2026-08-30 — Infrastructure v2 centralizes CI, Guard and Pages
+
+The three local workflows are callers of the protected `ai-dev-infra@v2`
+workflows. The test suite verifies their exact references, permissions and
+concurrency settings because those caller-owned settings cannot be enforced
+inside a reusable workflow.

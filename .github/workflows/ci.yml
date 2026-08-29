@@ -12,4 +12,4 @@ jobs:
   verify:
     # Central CI lives in mukkii-game/ai-dev-infra. Do not copy its contents
     # here — this repository only calls it.
-    uses: mukkii-game/ai-dev-infra/.github/workflows/verify-web.yml@v1
+    uses: mukkii-game/ai-dev-infra/.github/workflows/verify-web.yml@v2
