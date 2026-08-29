@@ -76,3 +76,21 @@ request is ordinary, rather than merely failing to look suspicious:
 
 The path decision runs inside jq over JSON values rather than over shell text,
 so a filename containing quotes, spaces or newlines is data and never syntax.
+
+## 2026-08-29 — Pages publishes the artifact CI verified, and runs no code
+
+`.github/workflows/deploy-pages.yml` accepts successful `CI` runs from both
+pull requests and pushes. A pull-request artifact is eligible only after that
+exact head was squash-merged by `github-actions[bot]`, its Git tree matches the
+merge commit, and that commit is still the head of `main`. This covers native
+auto-merges performed with `GITHUB_TOKEN`, which do not start another workflow.
+A push artifact covers reviewed manual merges and is eligible only while its
+commit is still the head of `main`.
+
+The workflow never checks the repository out, installs dependencies, rebuilds,
+or executes artifact contents. It fetches only the triggering run's `web-build`
+by `workflow_run.id`, verifies that it contains `index.html`, and hands it to
+GitHub Pages. A missing artifact fails the job.
+
+The deployment rechecks `main` immediately before publishing, so a run cannot
+roll the site back if another merge lands while its artifact is being packaged.
