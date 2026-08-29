@@ -32,7 +32,8 @@
         font-variant-numeric: tabular-nums;
         letter-spacing: 0.02em;
       }
-      .best-score .label {
+      .best-score .label,
+      .hud .label {
         color: #94a3b8;
       }
       .hud {
@@ -55,8 +56,8 @@
     </p>
     <canvas data-testid="game-canvas" width="480" height="320"></canvas>
     <div class="hud">
-      <span>Score: <strong data-testid="score">0</strong></span>
-      <span>Status: <strong data-testid="status">playing</strong></span>
+      <span><span class="label">Score:</span> <strong data-testid="score">0</strong></span>
+      <span><span class="label">Status:</span> <strong data-testid="status">playing</strong></span>
     </div>
     <p class="hint">Move with ← → or the pointer. Press R to restart.</p>
     <script type="module" src="/src/main.ts"></script>

@@ -23,6 +23,9 @@ test.describe('Yasu', () => {
 
     await expect(page.getByTestId('score')).toBeVisible();
     await expect(page.getByTestId('status')).toHaveText('playing');
+
+    // The HUD labels read the same way as the Best Score readout above.
+    await expect(page.locator('.hud')).toHaveText('Score: 0 Status: playing');
   });
 
   test('shows the best score above the game area', async ({ page }) => {
