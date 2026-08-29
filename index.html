@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Yasu</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: #0b0e14;
+        color: #e2e8f0;
+      }
+      canvas {
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+        touch-action: none;
+        max-width: 100%;
+      }
+      .hud {
+        display: flex;
+        gap: 16px;
+        font-variant-numeric: tabular-nums;
+      }
+      .hint {
+        margin: 0;
+        font-size: 13px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 data-testid="title">Yasu</h1>
+    <canvas data-testid="game-canvas" width="480" height="320"></canvas>
+    <div class="hud">
+      <span>Score: <strong data-testid="score">0</strong></span>
+      <span>Status: <strong data-testid="status">playing</strong></span>
+    </div>
+    <p class="hint">Move with ← → or the pointer. Press R to restart.</p>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
