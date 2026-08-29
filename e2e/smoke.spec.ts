@@ -32,6 +32,10 @@ test.describe('Yasu', () => {
     await expect(bestScore).toBeVisible();
     await expect(bestScore).toHaveText('0');
 
+    // The label reads as one line next to the value. A string matcher is used
+    // rather than a regex, because only string matching normalises whitespace.
+    await expect(page.locator('.best-score')).toHaveText('Best Score: 0');
+
     // "Best Score" belongs at the top of the screen, above the play field.
     const bestBox = await bestScore.boundingBox();
     const canvasBox = await page.getByTestId('game-canvas').boundingBox();
