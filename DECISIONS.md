@@ -35,3 +35,10 @@ the Chromium project is configured, matching the central workflow's
 
 Relative asset paths keep the built bundle usable from any sub-path, so the CI
 artifact can be opened or hosted without a rebuild.
+
+## 2026-08-29 — The best score survives a restart
+
+`restart()` carries `bestScore` over instead of returning a wholly fresh state,
+so pressing `R` clears the round without erasing what the player has already
+achieved. `createGame()` stays the true zero state and is what the unit tests
+build on.

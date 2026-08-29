@@ -1,4 +1,4 @@
-import { FIELD, createGame, movePaddle, setPaddleCenter, step } from './game';
+import { FIELD, createGame, movePaddle, restart, setPaddleCenter, step } from './game';
 import { render } from './render';
 
 function required<T>(value: T | null, what: string): T {
@@ -18,6 +18,10 @@ const statusEl = required(
   document.querySelector<HTMLElement>('[data-testid="status"]'),
   'the status display',
 );
+const bestScoreEl = required(
+  document.querySelector<HTMLElement>('[data-testid="best-score"]'),
+  'the best score display',
+);
 const ctx = required(canvas.getContext('2d'), 'the 2D canvas context');
 
 canvas.width = FIELD.width;
@@ -32,6 +36,7 @@ let state = createGame();
 function syncHud(): void {
   scoreEl.textContent = String(state.score);
   statusEl.textContent = state.status;
+  bestScoreEl.textContent = String(state.bestScore);
   canvas.dataset.paddleX = String(state.paddleX);
   canvas.dataset.status = state.status;
 }
@@ -42,7 +47,7 @@ document.addEventListener('keydown', (event) => {
   } else if (event.key === 'ArrowRight') {
     state = movePaddle(state, 1);
   } else if (event.key === 'r' || event.key === 'R') {
-    state = createGame();
+    state = restart(state);
   } else {
     return;
   }

@@ -45,6 +45,8 @@ export interface GameState {
   /** X coordinate of the paddle's left edge. */
   paddleX: number;
   score: number;
+  /** Highest score reached so far; survives a restart. */
+  bestScore: number;
   status: GameStatus;
 }
 
@@ -63,8 +65,17 @@ export function createGame(): GameState {
     },
     paddleX: (FIELD.width - PADDLE.width) / 2,
     score: 0,
+    bestScore: 0,
     status: 'playing',
   };
+}
+
+/**
+ * Starts a new round, carrying the best score across. Restarting is not
+ * supposed to erase what the player has already achieved.
+ */
+export function restart(state: GameState): GameState {
+  return { ...createGame(), bestScore: state.bestScore };
 }
 
 /**
@@ -136,6 +147,7 @@ export function step(state: GameState, dt: number): GameState {
     ball: { pos: { x, y }, vel: { x: vx, y: vy } },
     paddleX: state.paddleX,
     score,
+    bestScore: Math.max(state.bestScore, score),
     status,
   };
 }

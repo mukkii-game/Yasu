@@ -27,6 +27,11 @@
         touch-action: none;
         max-width: 100%;
       }
+      .best-score {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+      }
       .hud {
         display: flex;
         gap: 16px;
@@ -41,6 +46,7 @@
   </head>
   <body>
     <h1 data-testid="title">Yasu</h1>
+    <p class="best-score">Best Score: <strong data-testid="best-score">0</strong></p>
     <canvas data-testid="game-canvas" width="480" height="320"></canvas>
     <div class="hud">
       <span>Score: <strong data-testid="score">0</strong></span>
