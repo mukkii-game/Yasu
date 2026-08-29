@@ -42,3 +42,19 @@ artifact can be opened or hosted without a rebuild.
 so pressing `R` clears the round without erasing what the player has already
 achieved. `createGame()` stays the true zero state and is what the unit tests
 build on.
+
+## 2026-08-29 — Auto-merge is gated by a Merge Guard, not granted repo-wide
+
+`.github/workflows/merge-guard.yml` enables GitHub's native auto-merge for pull
+requests, but fails and enables nothing when a pull request touches
+`.github/**`. Turning auto-merge on repository-wide would mean CI, workflow
+permissions and CODEOWNERS could all be changed with no human in the loop —
+including changes to the very checks that are supposed to gate the merge. Those
+files stay a human decision; ordinary game code does not.
+
+The guard runs on `pull_request_target` because a `pull_request` run from a
+fork gets a read-only token and cannot enable auto-merge. That trigger hands
+out a write-capable token in the base branch's context, so the workflow never
+checks out or executes anything from the pull request: it reads the changed
+paths from the API and treats them purely as data. Drafts are skipped and
+re-evaluated on `ready_for_review`.
