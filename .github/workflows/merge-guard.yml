@@ -1,0 +1,65 @@
+name: Merge Guard
+
+# Turns on GitHub's native auto-merge for ordinary pull requests, and refuses to
+# do so for any pull request that touches .github/** — CI, workflow permissions
+# and CODEOWNERS stay a human decision.
+#
+# Security posture: this runs on `pull_request_target`, so it executes in the
+# context of the BASE branch with a write-capable token. That is only safe
+# because it never touches the pull request's code:
+#   - no checkout of any kind, so PR code never reaches the runner
+#   - nothing from the PR is built, installed, or executed
+#   - the only PR-derived data is the list of changed paths, read from the API
+#     and used as grep input — never as code, and never interpolated into the
+#     shell through `${{ }}`
+on:
+  pull_request_target:
+    # `ready_for_review` is what re-evaluates a PR that started as a draft.
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# Exactly what enabling auto-merge needs, and nothing more.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: merge-guard-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    name: Guard and enable auto-merge
+    runs-on: ubuntu-latest
+    # Drafts are left alone; the ready_for_review trigger brings them back here.
+    if: github.event.pull_request.draft == false
+
+    steps:
+      # No external actions are used, so there is nothing to pin to a SHA.
+      - name: Check changed files and enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # --paginate walks every page, so a pull request with more changed
+          # files than fit in one response is still checked in full.
+          gh api --paginate "repos/${REPO}/pulls/${PR_NUMBER}/files" \
+            --jq '.[].filename' > changed-files.txt
+
+          echo "Changed files: $(wc -l < changed-files.txt)"
+
+          # Case-insensitive, and a bare `.github` entry counts too: this check
+          # fails closed, so an unusual path errs towards requiring a human.
+          if grep -Eiq '^\.github(/|$)' changed-files.txt; then
+            echo "::error::This pull request changes .github/** — auto-merge will not be enabled. Merge it by hand after review."
+            echo 'Paths under .github/:'
+            # Neutralise `::` so a crafted path cannot inject workflow commands
+            # into this log.
+            grep -Ei '^\.github(/|$)' changed-files.txt | sed 's/::/;;/g'
+            exit 1
+          fi
+
+          echo 'No .github/** changes; enabling auto-merge.'
+          gh pr merge --auto --squash --repo "${REPO}" "${PR_NUMBER}"
