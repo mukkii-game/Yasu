@@ -25,6 +25,21 @@ test.describe('Yasu', () => {
     await expect(page.getByTestId('status')).toHaveText('playing');
   });
 
+  test('shows the best score above the game area', async ({ page }) => {
+    await page.goto('/');
+
+    const bestScore = page.getByTestId('best-score');
+    await expect(bestScore).toBeVisible();
+    await expect(bestScore).toHaveText('0');
+
+    // "Best Score" belongs at the top of the screen, above the play field.
+    const bestBox = await bestScore.boundingBox();
+    const canvasBox = await page.getByTestId('game-canvas').boundingBox();
+    expect(bestBox).not.toBeNull();
+    expect(canvasBox).not.toBeNull();
+    expect(bestBox!.y).toBeLessThan(canvasBox!.y);
+  });
+
   test('boots without console errors', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));

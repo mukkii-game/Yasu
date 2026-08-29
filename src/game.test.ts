@@ -6,6 +6,7 @@ import {
   PADDLE_TOP,
   createGame,
   movePaddle,
+  restart,
   setPaddleCenter,
   step,
   type GameState,
@@ -22,6 +23,24 @@ describe('createGame', () => {
     expect(state.status).toBe('playing');
     expect(state.score).toBe(0);
     expect(state.paddleX).toBe((FIELD.width - PADDLE.width) / 2);
+    expect(state.bestScore).toBe(0);
+  });
+});
+
+describe('restart', () => {
+  it('resets the round but keeps the best score', () => {
+    const played = stateWith({ score: 5, bestScore: 7, status: 'over' });
+    const next = restart(played);
+    expect(next.bestScore).toBe(7);
+    expect(next.score).toBe(0);
+    expect(next.status).toBe('playing');
+    expect(next.paddleX).toBe((FIELD.width - PADDLE.width) / 2);
+  });
+
+  it('does not mutate the input state', () => {
+    const played = stateWith({ score: 5, bestScore: 7 });
+    restart(played);
+    expect(played.score).toBe(5);
   });
 });
 
@@ -137,6 +156,36 @@ describe('step', () => {
       0.5,
     );
     expect(next.status).toBe('over');
+  });
+
+  it('raises the best score when the score passes it', () => {
+    const paddleX = 100;
+    const next = step(
+      stateWith({
+        paddleX,
+        score: 3,
+        bestScore: 3,
+        ball: {
+          pos: { x: paddleX + PADDLE.width / 2, y: PADDLE_TOP - BALL.radius - 1 },
+          vel: { x: 0, y: 120 },
+        },
+      }),
+      0.1,
+    );
+    expect(next.score).toBe(4);
+    expect(next.bestScore).toBe(4);
+  });
+
+  it('keeps a higher best score from an earlier round', () => {
+    const next = step(
+      stateWith({
+        score: 1,
+        bestScore: 9,
+        ball: { pos: { x: 100, y: 100 }, vel: { x: 60, y: 40 } },
+      }),
+      0.1,
+    );
+    expect(next.bestScore).toBe(9);
   });
 
   it('treats a finished game as a fixed point', () => {

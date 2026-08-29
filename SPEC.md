@@ -32,16 +32,20 @@ test, build, and browser test. Gameplay depth is explicitly a non-goal.
    (`status: 'over'`).
 5. A finished game is a fixed point: stepping it changes nothing.
 6. The paddle is always clamped inside the field.
+7. The best score is the highest score reached so far. It never decreases, and
+   a restart carries it over rather than clearing it.
 
 ## Controls
 
 - `ArrowLeft` / `ArrowRight` — move the paddle one step (28 px).
 - Pointer movement over the canvas — centre the paddle on the pointer.
-- `R` — restart from the initial state.
+- `R` — restart the round. The score returns to 0; the best score is kept.
 
 ## Displayed state
 
-The HUD shows the current score and status. The canvas also mirrors state onto
+`Best Score` is shown at the top of the screen, above the play field. The HUD
+below the canvas shows the current score and status. The canvas also mirrors
+state onto
 `data-paddle-x` and `data-status` attributes so the end-to-end tests can assert
 on the simulation without reading pixels. These attributes are part of the
 contract with `e2e/`; renaming them requires updating those tests.
