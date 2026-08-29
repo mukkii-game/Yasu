@@ -1,0 +1,4 @@
+# Only CI and repository plumbing require a human owner's review.
+# Ordinary game code under src/, e2e/ and the docs are deliberately NOT owned,
+# so AI agents can land changes there without a human review gate.
+/.github/ @mukkii-game
