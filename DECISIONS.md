@@ -76,3 +76,21 @@ request is ordinary, rather than merely failing to look suspicious:
 
 The path decision runs inside jq over JSON values rather than over shell text,
 so a filename containing quotes, spaces or newlines is data and never syntax.
+
+## 2026-08-29 — Pages publishes the artifact CI verified, and runs no code
+
+`.github/workflows/deploy-pages.yml` waits for the `CI` workflow to finish on a
+push to `main`, then downloads that run's own `web-build` artifact and hands it
+to GitHub Pages. It never checks the repository out, never installs anything,
+and never rebuilds — so what goes live is byte-for-byte what the tests ran
+against, not a second build that merely ought to match.
+
+Keeping the deploy free of repository code also keeps it free of repository
+risk: the job holds `pages: write` and `id-token: write`, and nothing from the
+tree executes while it does.
+
+The artifact is fetched by the triggering run's `workflow_run.id`, so it cannot
+pick up another run's build, and a missing artifact fails the job. Before
+deploying, the run's `head_sha` is compared against the current `main`; if main
+has already moved on, the deployment is skipped rather than rolling the site
+back to an older build.

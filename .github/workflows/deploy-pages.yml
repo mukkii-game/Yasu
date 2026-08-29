@@ -1,0 +1,101 @@
+name: Deploy Pages
+
+# Publishes the exact artifact CI already verified, and never rebuilds it.
+#
+# The pipeline is: an ordinary pull request merges to main, CI runs on that push
+# and uploads `web-build`, and only then does this workflow take that same
+# artifact and hand it to GitHub Pages.
+#
+# Nothing from the repository runs here. There is no checkout, no npm install,
+# no build and no test — this job only moves bytes that a green CI run produced,
+# so what goes live is what was tested.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+# Only what publishing needs: read the triggering run's artifact, and deploy.
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. In-progress deployments are allowed to finish rather
+# than being cancelled, and GitHub keeps only the newest queued run, so a slower
+# older deployment cannot land on top of a newer one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publish the CI artifact to Pages
+    runs-on: ubuntu-latest
+    # Only a successful CI run, and only one triggered by a push to main —
+    # never a pull request run, whose artifact was built from unmerged code.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Confirm the build still matches main
+        id: freshness
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BUILD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+
+          # If main moved on while this run was queued, the artifact is already
+          # stale. Publishing it would roll the site back, so stand down and let
+          # the newer run's own deployment publish instead.
+          main_sha=$(gh api "repos/${REPO}/git/ref/heads/main" --jq '.object.sha')
+          echo "CI built ${BUILD_SHA}; main is now at ${main_sha}"
+
+          if [ "${BUILD_SHA}" = "${main_sha}" ]; then
+            echo 'current=true' >> "${GITHUB_OUTPUT}"
+          else
+            echo 'current=false' >> "${GITHUB_OUTPUT}"
+            echo "::notice::main has moved past ${BUILD_SHA}; skipping so the newer build publishes instead."
+          fi
+
+      # Pinned to the triggering run's id, so this can only ever fetch the
+      # artifact from the CI run that led here — never some other run's.
+      # A missing artifact fails the step, and so the job.
+      - name: Download the artifact CI verified
+        if: steps.freshness.outputs.current == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: web-build
+          path: site
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check the artifact holds a site
+        if: steps.freshness.outputs.current == 'true'
+        run: |
+          set -euo pipefail
+          # Inspected, never executed.
+          test -f site/index.html
+          echo 'Publishing:'
+          find site -type f | sort
+
+      # Re-packages the downloaded directory in the tar layout Pages expects.
+      # It archives the directory and runs nothing inside it.
+      - name: Package it for Pages
+        if: steps.freshness.outputs.current == 'true'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: steps.freshness.outputs.current == 'true'
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
