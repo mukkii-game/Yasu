@@ -58,3 +58,21 @@ out a write-capable token in the base branch's context, so the workflow never
 checks out or executes anything from the pull request: it reads the changed
 paths from the API and treats them purely as data. Drafts are skipped and
 re-evaluated on `ready_for_review`.
+
+## 2026-08-29 — The Merge Guard fails closed on every check
+
+The guard was hardened so that auto-merge requires positive proof that a pull
+request is ordinary, rather than merely failing to look suspicious:
+
+- pull requests from forks are refused outright, whatever they touch — a fork's
+  head sits outside this repository's review and ruleset guarantees
+- `previous_filename` is examined alongside `filename`, so moving a file *out*
+  of `.github/` is caught even though its new path looks innocent
+- the number of files returned by the API must equal the pull request's own
+  `changed_files`; a mismatch means something went unexamined, so it blocks
+- a change larger than the files endpoint will list (3000) blocks, because it
+  cannot be inspected in full
+- any API failure blocks, since `set -e` stops the job before auto-merge
+
+The path decision runs inside jq over JSON values rather than over shell text,
+so a filename containing quotes, spaces or newlines is data and never syntax.

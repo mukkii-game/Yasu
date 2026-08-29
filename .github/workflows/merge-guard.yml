@@ -1,17 +1,19 @@
 name: Merge Guard
 
 # Turns on GitHub's native auto-merge for ordinary pull requests, and refuses to
-# do so for any pull request that touches .github/** — CI, workflow permissions
-# and CODEOWNERS stay a human decision.
+# do so for anything that could reach .github/** — CI, workflow permissions and
+# CODEOWNERS stay a human decision.
+#
+# Every check below fails closed: anything the job cannot positively verify
+# blocks auto-merge rather than allowing it.
 #
 # Security posture: this runs on `pull_request_target`, so it executes in the
 # context of the BASE branch with a write-capable token. That is only safe
 # because it never touches the pull request's code:
 #   - no checkout of any kind, so PR code never reaches the runner
 #   - nothing from the PR is built, installed, or executed
-#   - the only PR-derived data is the list of changed paths, read from the API
-#     and used as grep input — never as code, and never interpolated into the
-#     shell through `${{ }}`
+#   - the only PR-derived data is the changed-path list, read from the API and
+#     kept as JSON end to end, so an exotic filename is data and never syntax
 on:
   pull_request_target:
     # `ready_for_review` is what re-evaluates a PR that started as a draft.
@@ -40,24 +42,70 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
+          # Attacker-influenced values. They are read as data through the
+          # environment and compared, never interpolated into this script.
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          EXPECTED_FILES: ${{ github.event.pull_request.changed_files }}
         run: |
           set -euo pipefail
 
-          # --paginate walks every page, so a pull request with more changed
-          # files than fit in one response is still checked in full.
+          # 1. Forks never get auto-merge. A fork's head is outside this
+          #    repository's review and ruleset guarantees, so it is a human's
+          #    call regardless of which paths it touches. A deleted fork leaves
+          #    HEAD_REPO empty, which lands here too.
+          if [ "${HEAD_REPO:-}" != "${REPO}" ]; then
+            echo "::error::Head repository is not ${REPO}; auto-merge is only ever enabled for branches in this repository."
+            exit 1
+          fi
+
+          # 2. The files endpoint stops at 3000 entries. Past that the change
+          #    cannot be inspected in full, so it does not qualify.
+          if [ "${EXPECTED_FILES}" -gt 3000 ]; then
+            echo "::error::This pull request changes ${EXPECTED_FILES} files, more than the files API will list. Every path must be verifiable."
+            exit 1
+          fi
+
+          # One compact JSON object per line. Filenames stay JSON-encoded, so a
+          # path containing quotes, spaces or newlines cannot break the parse.
+          # A failure here (rate limit, transport error) trips `set -e` and
+          # blocks, which is the direction we want.
           gh api --paginate "repos/${REPO}/pulls/${PR_NUMBER}/files" \
-            --jq '.[].filename' > changed-files.txt
+            --jq '.[] | {filename: .filename, previous_filename: (.previous_filename // null)}' \
+            > files.jsonl
 
-          echo "Changed files: $(wc -l < changed-files.txt)"
+          # 3. The whole decision happens inside jq, over JSON values.
+          #    `previous_filename` is checked as well, so moving a file OUT of
+          #    .github/ is caught even though its new path looks innocent.
+          verdict=$(jq -s --argjson expected "${EXPECTED_FILES}" '
+            def touches_github:
+              . != null and (ascii_downcase | test("^\\.github(/|$)"));
+            {
+              seen: length,
+              expected: $expected,
+              offenders: [
+                .[] | select((.filename | touches_github)
+                          or (.previous_filename | touches_github))
+              ]
+            }
+          ' files.jsonl)
 
-          # Case-insensitive, and a bare `.github` entry counts too: this check
-          # fails closed, so an unusual path errs towards requiring a human.
-          if grep -Eiq '^\.github(/|$)' changed-files.txt; then
-            echo "::error::This pull request changes .github/** — auto-merge will not be enabled. Merge it by hand after review."
-            echo 'Paths under .github/:'
-            # Neutralise `::` so a crafted path cannot inject workflow commands
-            # into this log.
-            grep -Ei '^\.github(/|$)' changed-files.txt | sed 's/::/;;/g'
+          seen=$(jq -r '.seen' <<<"${verdict}")
+          offending=$(jq -r '.offenders | length' <<<"${verdict}")
+          echo "Files inspected: ${seen} (pull request reports ${EXPECTED_FILES})"
+
+          # 4. If the API did not hand back exactly what the pull request says it
+          #    changed, some path went unexamined. Refuse rather than guess.
+          if [ "${seen}" -ne "${EXPECTED_FILES}" ]; then
+            echo "::error::Inspected ${seen} files but this pull request reports ${EXPECTED_FILES}; not every change could be verified."
+            exit 1
+          fi
+
+          if [ "${offending}" -ne 0 ]; then
+            echo "::error::This pull request touches .github/** — auto-merge will not be enabled. Merge it by hand after review."
+            echo 'Offending entries (JSON-encoded):'
+            # Printing JSON keeps a crafted path on one line and quoted; the
+            # substitution additionally defuses workflow commands.
+            jq -c '.offenders[]' <<<"${verdict}" | sed 's/::/;;/g'
             exit 1
           fi
 
