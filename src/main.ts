@@ -21,7 +21,9 @@ let visibleCharacters = Number.POSITIVE_INFINITY;
 let typeTimer: number | undefined;
 let punchlineTimer: number | undefined;
 let punchlineSecondTimer: number | undefined;
+let endTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
+let endPunchlineVisible = false;
 
 function getAudio(): AudioContext {
   audio ??= new AudioContext();
@@ -57,6 +59,44 @@ function playJingle(): void {
   void jingle.play().catch(() => undefined);
 }
 
+function textBlip(): void {
+  const context = getAudio();
+  const now = context.currentTime;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = 'square';
+  oscillator.frequency.value = visibleCharacters % 4 === 0 ? 392 : 330;
+  gain.gain.setValueAtTime(0.011, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+  oscillator.connect(gain).connect(context.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.018);
+}
+
+function playBigJingle(): void {
+  playJingle();
+  const context = getAudio();
+  const now = context.currentTime;
+  const notes = [
+    { at: 0, frequency: 392, duration: 0.14, volume: 0.022 },
+    { at: 0.16, frequency: 523, duration: 0.16, volume: 0.024 },
+    { at: 0.35, frequency: 523, duration: 0.85, volume: 0.024 },
+    { at: 0.35, frequency: 659, duration: 0.85, volume: 0.02 },
+    { at: 0.35, frequency: 784, duration: 0.85, volume: 0.017 },
+  ];
+  notes.forEach(({ at, frequency, duration, volume }) => {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(volume, now + at);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + at + duration);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start(now + at);
+    oscillator.stop(now + at + duration);
+  });
+}
+
 function clearPunchlineTimers(): void {
   if (punchlineTimer !== undefined) window.clearTimeout(punchlineTimer);
   if (punchlineSecondTimer !== undefined) window.clearTimeout(punchlineSecondTimer);
@@ -65,7 +105,7 @@ function clearPunchlineTimers(): void {
 }
 
 function render(): void {
-  renderApp(root, state, { visibleCharacters, punchlineStage });
+  renderApp(root, state, { visibleCharacters, punchlineStage, endPunchlineVisible });
 }
 
 function fullDialogueLength(): number {
@@ -79,16 +119,14 @@ function schedulePunchline(): void {
   punchlineTimer = window.setTimeout(() => {
     punchlineTimer = undefined;
     punchlineStage = 1;
-    playJingle();
     render();
-    if (step.punchline === '人間としてヤスッ！') {
-      punchlineSecondTimer = window.setTimeout(() => {
-        punchlineSecondTimer = undefined;
-        punchlineStage = 2;
-        render();
-      }, 500);
-    }
-  }, 500);
+    punchlineSecondTimer = window.setTimeout(() => {
+      punchlineSecondTimer = undefined;
+      punchlineStage = 2;
+      playJingle();
+      render();
+    }, 550);
+  }, 750);
 }
 
 function finishTyping(): void {
@@ -120,6 +158,8 @@ function beginTyping(): void {
   render();
   const tick = () => {
     visibleCharacters += 1;
+    const character = Array.from(dialogueText(currentDialogue(state)!))[visibleCharacters - 1];
+    if (visibleCharacters % 2 === 0 && character?.trim()) textBlip();
     render();
     if (visibleCharacters < total) typeTimer = window.setTimeout(tick, 38);
     else {
@@ -130,10 +170,28 @@ function beginTyping(): void {
   typeTimer = window.setTimeout(tick, 38);
 }
 
+function clearEndTimer(): void {
+  if (endTimer !== undefined) window.clearTimeout(endTimer);
+  endTimer = undefined;
+}
+
+function scheduleEndPunchline(): void {
+  clearEndTimer();
+  endTimer = window.setTimeout(() => {
+    endTimer = undefined;
+    endPunchlineVisible = true;
+    playBigJingle();
+    render();
+  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1600 : 7200);
+}
+
 function setState(next: GameState): void {
   if (next === state) return;
+  clearEndTimer();
+  endPunchlineVisible = false;
   state = next;
   beginTyping();
+  if (next.phase === 'end') scheduleEndPunchline();
 }
 
 function advanceOrFinish(): void {
@@ -143,7 +201,7 @@ function advanceOrFinish(): void {
     return;
   }
   if (step?.punchline) {
-    if (punchlineStage === 0 || (step.punchline === '人間としてヤスッ！' && punchlineStage < 2)) return;
+    if (punchlineStage < 2) return;
   }
   setState(advance(state));
 }
@@ -163,7 +221,7 @@ root.addEventListener('click', (event) => {
     return;
   }
   const action = target.dataset.action;
-  if (action === 'start') { setState(startGame(state)); return; }
+  if (action === 'start') { getAudio(); setState(startGame(state)); return; }
   if (action === 'kana') { setState(chooseKana(state, target.dataset.kana ?? '')); return; }
   if (action === 'delete') { setState(deleteKana(state)); return; }
   if (action === 'clear') { setState(clearAnswer(state)); return; }
@@ -183,7 +241,7 @@ document.addEventListener('keydown', (event) => {
   }
   if (event.key !== 'Enter' && event.key !== ' ') return;
   event.preventDefault();
-  if (state.phase === 'title') setState(startGame(state));
+  if (state.phase === 'title') { getAudio(); setState(startGame(state)); }
   else if (state.phase === 'input') submit();
 });
 

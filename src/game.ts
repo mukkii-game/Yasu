@@ -5,7 +5,7 @@ export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'endin
 export interface DialogueStep {
   readonly speaker: 'ヤス' | 'あなた';
   readonly text: string;
-  readonly punchline?: '動機がヤスッ！' | '報酬もヤスッ！' | '人間としてヤスッ！';
+  readonly punchline?: 'トリックがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人間としてヤスッ！';
 }
 
 export interface GameState {
@@ -22,6 +22,7 @@ export const INTRO: readonly DialogueStep[] = [
 ];
 
 export const ENDING: readonly DialogueStep[] = [
+  { speaker: 'あなた', text: 'かおにかいてあるから', punchline: 'トリックがヤスッ！' },
   { speaker: 'あなた', text: 'ヤス、なぜこんなころしをしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でも もらったほうしゅうは3000えんでした', punchline: '報酬もヤスッ！' },

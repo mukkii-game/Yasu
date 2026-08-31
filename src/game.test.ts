@@ -60,13 +60,14 @@ describe('game flow', () => {
       if (step?.punchline) punchlines.push(step.punchline);
       state = advance(state);
     }
-    expect(punchlines).toEqual(['動機がヤスッ！', '報酬もヤスッ！', '人間としてヤスッ！']);
+    expect(punchlines).toEqual(['トリックがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人間としてヤスッ！']);
     expect(state.phase).toBe('end');
   });
 
   it('formats the speaker and quote on one continuous line', () => {
     expect(dialogueText(INTRO[0])).toBe('ヤス「ボス、これいじょうのてがかりがありません。めいきゅういりです。」');
-    expect(dialogueText(ENDING[0])).toBe('あなた「ヤス、なぜこんなころしをしたんだ」');
+    expect(dialogueText(ENDING[0])).toBe('あなた「かおにかいてあるから」');
+    expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なぜこんなころしをしたんだ」');
   });
 
   it('restart always returns to a clean title state', () => {

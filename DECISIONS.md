@@ -145,3 +145,16 @@ then stops and opens a simple smiling mouth when the first punchline appears.
 Punchlines wait 500 ms, use large unboxed text, and share one short CC0 comic
 fanfare. The ending contrasts the blue title with a gray-building sunset and a
 small escort pair moving right-to-left, with no foreground protagonist.
+
+## 2026-09-01 — Every joke lands in the same two-beat cadence
+
+Dialogue typing regains a quiet generated square-wave blip while navigation and
+wrong answers stay silent. Yasu's larger blank face now literally carries the
+vertical clue 「ヤ」「ス」, so the new answer 「かおにかいてあるから」 can lead
+directly into 「トリックが」 and, after a short pause, the larger 「ヤスッ！」.
+The motive, reward, and human-worth punchlines use that same setup/payoff timing,
+white-on-pink sprite lettering, and a single fanfare on the payoff.
+
+The sunset road is lighter so both escort sprites remain readable. Their walk is
+now finite; once they leave, a full-screen 「ヤスッ！ と つっこんでください」
+closes the game with a deliberately oversized generated chord.

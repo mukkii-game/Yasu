@@ -54,21 +54,22 @@ test.describe('犯人はヤス', () => {
     await expect(page.getByTestId('answer-slots')).toContainText('ヤス');
     await page.getByTestId('decide').click();
     await expect(page.locator('[data-scene-mode="nervous"]')).toBeVisible();
+    await expect(page.locator('.face-name')).toHaveText('ヤス');
     await finishDialogue(page, 'reveal-next');
     await expect(page.getByTestId('reveal-next')).toContainText('なぜわかったんですかっ');
   });
 
-  test('shows a punchline on the same beat as Yasu finishes speaking', async ({ page }) => {
+  test('reveals the face clue with a two-beat punchline', async ({ page }) => {
     await page.goto('/');
     await reachInput(page);
     await page.getByRole('button', { name: 'ヤ', exact: true }).click();
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
     await advanceDialogue(page, 'reveal-next');
-    await advanceDialogue(page, 'ending-next');
     await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('punchline')).toHaveCount(0);
-    await expect(page.getByTestId('punchline')).toHaveText('動機がヤスッ！');
+    await expect(page.getByTestId('punchline').locator('span')).toHaveText('トリックが');
+    await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
     await expect(page.locator('[data-scene-mode="smiling"] .mouth')).toBeVisible();
   });
 
@@ -81,12 +82,33 @@ test.describe('犯人はヤス', () => {
     expect(errors).toEqual([]);
   });
 
+  test('finishes with the full-screen final comeback after the escort leaves', async ({ page }) => {
+    await page.goto('/');
+    await reachInput(page);
+    await page.getByRole('button', { name: 'ヤ', exact: true }).click();
+    await page.getByRole('button', { name: 'ス', exact: true }).click();
+    await page.getByTestId('decide').click();
+    await page.getByTestId('reveal-next').click();
+    await page.getByTestId('reveal-next').click();
+
+    for (const hasPunchline of [true, false, true, true, true]) {
+      await page.getByTestId('ending-next').click();
+      if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
+      await page.getByTestId('ending-next').click();
+    }
+
+    await expect(page.getByTestId('the-end')).toBeVisible();
+    await expect(page.getByTestId('end-punchline')).toContainText('ヤスッ！', { timeout: 10_000 });
+    await expect(page.getByTestId('end-punchline')).toContainText('と つっこんでください');
+  });
+
   test('keeps the complete kana controls inside a phone viewport', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize({ width: 360, height: 740 });
     await page.goto('/');
     await expect(page.getByTestId('game-screen')).toHaveCSS('width', '256px');
     await reachInput(page);
     await expect(page.getByRole('button', { name: 'ン', exact: true })).toBeVisible();
     await expect(page.getByTestId('decide')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   });
 });
