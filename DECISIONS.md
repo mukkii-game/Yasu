@@ -110,3 +110,20 @@ story transitions, `render.ts` owns DOM output, and `main.ts` owns input and
 generated Web Audio. Visuals are original CSS shapes rather than copied game
 assets, and all gameplay remains inside the portable Vite build already used by
 the central CI and Pages workflows.
+
+## 2026-08-31 — The presentation follows a 256×240 console budget
+
+The screen now uses the Famicom/NES PPU's 256×240 logical picture size, a fixed
+16-color subset of the hardware palette, flat CSS pixel shapes, and integer-only
+1×/2×/3× scaling. Dialogue data is stored as continuous `話者「本文」` strings
+and revealed one character at a time. Punchlines are attached to the Yasu line
+that triggers them and enter as fast overlay sprites, instead of becoming slow
+full-screen pages. The final scene has no music and any input returns to title.
+
+## 2026-08-31 — Third-party retro assets are local and redistributable
+
+DotGothic16 is bundled under SIL Open Font License 1.1. Three short effects from
+Juhani Junkala's Essential Retro Video Game Sound Effects Collection are bundled
+under CC0. Assets are served from the Pages build rather than fetched at runtime;
+their upstream locations and licenses are recorded in `CREDITS.md` and alongside
+the files in `public/`.

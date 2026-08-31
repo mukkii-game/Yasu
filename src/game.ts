@@ -3,17 +3,10 @@
 export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'ending' | 'end';
 
 export interface DialogueStep {
-  readonly kind: 'dialogue';
   readonly speaker: 'ヤス' | 'あなた';
-  readonly lines: readonly string[];
+  readonly text: string;
+  readonly punchline?: '動機がヤスッ！' | '報酬もヤスッ！' | '人間としてヤスッ！';
 }
-
-export interface CutinStep {
-  readonly kind: 'cutin';
-  readonly lines: readonly [string, string];
-}
-
-export type EndingStep = DialogueStep | CutinStep;
 
 export interface GameState {
   readonly phase: Phase;
@@ -23,20 +16,20 @@ export interface GameState {
 }
 
 export const INTRO: readonly DialogueStep[] = [
-  { kind: 'dialogue', speaker: 'ヤス', lines: ['ボス、これいじょうの', 'てがかりがありません。', 'めいきゅういりです。'] },
-  { kind: 'dialogue', speaker: 'ヤス', lines: ['えっ？　はんにんが', 'わかったんですか？'] },
-  { kind: 'dialogue', speaker: 'あなた', lines: ['はんにんは⋯'] },
+  { speaker: 'ヤス', text: 'ボス、これいじょうのてがかりがありません。めいきゅういりです。' },
+  { speaker: 'ヤス', text: 'えっ？　はんにんがわかったんですか？' },
+  { speaker: 'あなた', text: 'はんにんは⋯' },
 ];
 
-export const ENDING: readonly EndingStep[] = [
-  { kind: 'dialogue', speaker: 'あなた', lines: ['なぜこんなころしを・・・'] },
-  { kind: 'dialogue', speaker: 'ヤス', lines: ['いやー ラクしてもうかる', 'バイトだってネットでみて'] },
-  { kind: 'cutin', lines: ['動機が', 'ヤスッ！'] },
-  { kind: 'dialogue', speaker: 'ヤス', lines: ['でも もらったほうしゅうは', '3000えんでした'] },
-  { kind: 'cutin', lines: ['報酬も', 'ヤスッ！'] },
-  { kind: 'dialogue', speaker: 'ヤス', lines: ['まあ しょはんだし', 'そこそこででてこれますよね'] },
-  { kind: 'cutin', lines: ['人間として', 'ヤスッ！'] },
+export const ENDING: readonly DialogueStep[] = [
+  { speaker: 'あなた', text: 'なぜこんなころしを・・・' },
+  { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
+  { speaker: 'ヤス', text: 'でも もらったほうしゅうは3000えんでした', punchline: '報酬もヤスッ！' },
+  { speaker: 'ヤス', text: 'まあ しょはんだしそこそこででてこれますよね', punchline: '人間としてヤスッ！' },
 ];
+
+export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。' };
+export const REVEAL: DialogueStep = { speaker: 'ヤス', text: 'な、なぜわかったんですかっ！？' };
 
 export const KANA = [
   'ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ',
@@ -51,32 +44,27 @@ export function createGame(): GameState {
 }
 
 export function startGame(state: GameState): GameState {
-  if (state.phase !== 'title') return state;
-  return { ...state, phase: 'dialogue', introIndex: 0 };
+  return state.phase === 'title' ? { ...state, phase: 'dialogue', introIndex: 0 } : state;
 }
 
 export function advance(state: GameState): GameState {
   if (state.phase === 'dialogue') {
-    if (state.introIndex < INTRO.length - 1) {
-      return { ...state, introIndex: state.introIndex + 1 };
-    }
-    return { ...state, phase: 'input', answer: [] };
+    return state.introIndex < INTRO.length - 1
+      ? { ...state, introIndex: state.introIndex + 1 }
+      : { ...state, phase: 'input', answer: [] };
   }
   if (state.phase === 'wrong') return { ...state, phase: 'input' };
   if (state.phase === 'reveal') return { ...state, phase: 'ending', endingIndex: 0 };
   if (state.phase === 'ending') {
-    if (state.endingIndex < ENDING.length - 1) {
-      return { ...state, endingIndex: state.endingIndex + 1 };
-    }
-    return { ...state, phase: 'end' };
+    return state.endingIndex < ENDING.length - 1
+      ? { ...state, endingIndex: state.endingIndex + 1 }
+      : { ...state, phase: 'end' };
   }
   return state;
 }
 
 export function chooseKana(state: GameState, character: string): GameState {
-  if (state.phase !== 'input' || state.answer.length >= 2 || !KANA.includes(character as typeof KANA[number])) {
-    return state;
-  }
+  if (state.phase !== 'input' || state.answer.length >= 2 || !KANA.includes(character as typeof KANA[number])) return state;
   return { ...state, answer: [...state.answer, character] };
 }
 
@@ -101,6 +89,14 @@ export function restart(): GameState {
   return createGame();
 }
 
-export function isCutin(state: GameState): boolean {
-  return state.phase === 'ending' && ENDING[state.endingIndex]?.kind === 'cutin';
+export function currentDialogue(state: GameState): DialogueStep | undefined {
+  if (state.phase === 'dialogue') return INTRO[state.introIndex];
+  if (state.phase === 'wrong') return WRONG;
+  if (state.phase === 'reveal') return REVEAL;
+  if (state.phase === 'ending') return ENDING[state.endingIndex];
+  return undefined;
+}
+
+export function dialogueText(step: DialogueStep): string {
+  return `${step.speaker}「${step.text}」`;
 }

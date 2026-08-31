@@ -1,29 +1,43 @@
-import { ENDING, INTRO, KANA, isCutin, type DialogueStep, type GameState } from './game';
+import { KANA, currentDialogue, dialogueText, type GameState } from './game';
 
-function dialogue(step: DialogueStep, testId = 'dialogue-next'): string {
-  const lines = step.lines
-    .map((line, index) => `<span>${line}${index === step.lines.length - 1 ? '」' : ''}</span>`)
-    .join('');
-  return `<button class="dialogue-box screen-button" data-testid="${testId}" data-action="advance" type="button" aria-label="会話を進める">
-    <span class="dialogue-copy"><b>${step.speaker}</b>「${lines}</span><span class="next-mark" aria-hidden="true">▼</span>
+export interface RenderOptions {
+  readonly muted: boolean;
+  readonly visibleCharacters: number;
+}
+
+function escapeHtml(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+}
+
+function dialogue(state: GameState, visibleCharacters: number): string {
+  const step = currentDialogue(state);
+  if (!step) return '';
+  const fullText = dialogueText(step);
+  const visibleText = Array.from(fullText).slice(0, visibleCharacters).join('');
+  const complete = visibleText === fullText;
+  const testId = state.phase === 'wrong' ? 'wrong-next' : state.phase === 'reveal' ? 'reveal-next' : state.phase === 'ending' ? 'ending-next' : 'dialogue-next';
+  const punchline = complete && step.punchline
+    ? `<div class="sprite-punchline" data-testid="punchline">${escapeHtml(step.punchline)}</div>`
+    : '';
+  return `${punchline}<button class="dialogue-box screen-button" data-testid="${testId}" data-action="advance" type="button" aria-label="${escapeHtml(fullText)}">
+    <span class="dialogue-copy">${escapeHtml(visibleText)}<i class="type-cursor" aria-hidden="true"></i></span>
+    ${complete ? '<span class="next-mark" aria-hidden="true">▼</span>' : ''}
   </button>`;
 }
 
 function officeScene(revealed: boolean): string {
   return `<div class="scene office-scene${revealed ? ' revealed' : ''}" aria-hidden="true">
-    <div class="window"></div><div class="shelf"><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="person boss"><span class="head"></span><span class="body"></span></div>
-    <div class="person yasu"><span class="head"></span><span class="hair"></span><span class="body"></span></div>
-    <div class="desk"><span></span></div>${revealed ? '<div class="shock-lines"></div>' : ''}
+    <div class="window"><i></i></div><div class="filing"><i></i><i></i><i></i></div><div class="clock"></div>
+    <div class="person boss"><span class="head"></span><span class="hair"></span><span class="body"></span></div>
+    <div class="person yasu"><span class="head"></span><span class="hair"></span><span class="face"></span><span class="body"></span></div>
+    <div class="desk"><i></i></div>${revealed ? '<div class="shock-lines"></div>' : ''}
   </div>`;
 }
 
 function endScene(): string {
-  return `<div class="scene end-scene" aria-hidden="true">
-    <div class="night-city"></div><div class="police-car"><span></span><i></i></div>
-    <div class="watcher"><span></span><i></i></div>
-    <div class="walkers"><span class="officer"></span><span class="cuffed"></span></div><div class="road"></div>
-  </div>`;
+  return `<div class="end-city" aria-hidden="true"><i class="end-building a"></i><i class="end-building b"></i><i class="end-building c"></i><i class="end-road"></i></div>
+    <div class="watcher" aria-hidden="true"><i></i></div>
+    <div class="walkers" aria-hidden="true"><i class="officer"></i><i class="cuffed"></i><b class="handcuff"></b></div>`;
 }
 
 function kanaPanel(state: GameState): string {
@@ -31,44 +45,39 @@ function kanaPanel(state: GameState): string {
     `<button type="button" data-action="kana" data-kana="${character}" aria-label="${character}" ${state.answer.length >= 2 ? 'disabled' : ''}>${character}</button>`,
   ).join('');
   return `<section class="kana-panel" data-testid="kana-panel" aria-label="犯人の名前を二文字で選ぶ">
-    <div class="answer-line" data-testid="answer-slots"><span>はんにんは</span><span class="${state.answer[0] ? 'filled' : ''}">${state.answer[0] ?? '＿'}</span><span class="${state.answer[1] ? 'filled' : ''}">${state.answer[1] ?? '＿'}</span></div>
+    <div class="answer-line" data-testid="answer-slots"><span>はんにんは</span><b>${state.answer[0] ?? '＿'}</b><b>${state.answer[1] ?? '＿'}</b></div>
     <div class="kana-grid">${buttons}</div>
     <div class="input-controls">
       <button type="button" data-action="delete" ${state.answer.length ? '' : 'disabled'}>けす</button>
-      <button type="button" data-action="clear" ${state.answer.length ? '' : 'disabled'}>クリア</button>
+      <button type="button" data-action="clear" ${state.answer.length ? '' : 'disabled'}>ぜんぶけす</button>
       <button class="decide" data-testid="decide" type="button" data-action="submit" ${state.answer.length === 2 ? '' : 'disabled'}>けってい</button>
     </div>
   </section>`;
 }
 
-export function renderApp(root: HTMLElement, state: GameState, muted: boolean): void {
-  let content = '';
+function titleScreen(): string {
+  return `<button class="title-screen screen-button" data-testid="start-button" data-action="start" type="button" aria-label="犯人はヤス スタート">
+    <span class="title-city" aria-hidden="true">
+      <i class="building building-a"></i><i class="building building-b"></i><i class="building building-c"></i>
+      <i class="street"></i><i class="chalk-body"><b></b></i><i class="title-detective"></i><i class="sun"></i>
+    </span>
+    <span class="title-main">犯人はヤス</span><span class="press-start">▶ スタート</span>
+  </button>`;
+}
+
+export function renderApp(root: HTMLElement, state: GameState, options: RenderOptions): void {
+  let content: string;
   if (state.phase === 'title') {
-    content = `<button class="title-screen screen-button" data-testid="start-button" data-action="start" type="button">
-      <span class="title-kicker">8-BIT MYSTERY</span><span class="title-main"><small>はんにんは</small>犯人はヤス</span>
-      <span class="title-rule"></span><span class="press-start">▶ PRESS START</span>
-      <span class="parody-note">オリジナル・パロディ作品</span><span class="city-pixels" aria-hidden="true"></span>
-    </button>`;
+    content = titleScreen();
+  } else if (state.phase === 'end') {
+    content = `<button class="end-screen screen-button" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span></button>`;
   } else {
-    const scene = state.phase === 'end' ? endScene() : officeScene(state.phase === 'reveal' || state.phase === 'ending');
-    if (state.phase === 'dialogue') content = scene + dialogue(INTRO[state.introIndex]);
-    else if (state.phase === 'input') content = scene + kanaPanel(state);
-    else if (state.phase === 'wrong') content = scene + dialogue({ kind: 'dialogue', speaker: 'ヤス', lines: ['いや、ちがうでしょう。', 'もういちど かんがえてください。'] }, 'wrong-next');
-    else if (state.phase === 'reveal') content = scene + dialogue({ kind: 'dialogue', speaker: 'ヤス', lines: ['な、なぜわかったんですかっ！？'] }, 'reveal-next') + '<div class="screen-flash"></div>';
-    else if (state.phase === 'ending' && isCutin(state)) {
-      const step = ENDING[state.endingIndex];
-      if (step.kind === 'cutin') content = `${scene}<button class="cutin screen-button" data-testid="cutin" data-action="advance" type="button"><span>${step.lines[0]}</span><strong>${step.lines[1]}</strong><i>▶</i></button><div class="screen-flash"></div>`;
-    } else if (state.phase === 'ending') {
-      const step = ENDING[state.endingIndex];
-      if (step.kind === 'dialogue') content = scene + dialogue(step, 'ending-next');
-    } else if (state.phase === 'end') {
-      content = `${scene}<div class="end-copy"><p data-testid="the-end">THE END</p><span>ヤスは しずかに れんこうされた</span><button type="button" data-action="restart">もういちど</button></div>`;
-    }
-    content = `<header class="title-bar"><span>じけんファイル 01</span><span>さいしゅうすいり</span></header>${content}`;
+    const scene = officeScene(state.phase === 'reveal' || state.phase === 'ending');
+    content = state.phase === 'input' ? scene + kanaPanel(state) : scene + dialogue(state, options.visibleCharacters);
   }
 
-  root.innerHTML = `<section class="game-shell"><div class="game-screen phase-${state.phase}" data-testid="game-screen">
-    <button class="sound-toggle" type="button" data-action="sound" aria-label="${muted ? '音を出す' : '音を消す'}">${muted ? '♪×' : '♪'}</button>
-    ${content}<div class="scanlines" aria-hidden="true"></div>
-  </div><p class="outside-hint">タップ / クリック / ENTER　　♪ サウンドあり</p></section>`;
+  root.innerHTML = `<main class="game-shell"><div class="screen-frame"><section class="game-screen phase-${state.phase}" data-testid="game-screen">
+    ${state.phase !== 'title' && state.phase !== 'end' ? `<button class="sound-toggle" type="button" data-action="sound" aria-label="${options.muted ? '音を出す' : '音を消す'}">${options.muted ? '♪×' : '♪'}</button>` : ''}
+    ${content}
+  </section></div></main>`;
 }

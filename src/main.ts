@@ -1,4 +1,7 @@
-import { advance, chooseKana, clearAnswer, createGame, deleteKana, isCutin, restart, startGame, submitAnswer, type GameState } from './game';
+import {
+  advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText,
+  restart, startGame, submitAnswer, type GameState,
+} from './game';
 import { renderApp } from './render';
 import './style.css';
 
@@ -8,11 +11,19 @@ function required<T>(value: T | null, message: string): T {
 }
 
 const root = required(document.querySelector<HTMLElement>('#app'), 'Game root is missing');
+const sfx = {
+  select: new Audio(`${import.meta.env.BASE_URL}audio/select.wav`),
+  wrong: new Audio(`${import.meta.env.BASE_URL}audio/wrong.wav`),
+  shock: new Audio(`${import.meta.env.BASE_URL}audio/shock.wav`),
+};
+Object.values(sfx).forEach((sound) => { sound.preload = 'auto'; sound.volume = 0.32; });
 
 let state: GameState = createGame();
 let muted = false;
 let audio: AudioContext | undefined;
-let endingTimer: number | undefined;
+let visibleCharacters = Number.POSITIVE_INFINITY;
+let typeTimer: number | undefined;
+let punchlineSoundKey = '';
 
 function getAudio(): AudioContext | undefined {
   if (muted) return undefined;
@@ -21,12 +32,12 @@ function getAudio(): AudioContext | undefined {
   return audio;
 }
 
-function tone(frequency = 440, duration = 0.06, type: OscillatorType = 'square', volume = 0.045): void {
+function tone(frequency: number, duration = 0.025, volume = 0.022): void {
   const context = getAudio();
   if (!context) return;
   const oscillator = context.createOscillator();
   const gain = context.createGain();
-  oscillator.type = type;
+  oscillator.type = 'square';
   oscillator.frequency.value = frequency;
   gain.gain.setValueAtTime(volume, context.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + duration);
@@ -35,43 +46,92 @@ function tone(frequency = 440, duration = 0.06, type: OscillatorType = 'square',
   oscillator.stop(context.currentTime + duration);
 }
 
-function shock(): void {
-  const context = getAudio();
-  if (!context) return;
-  [0, 0.09, 0.18].forEach((offset, index) => {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = index === 2 ? 'sawtooth' : 'square';
-    oscillator.frequency.setValueAtTime(130 - index * 23, context.currentTime + offset);
-    oscillator.frequency.exponentialRampToValueAtTime(52, context.currentTime + offset + 0.25);
-    gain.gain.setValueAtTime(0.085, context.currentTime + offset);
-    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + offset + 0.3);
-    oscillator.connect(gain).connect(context.destination);
-    oscillator.start(context.currentTime + offset);
-    oscillator.stop(context.currentTime + offset + 0.31);
-  });
+function play(name: keyof typeof sfx): void {
+  if (muted) return;
+  const sound = sfx[name];
+  sound.currentTime = 0;
+  void sound.play().catch(() => undefined);
 }
 
-function syncEndingMusic(): void {
-  if (endingTimer !== undefined) window.clearInterval(endingTimer);
-  endingTimer = undefined;
-  if (state.phase !== 'end' || muted) return;
-  const notes = [262, 330, 392, 523, 392, 440, 494, 392];
-  let note = 0;
-  const play = () => { tone(notes[note++ % notes.length], 0.16, 'square', 0.025); };
-  play();
-  endingTimer = window.setInterval(play, 220);
+function flashScreen(): void {
+  root.classList.remove('reveal-flash');
+  void root.offsetWidth;
+  root.classList.add('reveal-flash');
+  window.setTimeout(() => root.classList.remove('reveal-flash'), 500);
 }
 
 function render(): void {
-  renderApp(root, state, muted);
-  syncEndingMusic();
+  renderApp(root, state, { muted, visibleCharacters });
 }
 
-function move(next: GameState, sound = 220): void {
-  state = next;
-  tone(sound, 0.04);
+function fullDialogueLength(): number {
+  const step = currentDialogue(state);
+  return step ? Array.from(dialogueText(step)).length : 0;
+}
+
+function punchlineKey(): string {
+  const step = currentDialogue(state);
+  return step?.punchline ? `${state.phase}:${state.endingIndex}:${step.punchline}` : '';
+}
+
+function finishTyping(): void {
+  if (typeTimer !== undefined) window.clearTimeout(typeTimer);
+  typeTimer = undefined;
+  visibleCharacters = fullDialogueLength();
   render();
+  const key = punchlineKey();
+  if (key && key !== punchlineSoundKey) {
+    punchlineSoundKey = key;
+    play('shock');
+  }
+}
+
+function beginTyping(): void {
+  if (typeTimer !== undefined) window.clearTimeout(typeTimer);
+  typeTimer = undefined;
+  const total = fullDialogueLength();
+  if (!total) {
+    visibleCharacters = Number.POSITIVE_INFINITY;
+    render();
+    return;
+  }
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    visibleCharacters = total;
+    render();
+    return;
+  }
+  visibleCharacters = 0;
+  render();
+  const tick = () => {
+    visibleCharacters += 1;
+    if (visibleCharacters % 2 === 0) tone(state.phase === 'ending' ? 294 : 330);
+    render();
+    if (visibleCharacters < total) typeTimer = window.setTimeout(tick, 38);
+    else {
+      typeTimer = undefined;
+      const key = punchlineKey();
+      if (key && key !== punchlineSoundKey) {
+        punchlineSoundKey = key;
+        play('shock');
+      }
+    }
+  };
+  typeTimer = window.setTimeout(tick, 38);
+}
+
+function setState(next: GameState, effect?: keyof typeof sfx): void {
+  if (next === state) return;
+  state = next;
+  if (effect) play(effect);
+  beginTyping();
+}
+
+function advanceOrFinish(): void {
+  if (currentDialogue(state) && visibleCharacters < fullDialogueLength()) {
+    finishTyping();
+    return;
+  }
+  setState(advance(state), 'select');
 }
 
 root.addEventListener('click', (event) => {
@@ -79,36 +139,41 @@ root.addEventListener('click', (event) => {
   if (!target) return;
   const action = target.dataset.action;
   if (action === 'sound') { muted = !muted; render(); return; }
-  if (action === 'start') {
-    tone(392, 0.08); window.setTimeout(() => tone(523, 0.12), 80);
-    state = startGame(state); render(); return;
-  }
-  if (action === 'kana') { move(chooseKana(state, target.dataset.kana ?? ''), 360 + state.answer.length * 90); return; }
-  if (action === 'delete') { move(deleteKana(state)); return; }
-  if (action === 'clear') { move(clearAnswer(state)); return; }
+  if (action === 'start') { getAudio(); setState(startGame(state), 'select'); return; }
+  if (action === 'kana') { setState(chooseKana(state, target.dataset.kana ?? '')); tone(420 + state.answer.length * 70); return; }
+  if (action === 'delete') { setState(deleteKana(state)); tone(180); return; }
+  if (action === 'clear') { setState(clearAnswer(state)); tone(140); return; }
   if (action === 'submit') {
     const next = submitAnswer(state);
-    if (next.phase === 'reveal') shock(); else if (next.phase === 'wrong') tone(92, 0.28, 'square', 0.06);
-    state = next; render(); return;
+    if (next === state) return;
+    state = next;
+    if (next.phase === 'reveal') { play('shock'); flashScreen(); }
+    else play('wrong');
+    beginTyping();
+    return;
   }
-  if (action === 'advance') {
-    const next = advance(state);
-    if (!isCutin(state) && isCutin(next)) shock();
-    move(next, isCutin(next) ? 110 : 220); return;
-  }
-  if (action === 'restart') { move(restart(), 196); }
+  if (action === 'advance') { advanceOrFinish(); return; }
+  if (action === 'restart') { setState(restart(), 'select'); }
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.repeat) return;
+  if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (state.phase === 'end') { event.preventDefault(); setState(restart(), 'select'); return; }
   if (state.phase === 'input' && event.key === 'Backspace') {
-    event.preventDefault(); move(deleteKana(state)); return;
+    event.preventDefault(); setState(deleteKana(state)); tone(180); return;
   }
   if (event.key !== 'Enter' && event.key !== ' ') return;
   event.preventDefault();
-  if (state.phase === 'title') { state = startGame(state); tone(392, 0.08); render(); }
-  else if (state.phase === 'input') { state = submitAnswer(state); if (state.phase === 'reveal') shock(); render(); }
-  else if (state.phase !== 'end') { move(advance(state)); }
+  if (state.phase === 'title') { getAudio(); setState(startGame(state), 'select'); }
+  else if (state.phase === 'input') {
+    const next = submitAnswer(state);
+    if (next !== state) {
+      state = next;
+      if (next.phase === 'reveal') { play('shock'); flashScreen(); }
+      else play('wrong');
+      beginTyping();
+    }
+  } else advanceOrFinish();
 });
 
 render();
