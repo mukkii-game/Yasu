@@ -158,3 +158,15 @@ white-on-pink sprite lettering, and a single fanfare on the payoff.
 The sunset road is lighter so both escort sprites remain readable. Their walk is
 now finite; once they leave, a full-screen 「ヤスッ！ と つっこんでください」
 closes the game with a deliberately oversized generated chord.
+
+## 2026-09-01 — The clue fills Yasu's face and the scene survives the last joke
+
+The vertical name is now the entire facial feature: two large white, navy-edged
+glyphs on orange, with no eyes or mouth and a thinner circular outline. Dialogue
+starts almost flush with the picture. Every setup-to-「ヤスッ！」 pause is the
+same slightly longer 700 ms.
+
+The setting sun is centered and half hidden by the horizon. The final joke no
+longer replaces the sunset with black: 「このゲームのつくり」 and
+「ヤスッ！！！！」 overlay the scene below `THE END`, hold for one second, and
+then fade away slowly.

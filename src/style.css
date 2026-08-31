@@ -72,16 +72,14 @@ button { border: 0; border-radius: 0; font: inherit; }
 .clock::before { content: ""; position: absolute; left: 9px; top: 3px; width: 2px; height: 8px; background: var(--black); }
 .clock::after { content: ""; position: absolute; left: 9px; top: 9px; width: 6px; height: 2px; background: var(--black); }
 .yasu { position: absolute; z-index: 3; left: 99px; bottom: 25px; width: 58px; height: 67px; }
-.yasu .head { position: absolute; z-index: 2; left: 6px; top: -47px; width: 46px; height: 46px; border: 3px solid var(--black); border-radius: 50%; background: var(--skin); }
+.yasu .head { position: absolute; z-index: 2; left: 6px; top: -47px; width: 46px; height: 46px; border: 2px solid var(--black); border-radius: 50%; background: var(--skin); }
 .yasu .body { position: absolute; inset: 0; background: var(--navy); }
 .yasu .body::before { content: ""; position: absolute; left: 25px; top: 0; width: 8px; height: 48px; background: var(--white); }
-.yasu .face-name { position: absolute; left: 15px; top: 3px; display: flex; flex-direction: column; color: var(--black); font-size: 11px; font-style: normal; font-weight: 900; line-height: 12px; }
+.yasu .face-name { position: absolute; inset: -1px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--white); font-size: 23px; font-style: normal; font-weight: 900; line-height: 21px; text-shadow: 2px 0 var(--navy), -2px 0 var(--navy), 0 2px var(--navy), 0 -2px var(--navy); }
 .yasu .face-name b { font: inherit; }
-.yasu .mouth { display: none; position: absolute; left: 12px; top: 29px; width: 16px; height: 8px; background: var(--black); }
 .nervous .yasu { animation: tremble 75ms steps(2) infinite; }
-.smiling .yasu .mouth { display: block; }
 
-.dialogue-box { position: absolute; z-index: 12; left: 0; right: 0; bottom: 0; width: 256px; height: 74px; padding: 8px 13px 5px; color: var(--white); background: var(--black); text-align: left; font-size: 14px; line-height: 20px; letter-spacing: 0; }
+.dialogue-box { position: absolute; z-index: 12; left: 0; right: 0; bottom: 0; width: 256px; height: 74px; padding: 2px 13px 5px; color: var(--white); background: var(--black); text-align: left; font-size: 14px; line-height: 20px; letter-spacing: 0; }
 .dialogue-copy { display: inline; }
 .next-mark { position: absolute; right: 7px; bottom: 3px; color: var(--white); animation: blink 700ms steps(1) infinite; }
 
@@ -106,7 +104,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 .end-screen { position: absolute; inset: 0; width: 256px; height: 240px; padding: 0; overflow: hidden; background: var(--orange); }
 .end-city { position: absolute; inset: 0; background: var(--orange); }
 .end-city::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 72px; background: var(--pink); }
-.setting-sun { position: absolute; z-index: 1; right: 27px; bottom: 48px; width: 28px; height: 28px; border-radius: 50%; background: var(--yellow); }
+.setting-sun { position: absolute; z-index: 1; left: 114px; bottom: 38px; width: 28px; height: 28px; border-radius: 50%; background: var(--yellow); }
 .end-building { position: absolute; z-index: 2; bottom: 52px; background: var(--gray); box-shadow: inset -5px 0 var(--silver); }
 .end-building::after { content: ""; position: absolute; left: 7px; top: 12px; width: 6px; height: 6px; background: var(--navy); box-shadow: 0 15px var(--navy), 0 30px var(--navy); }
 .end-building.a { left: 0; width: 41px; height: 83px; }
@@ -122,15 +120,16 @@ button { border: 0; border-radius: 0; font: inherit; }
 .walkers .cuffed-yasu::before { background: var(--gray); }
 .handcuff { position: absolute; left: 11px; top: 18px; width: 13px; height: 3px; border-left: 3px solid var(--silver); border-right: 3px solid var(--silver); background: var(--silver); }
 .the-end { position: absolute; z-index: 10; left: 0; right: 0; top: 25px; color: var(--white); font-size: 40px; font-weight: 900; line-height: 46px; letter-spacing: 3px; text-shadow: 1px 0 var(--white), -1px 0 var(--white), 0 1px var(--white), 0 -1px var(--white); }
-.end-final { position: absolute; z-index: 20; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--black); color: var(--white); }
-.end-final strong { font-size: 58px; font-weight: 900; line-height: 65px; text-shadow: 3px 0 var(--pink), -3px 0 var(--pink), 0 3px var(--pink), 0 -3px var(--pink), 4px 4px var(--red); animation: final-pop 180ms steps(3) both; }
-.end-final small { margin-top: 13px; font-size: 17px; line-height: 22px; }
+.end-final { position: absolute; z-index: 20; inset: 82px 0 0; display: flex; flex-direction: column; align-items: center; background: transparent; color: var(--white); animation: final-fade 2.4s linear 1s forwards; }
+.end-final strong { margin-top: 8px; font-size: 34px; font-weight: 900; line-height: 42px; letter-spacing: -2px; text-shadow: 3px 0 var(--pink), -3px 0 var(--pink), 0 3px var(--pink), 0 -3px var(--pink), 4px 4px var(--red); animation: final-pop 180ms steps(3) both; }
+.end-final small { font-size: 17px; font-weight: 900; line-height: 24px; text-shadow: 2px 0 var(--black), -2px 0 var(--black), 0 2px var(--black), 2px 2px var(--black); }
 
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink-border { 50% { border-color: var(--white); } }
 @keyframes tremble { 50% { transform: translate(2px, -1px); } }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes final-pop { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes final-fade { from { opacity: 1; } to { opacity: 0; } }
 @keyframes escort-walk { 0% { transform: translateX(0); } 48% { transform: translateX(-118px) translateY(-1px); } 50% { transform: translateX(-122px); } 100% { transform: translateX(-254px); } }
 
 @media (min-width: 540px) and (min-height: 520px) { :root { --scale: 2; } }
