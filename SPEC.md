@@ -15,25 +15,28 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
    - The player says 「はんにんは⋯」.
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
-5. 「ヤス」 triggers the reveal, a generated 8-bit shock sound, and flashing effects.
-6. The ending advances through Yasu's motive, reward, and attitude. Each receives a full-screen cut-in:
+5. 「ヤス」 triggers the reveal, a short 8-bit shock sound, and flashing effects.
+6. The ending advances through Yasu's motive, reward, and attitude. When each Yasu line finishes typing, its large colored punchline sprite immediately flies in from the right above the dialogue area; it does not consume a separate page:
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」
    - 「人間としてヤスッ！」
-7. The final screen shows a large `THE END`, Yasu being led away in handcuffs, the player watching in the foreground, a looping walk animation, and looping generated ending music.
-8. 「もういちど」 returns to a clean title state.
+7. The final screen shows a large `THE END`, Yasu being led away in handcuffs, and the player watching in the foreground. There is no ending music.
+8. Any tap, click, or unmodified key on `THE END` returns to a clean title state; no retry button is shown.
 
 ## Controls
 
-- Tap/click dialogue windows or press Enter/Space to advance.
+- Dialogue is typed one character at a time. Tap/click or Enter/Space completes the current line first, then advances on the next input.
 - Select katakana with the on-screen panel. `Backspace` removes the last selected character.
-- 「けす」 removes one character; 「クリア」 removes both; 「けってい」 submits two characters.
-- The `♪` control toggles generated sound effects and ending music.
+- 「けす」 removes one character; 「ぜんぶけす」 removes both; 「けってい」 submits two characters.
+- The `♪` control toggles short sound effects. The game has no background or ending music.
 
 ## Presentation
 
-- The game stays inside a responsive 4:3 display with scanlines, a limited navy/cream/gold/cyan/red palette, hard pixel-like edges, and CSS-built silhouettes.
-- Text remains readable and controls remain touch-sized on phones.
+- The logical display is exactly 256×240 pixels and scales only by integer factors (1×, 2×, 3×), preserving hard edges on phones and desktops.
+- The CSS palette is a fixed 16-color NES-inspired subset. Scenes use flat fills; each small character sprite uses no more than four visible colors.
+- The title shows a daytime city street, a chalk body outline, and an anonymous detective silhouette. The story scene is a normal daylight office rather than a night scene.
+- Japanese dialogue stays in one continuous `話者「本文」` string and only wraps naturally at the screen edge.
+- Text remains readable and all kana input remains available by touch on phones.
 - No copied screenshots, sprites, logos, characters, or music are used.
 - Animation is reduced when `prefers-reduced-motion` is enabled.
 
@@ -41,7 +44,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 
 - `src/game.ts` — pure immutable state transitions, dialogue data, and kana list.
 - `src/render.ts` — turns a `GameState` into accessible DOM markup.
-- `src/main.ts` — event delegation, keyboard/touch control, generated Web Audio effects, and rendering coordination.
-- `src/style.css` — the complete 8-bit visual presentation and responsive rules.
+- `src/main.ts` — event delegation, keyboard/touch control, character-by-character timing, pulse-wave text blips, licensed sound playback, and rendering coordination.
+- `src/style.css` — the complete 256×240 presentation, 16-color palette, CSS pixel scenes, and integer scaling rules.
 
 Pure gameplay transitions belong in `src/game.ts` and stay DOM-free so Vitest can cover the full route to the ending.

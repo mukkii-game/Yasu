@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ENDING, INTRO, advance, chooseKana, clearAnswer, createGame, deleteKana, isCutin, restart, startGame, submitAnswer } from './game';
+import { ENDING, INTRO, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
 
 function reachInput() {
   let state = startGame(createGame());
@@ -50,17 +50,22 @@ describe('game flow', () => {
     expect(submitAnswer(one)).toBe(one);
   });
 
-  it('runs all ending beats and exposes each cut-in', () => {
+  it('keeps each punchline on the dialogue beat that triggers it', () => {
     let state = reachInput();
     state = chooseKana(chooseKana(state, 'ヤ'), 'ス');
     state = advance(submitAnswer(state));
-    const cutins: string[] = [];
+    const punchlines: string[] = [];
     for (let index = 0; index < ENDING.length; index += 1) {
-      if (isCutin(state)) cutins.push(ENDING[state.endingIndex].lines.join(''));
+      const step = currentDialogue(state);
+      if (step?.punchline) punchlines.push(step.punchline);
       state = advance(state);
     }
-    expect(cutins).toEqual(['動機がヤスッ！', '報酬もヤスッ！', '人間としてヤスッ！']);
+    expect(punchlines).toEqual(['動機がヤスッ！', '報酬もヤスッ！', '人間としてヤスッ！']);
     expect(state.phase).toBe('end');
+  });
+
+  it('formats the speaker and quote on one continuous line', () => {
+    expect(dialogueText(INTRO[0])).toBe('ヤス「ボス、これいじょうのてがかりがありません。めいきゅういりです。」');
   });
 
   it('restart always returns to a clean title state', () => {
