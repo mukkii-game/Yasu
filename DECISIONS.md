@@ -127,3 +127,11 @@ Juhani Junkala's Essential Retro Video Game Sound Effects Collection are bundled
 under CC0. Assets are served from the Pages build rather than fetched at runtime;
 their upstream locations and licenses are recorded in `CREDITS.md` and alongside
 the files in `public/`.
+
+## 2026-08-31 — The culprit reveal breaks the normal room palette
+
+The correct answer now creates one abrupt horror beat before the comedy resumes:
+the daylight room switches to cold cyan/navy, Yasu's eyes and pose harden, the
+other figure becomes a silhouette, alarm shapes jitter, and a 720 ms flash fires.
+The sting layers the licensed impact with generated pulse, triangle, and noise
+voices, matching the NES APU vocabulary without using music or borrowed audio.

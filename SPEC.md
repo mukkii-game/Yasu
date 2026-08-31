@@ -15,7 +15,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
    - The player says 「はんにんは⋯」.
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
-5. 「ヤス」 triggers the reveal, a short 8-bit shock sound, and flashing effects.
+5. 「ヤス」 triggers the reveal. The daylight room snaps to a cold cyan/navy palette, the boss falls into silhouette, Yasu grows larger with sharply angled red eyes and a rigid expression, alarm streaks appear, the screen jolts and flashes, and a dissonant pulse/triangle/noise sting plays. The effect remains through Yasu's shocked reply, then the comedy returns to the normal room palette.
 6. The ending advances through Yasu's motive, reward, and attitude. When each Yasu line finishes typing, its large colored punchline sprite immediately flies in from the right above the dialogue area; it does not consume a separate page:
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」

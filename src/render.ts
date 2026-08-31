@@ -25,12 +25,12 @@ function dialogue(state: GameState, visibleCharacters: number): string {
   </button>`;
 }
 
-function officeScene(revealed: boolean): string {
-  return `<div class="scene office-scene${revealed ? ' revealed' : ''}" aria-hidden="true">
+function officeScene(mode: 'normal' | 'shock' | 'after'): string {
+  return `<div class="scene office-scene ${mode === 'shock' ? 'shock-reveal' : mode === 'after' ? 'after-reveal' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div><div class="filing"><i></i><i></i><i></i></div><div class="clock"></div>
     <div class="person boss"><span class="head"></span><span class="hair"></span><span class="body"></span></div>
     <div class="person yasu"><span class="head"></span><span class="hair"></span><span class="face"></span><span class="body"></span></div>
-    <div class="desk"><i></i></div>${revealed ? '<div class="shock-lines"></div>' : ''}
+    <div class="desk"><i></i></div>${mode === 'shock' ? '<div class="shock-lines"></div><div class="dread-shadow"></div><div class="alarm-streaks"></div>' : ''}
   </div>`;
 }
 
@@ -72,7 +72,7 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
   } else if (state.phase === 'end') {
     content = `<button class="end-screen screen-button" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span></button>`;
   } else {
-    const scene = officeScene(state.phase === 'reveal' || state.phase === 'ending');
+    const scene = officeScene(state.phase === 'reveal' ? 'shock' : state.phase === 'ending' ? 'after' : 'normal');
     content = state.phase === 'input' ? scene + kanaPanel(state) : scene + dialogue(state, options.visibleCharacters);
   }
 
