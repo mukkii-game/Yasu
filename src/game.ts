@@ -1,153 +1,106 @@
-/**
- * Pure game logic for the Yasu paddle demo.
- *
- * Nothing in this module touches the DOM or the canvas: every function is a
- * deterministic transformation of `GameState`, which is what makes the rules
- * testable under Vitest in a plain Node environment.
- *
- * See SPEC.md for the behaviour these functions are expected to implement.
- */
+/** Pure state transitions for the two-character mystery game. */
 
-export const FIELD = {
-  width: 480,
-  height: 320,
-} as const;
+export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'ending' | 'end';
 
-export const PADDLE = {
-  width: 96,
-  height: 12,
-  /** Distance from the paddle's top edge to the bottom of the field. */
-  bottomMargin: 16,
-  /** Horizontal distance travelled per movement step, in pixels. */
-  speed: 28,
-} as const;
-
-export const BALL = {
-  radius: 8,
-  initialSpeedX: 150,
-  initialSpeedY: -180,
-} as const;
-
-export type GameStatus = 'playing' | 'over';
-
-export interface Vec {
-  x: number;
-  y: number;
+export interface DialogueStep {
+  readonly kind: 'dialogue';
+  readonly speaker: 'ヤス' | 'あなた';
+  readonly lines: readonly string[];
 }
 
-export interface Ball {
-  pos: Vec;
-  vel: Vec;
+export interface CutinStep {
+  readonly kind: 'cutin';
+  readonly lines: readonly [string, string];
 }
+
+export type EndingStep = DialogueStep | CutinStep;
 
 export interface GameState {
-  ball: Ball;
-  /** X coordinate of the paddle's left edge. */
-  paddleX: number;
-  score: number;
-  /** Highest score reached so far; survives a restart. */
-  bestScore: number;
-  status: GameStatus;
+  readonly phase: Phase;
+  readonly introIndex: number;
+  readonly endingIndex: number;
+  readonly answer: readonly string[];
 }
 
-/** Y coordinate of the paddle's top edge. Constant for the whole game. */
-export const PADDLE_TOP = FIELD.height - PADDLE.bottomMargin - PADDLE.height;
+export const INTRO: readonly DialogueStep[] = [
+  { kind: 'dialogue', speaker: 'ヤス', lines: ['ボス、これいじょうの', 'てがかりがありません。', 'めいきゅういりです。'] },
+  { kind: 'dialogue', speaker: 'ヤス', lines: ['えっ？　はんにんが', 'わかったんですか？'] },
+  { kind: 'dialogue', speaker: 'あなた', lines: ['はんにんは⋯'] },
+];
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
-}
+export const ENDING: readonly EndingStep[] = [
+  { kind: 'dialogue', speaker: 'あなた', lines: ['なぜこんなころしを・・・'] },
+  { kind: 'dialogue', speaker: 'ヤス', lines: ['いやー ラクしてもうかる', 'バイトだってネットでみて'] },
+  { kind: 'cutin', lines: ['動機が', 'ヤスッ！'] },
+  { kind: 'dialogue', speaker: 'ヤス', lines: ['でも もらったほうしゅうは', '3000えんでした'] },
+  { kind: 'cutin', lines: ['報酬も', 'ヤスッ！'] },
+  { kind: 'dialogue', speaker: 'ヤス', lines: ['まあ しょはんだし', 'そこそこででてこれますよね'] },
+  { kind: 'cutin', lines: ['人間として', 'ヤスッ！'] },
+];
+
+export const KANA = [
+  'ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ',
+  'サ', 'シ', 'ス', 'セ', 'ソ', 'タ', 'チ', 'ツ', 'テ', 'ト',
+  'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',
+  'マ', 'ミ', 'ム', 'メ', 'モ', 'ヤ', 'ユ', 'ヨ', 'ラ', 'リ',
+  'ル', 'レ', 'ロ', 'ワ', 'ヲ', 'ン',
+] as const;
 
 export function createGame(): GameState {
-  return {
-    ball: {
-      pos: { x: FIELD.width / 2, y: FIELD.height / 2 },
-      vel: { x: BALL.initialSpeedX, y: BALL.initialSpeedY },
-    },
-    paddleX: (FIELD.width - PADDLE.width) / 2,
-    score: 0,
-    bestScore: 0,
-    status: 'playing',
-  };
+  return { phase: 'title', introIndex: 0, endingIndex: 0, answer: [] };
 }
 
-/**
- * Starts a new round, carrying the best score across. Restarting is not
- * supposed to erase what the player has already achieved.
- */
-export function restart(state: GameState): GameState {
-  return { ...createGame(), bestScore: state.bestScore };
+export function startGame(state: GameState): GameState {
+  if (state.phase !== 'title') return state;
+  return { ...state, phase: 'dialogue', introIndex: 0 };
 }
 
-/**
- * Moves the paddle by `direction` steps (-1 = left, +1 = right), keeping it
- * inside the field. Returns a new state; the input is never mutated.
- */
-export function movePaddle(state: GameState, direction: number): GameState {
-  const paddleX = clamp(
-    state.paddleX + direction * PADDLE.speed,
-    0,
-    FIELD.width - PADDLE.width,
-  );
-  return { ...state, paddleX };
-}
-
-/** Moves the paddle so that it is centred on `x`, keeping it inside the field. */
-export function setPaddleCenter(state: GameState, x: number): GameState {
-  const paddleX = clamp(x - PADDLE.width / 2, 0, FIELD.width - PADDLE.width);
-  return { ...state, paddleX };
-}
-
-/**
- * Advances the simulation by `dt` seconds.
- *
- * A finished game is a fixed point: stepping it returns the same state.
- */
-export function step(state: GameState, dt: number): GameState {
-  if (state.status === 'over') return state;
-
-  let { x, y } = state.ball.pos;
-  let { x: vx, y: vy } = state.ball.vel;
-  let score = state.score;
-
-  x += vx * dt;
-  y += vy * dt;
-
-  // Side walls.
-  if (x - BALL.radius < 0) {
-    x = BALL.radius;
-    vx = Math.abs(vx);
-  } else if (x + BALL.radius > FIELD.width) {
-    x = FIELD.width - BALL.radius;
-    vx = -Math.abs(vx);
-  }
-
-  // Ceiling.
-  if (y - BALL.radius < 0) {
-    y = BALL.radius;
-    vy = Math.abs(vy);
-  }
-
-  // Paddle: only a downward-moving ball can be caught.
-  const reachedPaddle = y + BALL.radius >= PADDLE_TOP;
-  if (reachedPaddle && vy > 0) {
-    const overlapsPaddle =
-      x >= state.paddleX - BALL.radius &&
-      x <= state.paddleX + PADDLE.width + BALL.radius;
-    if (overlapsPaddle) {
-      y = PADDLE_TOP - BALL.radius;
-      vy = -Math.abs(vy);
-      score += 1;
+export function advance(state: GameState): GameState {
+  if (state.phase === 'dialogue') {
+    if (state.introIndex < INTRO.length - 1) {
+      return { ...state, introIndex: state.introIndex + 1 };
     }
+    return { ...state, phase: 'input', answer: [] };
   }
+  if (state.phase === 'wrong') return { ...state, phase: 'input' };
+  if (state.phase === 'reveal') return { ...state, phase: 'ending', endingIndex: 0 };
+  if (state.phase === 'ending') {
+    if (state.endingIndex < ENDING.length - 1) {
+      return { ...state, endingIndex: state.endingIndex + 1 };
+    }
+    return { ...state, phase: 'end' };
+  }
+  return state;
+}
 
-  // Missed: the ball fell past the bottom of the field.
-  const status: GameStatus = y - BALL.radius > FIELD.height ? 'over' : 'playing';
+export function chooseKana(state: GameState, character: string): GameState {
+  if (state.phase !== 'input' || state.answer.length >= 2 || !KANA.includes(character as typeof KANA[number])) {
+    return state;
+  }
+  return { ...state, answer: [...state.answer, character] };
+}
 
-  return {
-    ball: { pos: { x, y }, vel: { x: vx, y: vy } },
-    paddleX: state.paddleX,
-    score,
-    bestScore: Math.max(state.bestScore, score),
-    status,
-  };
+export function deleteKana(state: GameState): GameState {
+  if (state.phase !== 'input' || state.answer.length === 0) return state;
+  return { ...state, answer: state.answer.slice(0, -1) };
+}
+
+export function clearAnswer(state: GameState): GameState {
+  if (state.phase !== 'input' || state.answer.length === 0) return state;
+  return { ...state, answer: [] };
+}
+
+export function submitAnswer(state: GameState): GameState {
+  if (state.phase !== 'input' || state.answer.length !== 2) return state;
+  return state.answer.join('') === 'ヤス'
+    ? { ...state, phase: 'reveal' }
+    : { ...state, phase: 'wrong', answer: [] };
+}
+
+export function restart(): GameState {
+  return createGame();
+}
+
+export function isCutin(state: GameState): boolean {
+  return state.phase === 'ending' && ENDING[state.endingIndex]?.kind === 'cutin';
 }

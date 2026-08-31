@@ -1,42 +1,22 @@
-# Yasu
+# 犯人はヤス
 
-A small Canvas game built with Vite + TypeScript, developed by AI agents from
-both Claude Code Cloud and OpenAI Codex Cloud.
+誰もが知っている答えを2文字で入力する、短編8ビット推理アドベンチャーです。
 
-The game is deliberately minimal: this repository exists mainly as the standard
-web-app template and as a live check that the central CI in
-[`mukkii-game/ai-dev-infra`](https://github.com/mukkii-game/ai-dev-infra) works
-end to end.
+## 遊び方
 
-## Getting started
+- 画面のタップ／クリック、または Enter / Space で会話を進めます。
+- 50音パネルから犯人の名前を2文字で選び、「けってい」を押します。
+- 右上の `♪` で効果音を切り替えられます。
+
+## 開発
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Move the paddle with the arrow keys or the pointer, and press `R` to restart.
+品質確認には `npm run typecheck`、`npm test`、`npm run build`、`npm run test:e2e` を使います。`main` に反映されたビルドは、リポジトリ既存のワークフローからGitHub Pagesへ公開されます。
 
-## Commands
+## 権利表記
 
-| command | what it does |
-| --- | --- |
-| `npm run dev` | Vite dev server |
-| `npm run build` | production build into `dist/` |
-| `npm run preview` | serve the built bundle |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest unit tests |
-| `npm run test:e2e` | Playwright browser tests (run `npx playwright install chromium` once) |
-
-## CI
-
-`.github/workflows/ci.yml` runs on pull requests and on pushes to `main`. It
-calls the central reusable workflow
-`mukkii-game/ai-dev-infra/.github/workflows/verify-web.yml@v1`, which installs
-with `npm ci` and runs typecheck, unit tests, build, and Playwright. The CI
-steps are not duplicated here.
-
-## For AI agents
-
-See [`AGENTS.md`](AGENTS.md) — plus [`SPEC.md`](SPEC.md) for behaviour and
-[`DECISIONS.md`](DECISIONS.md) for design decisions.
+本作はオリジナルのパロディ作品です。特定の既存ゲームの画像・音源・ロゴ・キャラクター素材は使用していません。

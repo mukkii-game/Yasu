@@ -1,65 +1,27 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Yasu</title>
-    <style>
-      :root {
-        color-scheme: dark;
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      }
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        background: #0b0e14;
-        color: #e2e8f0;
-      }
-      canvas {
-        border-radius: 8px;
-        box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
-        touch-action: none;
-        max-width: 100%;
-      }
-      .best-score {
-        margin: 0;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: 0.02em;
-      }
-      .best-score .label,
-      .hud .label {
-        color: #94a3b8;
-      }
-      .hud {
-        display: flex;
-        gap: 16px;
-        font-variant-numeric: tabular-nums;
-      }
-      .hint {
-        margin: 0;
-        font-size: 13px;
-        color: #94a3b8;
-      }
-    </style>
+    <meta name="description" content="2文字で終わる、8ビット推理アドベンチャー。" />
+    <meta name="theme-color" content="#0b1630" />
+    <meta property="og:title" content="犯人はヤス" />
+    <meta property="og:description" content="2文字で終わる、8ビット推理アドベンチャー。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:url" content="https://mukkii-game.github.io/Yasu/" />
+    <meta property="og:image" content="https://mukkii-game.github.io/Yasu/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="犯人はヤス — 2文字で終わる推理" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="犯人はヤス" />
+    <meta name="twitter:description" content="2文字で終わる、8ビット推理アドベンチャー。" />
+    <meta name="twitter:image" content="https://mukkii-game.github.io/Yasu/og.png" />
+    <title>犯人はヤス | 8ビット推理ゲーム</title>
   </head>
   <body>
-    <h1 data-testid="title">Yasu</h1>
-    <p class="best-score">
-      <span class="label">Best Score:</span>
-      <strong data-testid="best-score">0</strong>
-    </p>
-    <canvas data-testid="game-canvas" width="480" height="320"></canvas>
-    <div class="hud">
-      <span><span class="label">Score:</span> <strong data-testid="score">0</strong></span>
-      <span><span class="label">Status:</span> <strong data-testid="status">playing</strong></span>
-    </div>
-    <p class="hint">Move with ← → or the pointer. Press R to restart.</p>
+    <main id="app"></main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
