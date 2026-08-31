@@ -170,3 +170,16 @@ The setting sun is centered and half hidden by the horizon. The final joke no
 longer replaces the sunset with black: 「このゲームのつくり」 and
 「ヤスッ！！！！」 overlay the scene below `THE END`, hold for one second, and
 then fade away slowly.
+
+## 2026-09-01 — Dialogue and sound now share one strict adventure rhythm
+
+Every dialogue copy block is pinned to the top of its black panel, and its ▼ is
+inline after the closing quote rather than floating in a corner. Kana selection
+and confirmation gain distinct generated square-wave clicks. Punchline setups
+wait an additional half-second and now have their own brief lead sound before
+the existing payoff jingle.
+
+The face lettering is slightly smaller, unoutlined white, with a two-pixel gap.
+Punchline outlines shrink to one logical pixel. The last wording becomes
+「このゲームじたいが⋯　ヤスッ！！！！」; it remains visible while the whole
+sunset screen fades, after which the title returns automatically.
