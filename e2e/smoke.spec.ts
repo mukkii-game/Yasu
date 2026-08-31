@@ -1,10 +1,19 @@
 import { expect, test } from '@playwright/test';
 
+async function finishDialogue(page: import('@playwright/test').Page, testId: string) {
+  const box = page.getByTestId(testId);
+  await expect(box.locator('.next-mark')).toBeVisible({ timeout: 10_000 });
+}
+
+async function advanceDialogue(page: import('@playwright/test').Page, testId: string) {
+  await finishDialogue(page, testId);
+  await page.getByTestId(testId).click();
+}
+
 async function reachInput(page: import('@playwright/test').Page) {
   await page.getByTestId('start-button').click();
   for (let index = 0; index < 3; index += 1) {
-    await page.getByTestId('dialogue-next').click();
-    await page.getByTestId('dialogue-next').click();
+    await advanceDialogue(page, 'dialogue-next');
   }
   await expect(page.getByTestId('kana-panel')).toBeVisible();
 }
@@ -23,7 +32,7 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ア', exact: true }).click();
     await page.getByRole('button', { name: 'イ', exact: true }).click();
     await page.getByTestId('decide').click();
-    await page.getByTestId('wrong-next').click();
+    await finishDialogue(page, 'wrong-next');
     await expect(page.getByTestId('wrong-next')).toContainText('ちがうでしょう');
     await page.getByTestId('wrong-next').click();
     await expect(page.getByTestId('kana-panel')).toBeVisible();
@@ -36,7 +45,7 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await expect(page.getByTestId('answer-slots')).toContainText('ヤス');
     await page.getByTestId('decide').click();
-    await page.getByTestId('reveal-next').click();
+    await finishDialogue(page, 'reveal-next');
     await expect(page.getByTestId('reveal-next')).toContainText('なぜわかったんですかっ');
   });
 
@@ -46,11 +55,9 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ヤ', exact: true }).click();
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
-    await page.getByTestId('reveal-next').click();
-    await page.getByTestId('reveal-next').click();
-    await page.getByTestId('ending-next').click();
-    await page.getByTestId('ending-next').click();
-    await page.getByTestId('ending-next').click();
+    await advanceDialogue(page, 'reveal-next');
+    await advanceDialogue(page, 'ending-next');
+    await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('punchline')).toHaveText('動機がヤスッ！');
   });
 
