@@ -26,6 +26,14 @@ test.describe('犯人はヤス', () => {
     await expect(page.getByTestId('answer-slots')).toContainText('＿＿');
   });
 
+  test('advances dialogue when the room itself is clicked', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('start-button').click();
+    await finishDialogue(page, 'dialogue-next');
+    await page.locator('.office-scene').click();
+    await expect(page.getByTestId('dialogue-next')).toContainText('えっ？');
+  });
+
   test('rejects a wrong name and allows another try', async ({ page }) => {
     await page.goto('/');
     await reachInput(page);
@@ -45,7 +53,7 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await expect(page.getByTestId('answer-slots')).toContainText('ヤス');
     await page.getByTestId('decide').click();
-    await expect(page.locator('[data-scene-mode="shock"]')).toBeVisible();
+    await expect(page.locator('[data-scene-mode="nervous"]')).toBeVisible();
     await finishDialogue(page, 'reveal-next');
     await expect(page.getByTestId('reveal-next')).toContainText('なぜわかったんですかっ');
   });
@@ -59,7 +67,9 @@ test.describe('犯人はヤス', () => {
     await advanceDialogue(page, 'reveal-next');
     await advanceDialogue(page, 'ending-next');
     await finishDialogue(page, 'ending-next');
+    await expect(page.getByTestId('punchline')).toHaveCount(0);
     await expect(page.getByTestId('punchline')).toHaveText('動機がヤスッ！');
+    await expect(page.locator('[data-scene-mode="smiling"] .mouth')).toBeVisible();
   });
 
   test('boots without console errors', async ({ page }) => {

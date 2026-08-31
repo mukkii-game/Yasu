@@ -22,10 +22,10 @@ export const INTRO: readonly DialogueStep[] = [
 ];
 
 export const ENDING: readonly DialogueStep[] = [
-  { speaker: 'あなた', text: 'なぜこんなころしを・・・' },
+  { speaker: 'あなた', text: 'ヤス、なぜこんなころしをしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でも もらったほうしゅうは3000えんでした', punchline: '報酬もヤスッ！' },
-  { speaker: 'ヤス', text: 'まあ しょはんだしそこそこででてこれますよね', punchline: '人間としてヤスッ！' },
+  { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ', punchline: '人間としてヤスッ！' },
 ];
 
 export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。' };

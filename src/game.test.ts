@@ -66,6 +66,7 @@ describe('game flow', () => {
 
   it('formats the speaker and quote on one continuous line', () => {
     expect(dialogueText(INTRO[0])).toBe('ヤス「ボス、これいじょうのてがかりがありません。めいきゅういりです。」');
+    expect(dialogueText(ENDING[0])).toBe('あなた「ヤス、なぜこんなころしをしたんだ」');
   });
 
   it('restart always returns to a clean title state', () => {

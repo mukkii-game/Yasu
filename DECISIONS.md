@@ -135,3 +135,13 @@ the daylight room switches to cold cyan/navy, Yasu's eyes and pose harden, the
 other figure becomes a silhouette, alarm shapes jitter, and a 720 ms flash fires.
 The sting layers the licensed impact with generated pulse, triangle, and noise
 voices, matching the NES APU vocabulary without using music or borrowed audio.
+
+## 2026-08-31 — Restraint replaces the horror reveal
+
+The later direction deliberately removes the palette swap, facial detail,
+foreground furniture, navigation sounds, wrong-answer sound, and screen effects.
+One centered faceless Yasu carries the whole story: he trembles after the answer,
+then stops and opens a simple smiling mouth when the first punchline appears.
+Punchlines wait 500 ms, use large unboxed text, and share one short CC0 comic
+fanfare. The ending contrasts the blue title with a gray-building sunset and a
+small escort pair moving right-to-left, with no foreground protagonist.
