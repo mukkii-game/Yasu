@@ -28,10 +28,10 @@ function dialogue(state: GameState, options: RenderOptions): string {
   </button>`;
 }
 
-function officeScene(mode: 'plain' | 'nervous' | 'smiling'): string {
+function officeScene(mode: 'plain' | 'nervous' | 'settled'): string {
   return `<div class="scene office-scene ${mode}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div><div class="filing"><i></i><i></i><i></i></div><div class="clock"></div>
-    <div class="yasu"><span class="head"><i class="face-name"><b>ヤ</b><b>ス</b></i><i class="mouth"></i></span><span class="body"></span></div>
+    <div class="yasu"><span class="head"><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"></span></div>
   </div>`;
 }
 
@@ -70,12 +70,12 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     content = titleScreen();
   } else if (state.phase === 'end') {
     const finalPunchline = options.endPunchlineVisible
-      ? '<span class="end-final" data-testid="end-punchline"><strong>ヤスッ！</strong><small>と つっこんでください</small></span>'
+      ? '<span class="end-final" data-testid="end-punchline"><small>このゲームのつくり</small><strong>ヤスッ！！！！</strong></span>'
       : '';
     content = `<button class="end-screen screen-button" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
-    const sceneMode = comedyMode ? 'smiling' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
+    const sceneMode = comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
     const scene = officeScene(sceneMode);
     content = state.phase === 'input' ? scene + kanaPanel(state) : scene + dialogue(state, options);
   }

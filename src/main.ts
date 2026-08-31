@@ -125,7 +125,7 @@ function schedulePunchline(): void {
       punchlineStage = 2;
       playJingle();
       render();
-    }, 550);
+    }, 700);
   }, 750);
 }
 

@@ -16,12 +16,12 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
 5. 「ヤス」 triggers the reveal. The room and faceless front-facing Yasu do not change color; Yasu only trembles rapidly while a quiet high-pitched two-hit-and-chord sting plays.
-6. After Yasu asks why the player knows, the player answers `あなた「かおにかいてあるから」`. The ending then advances through the accusation, motive, reward, and attitude. Every punchline uses the same two-beat rhythm: its setup waits 750 ms after the line, then the larger 「ヤスッ！」 follows 550 ms later with a short comic fanfare. Both are thick white text with a pink outline and no box:
+6. After Yasu asks why the player knows, the player answers `あなた「かおにかいてあるから」`. The ending then advances through the accusation, motive, reward, and attitude. Every punchline uses the same two-beat rhythm: its setup waits 750 ms after the line, then the larger 「ヤスッ！」 follows 700 ms later with a short comic fanfare. Both are thick white text with a pink outline and no box:
    - 「トリックが」 → 「ヤスッ！」
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」
    - 「人間として」 → 「ヤスッ！」
-7. The final screen is a sunset city with a lighter road. A small anonymous escort and the handcuffed detective Yasu walk slowly from right to left. There is no foreground player. `THE END` is thick plain white text and there is no ending music. After both figures leave, a full-screen 「ヤスッ！ と つっこんでください」 appears with an exaggerated final sting.
+7. The final screen is a sunset city with a lighter road and a centered sun half below the horizon. A small anonymous escort and the handcuffed detective Yasu walk slowly from right to left. There is no foreground player. `THE END` is thick plain white text and there is no ending music. After both figures leave, 「このゲームのつくり」「ヤスッ！！！！」 overlays the still-visible scene with an exaggerated final sting, holds for one second, then fades slowly.
 8. Any tap, click, or unmodified key on `THE END` returns to a clean title state; no retry button is shown.
 
 ## Controls
@@ -36,8 +36,9 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 - The logical display is exactly 256×240 pixels and scales only by integer factors (1×, 2×, 3×), preserving hard edges on phones and desktops.
 - The CSS palette is a fixed 16-color NES-inspired subset. Scenes use flat fills; each small character sprite uses no more than four visible colors.
 - The title vignette contains only buildings, sky, and a straight sea horizon. It has no road, body outline, or person.
-- The story scene contains only one front-facing Yasu: a larger round blank head marked vertically 「ヤ」「ス」 and a square upper body. There is no boss, foreground player, or desk. Yasu stops trembling and gains only an open smiling mouth once the first punchline appears.
+- The story scene contains only one front-facing Yasu: a larger round blank head filled by thick white 「ヤ」「ス」 lettering and a square upper body. The face has no eyes or mouth. There is no boss, foreground player, or desk. Yasu stops trembling once the first punchline appears.
 - Japanese dialogue stays in one continuous `話者「本文」` string and only wraps naturally at the screen edge.
+- Dialogue begins two pixels below the scene boundary so the text sits directly beneath the picture.
 - Text remains readable and all kana input remains available by touch on phones.
 - No copied screenshots, sprites, logos, characters, or music are used.
 - Animation is reduced when `prefers-reduced-motion` is enabled.

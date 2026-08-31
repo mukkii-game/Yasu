@@ -70,7 +70,7 @@ test.describe('犯人はヤス', () => {
     await expect(page.getByTestId('punchline')).toHaveCount(0);
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('トリックが');
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
-    await expect(page.locator('[data-scene-mode="smiling"] .mouth')).toBeVisible();
+    await expect(page.locator('[data-scene-mode="settled"]')).toBeVisible();
   });
 
   test('boots without console errors', async ({ page }) => {
@@ -82,7 +82,7 @@ test.describe('犯人はヤス', () => {
     expect(errors).toEqual([]);
   });
 
-  test('finishes with the full-screen final comeback after the escort leaves', async ({ page }) => {
+  test('overlays and fades the final comeback after the escort leaves', async ({ page }) => {
     await page.goto('/');
     await reachInput(page);
     await page.getByRole('button', { name: 'ヤ', exact: true }).click();
@@ -98,8 +98,10 @@ test.describe('犯人はヤス', () => {
     }
 
     await expect(page.getByTestId('the-end')).toBeVisible();
-    await expect(page.getByTestId('end-punchline')).toContainText('ヤスッ！', { timeout: 10_000 });
-    await expect(page.getByTestId('end-punchline')).toContainText('と つっこんでください');
+    await expect(page.getByTestId('end-punchline')).toContainText('このゲームのつくり', { timeout: 10_000 });
+    await expect(page.getByTestId('end-punchline')).toContainText('ヤスッ！！！！');
+    await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await expect(page.getByTestId('end-punchline')).toHaveCSS('opacity', '0', { timeout: 5_000 });
   });
 
   test('keeps the complete kana controls inside a phone viewport', async ({ page }) => {
