@@ -3,6 +3,7 @@ import { KANA, currentDialogue, dialogueText, type GameState } from './game';
 export interface RenderOptions {
   readonly visibleCharacters: number;
   readonly punchlineStage: 0 | 1 | 2;
+  readonly endPunchlineVisible: boolean;
 }
 
 function escapeHtml(value: string): string {
@@ -18,13 +19,11 @@ function dialogue(state: GameState, options: RenderOptions): string {
   const testId = state.phase === 'wrong' ? 'wrong-next' : state.phase === 'reveal' ? 'reveal-next' : state.phase === 'ending' ? 'ending-next' : 'dialogue-next';
   let punchline = '';
   if (complete && step.punchline && options.punchlineStage > 0) {
-    punchline = step.punchline === '人間としてヤスッ！'
-      ? `<div class="sprite-punchline split" data-testid="punchline"><span>人間として</span>${options.punchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</div>`
-      : `<div class="sprite-punchline" data-testid="punchline">${escapeHtml(step.punchline)}</div>`;
+    const prefix = step.punchline.replace('ヤスッ！', '');
+    punchline = `<div class="sprite-punchline split stage-${options.punchlineStage}" data-testid="punchline"><span>${escapeHtml(prefix)}</span>${options.punchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</div>`;
   }
-  const singleLine = state.phase === 'ending' && state.endingIndex === 0 ? ' single-line' : '';
   return `${punchline}<button class="dialogue-box screen-button" data-testid="${testId}" data-action="advance" type="button" aria-label="${escapeHtml(fullText)}">
-    <span class="dialogue-copy${singleLine}">${escapeHtml(visibleText)}</span>
+    <span class="dialogue-copy">${escapeHtml(visibleText)}</span>
     ${complete ? '<span class="next-mark" aria-hidden="true">▼</span>' : ''}
   </button>`;
 }
@@ -32,7 +31,7 @@ function dialogue(state: GameState, options: RenderOptions): string {
 function officeScene(mode: 'plain' | 'nervous' | 'smiling'): string {
   return `<div class="scene office-scene ${mode}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div><div class="filing"><i></i><i></i><i></i></div><div class="clock"></div>
-    <div class="yasu"><span class="head"><i class="mouth"></i></span><span class="body"></span></div>
+    <div class="yasu"><span class="head"><i class="face-name"><b>ヤ</b><b>ス</b></i><i class="mouth"></i></span><span class="body"></span></div>
   </div>`;
 }
 
@@ -70,9 +69,12 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
   if (state.phase === 'title') {
     content = titleScreen();
   } else if (state.phase === 'end') {
-    content = `<button class="end-screen screen-button" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span></button>`;
+    const finalPunchline = options.endPunchlineVisible
+      ? '<span class="end-final" data-testid="end-punchline"><strong>ヤスッ！</strong><small>と つっこんでください</small></span>'
+      : '';
+    content = `<button class="end-screen screen-button" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
   } else {
-    const comedyMode = state.phase === 'ending' && (state.endingIndex >= 2 || options.punchlineStage > 0);
+    const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const sceneMode = comedyMode ? 'smiling' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
     const scene = officeScene(sceneMode);
     content = state.phase === 'input' ? scene + kanaPanel(state) : scene + dialogue(state, options);
