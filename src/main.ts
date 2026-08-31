@@ -53,11 +53,60 @@ function play(name: keyof typeof sfx): void {
   void sound.play().catch(() => undefined);
 }
 
+function horrorSting(): void {
+  play('shock');
+  const context = getAudio();
+  if (!context) return;
+  const now = context.currentTime;
+
+  ([
+    ['square', 92, 43, 0.055],
+    ['square', 99, 47, 0.042],
+    ['triangle', 61, 36, 0.07],
+  ] as const).forEach(([type, from, to, volume]) => {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(from, now);
+    oscillator.frequency.exponentialRampToValueAtTime(to, now + 0.78);
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.82);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.84);
+  });
+
+  const noiseLength = Math.floor(context.sampleRate * 0.72);
+  const buffer = context.createBuffer(1, noiseLength, context.sampleRate);
+  const samples = buffer.getChannelData(0);
+  let register = 0x7fff;
+  let value = 1;
+  for (let index = 0; index < noiseLength; index += 1) {
+    if (index % 18 === 0) {
+      const bit = (register ^ (register >> 1)) & 1;
+      register = (register >> 1) | (bit << 14);
+      value = register & 1 ? 1 : -1;
+    }
+    samples[index] = value;
+  }
+  const noise = context.createBufferSource();
+  const filter = context.createBiquadFilter();
+  const gain = context.createGain();
+  noise.buffer = buffer;
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1200, now);
+  filter.frequency.exponentialRampToValueAtTime(120, now + 0.72);
+  gain.gain.setValueAtTime(0.075, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.72);
+  noise.connect(filter).connect(gain).connect(context.destination);
+  noise.start(now);
+}
+
 function flashScreen(): void {
   root.classList.remove('reveal-flash');
   void root.offsetWidth;
   root.classList.add('reveal-flash');
-  window.setTimeout(() => root.classList.remove('reveal-flash'), 500);
+  window.setTimeout(() => root.classList.remove('reveal-flash'), 760);
 }
 
 function render(): void {
@@ -147,7 +196,7 @@ root.addEventListener('click', (event) => {
     const next = submitAnswer(state);
     if (next === state) return;
     state = next;
-    if (next.phase === 'reveal') { play('shock'); flashScreen(); }
+    if (next.phase === 'reveal') { horrorSting(); flashScreen(); }
     else play('wrong');
     beginTyping();
     return;
@@ -169,7 +218,7 @@ document.addEventListener('keydown', (event) => {
     const next = submitAnswer(state);
     if (next !== state) {
       state = next;
-      if (next.phase === 'reveal') { play('shock'); flashScreen(); }
+      if (next.phase === 'reveal') { horrorSting(); flashScreen(); }
       else play('wrong');
       beginTyping();
     }

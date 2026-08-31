@@ -101,7 +101,8 @@ button { border: 0; border-radius: 0; font: inherit; }
 .person .body { position: absolute; inset: 0; background: var(--navy); clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%); }
 .person .body::before { content: ""; position: absolute; left: 17px; top: 0; width: 5px; height: 34px; background: var(--white); }
 .person .body::after { content: ""; position: absolute; left: 17px; top: 4px; width: 5px; height: 18px; background: var(--red); }
-.person .face { position: absolute; z-index: 4; left: 13px; top: -15px; width: 3px; height: 3px; background: var(--black); box-shadow: 10px 0 var(--black), 4px 9px var(--black), 7px 9px var(--black); }
+.person .face { position: absolute; z-index: 4; left: 13px; top: -15px; width: 3px; height: 3px; background: var(--black); box-shadow: 10px 0 var(--black); }
+.person .face::after { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 2px; background: var(--black); }
 .boss { left: 70px; }
 .boss .body { background: var(--black); }
 .boss .hair { width: 31px; left: 4px; }
@@ -111,8 +112,27 @@ button { border: 0; border-radius: 0; font: inherit; }
 .desk::before { left: 14px; }
 .desk::after { right: 14px; }
 .desk i { position: absolute; left: 72px; top: -13px; width: 31px; height: 12px; background: var(--white); transform: skewX(-18deg); }
-.revealed .yasu { animation: tremble 90ms steps(2) infinite; }
-.shock-lines { position: absolute; z-index: 2; right: 39px; top: 14px; width: 72px; height: 72px; border: 7px dashed var(--red); transform: rotate(9deg); }
+.after-reveal .yasu { animation: tremble 90ms steps(2) infinite; }
+.shock-reveal { background: var(--cyan); animation: scene-jolt 110ms steps(2) 7; }
+.shock-reveal::after { background: var(--navy); }
+.shock-reveal .window { border-color: var(--white); background: var(--navy); box-shadow: 4px 4px var(--blue); }
+.shock-reveal .window i { background: var(--black); box-shadow: 34px 0 var(--black); }
+.shock-reveal .filing { background: var(--blue); box-shadow: inset 0 5px var(--navy), inset 0 -5px var(--navy); }
+.shock-reveal .clock { border-color: var(--red); background: var(--black); }
+.shock-reveal .clock::before, .shock-reveal .clock::after { background: var(--white); }
+.shock-reveal .boss { filter: brightness(0); }
+.shock-reveal .yasu { right: 48px; bottom: 29px; transform: scale(1.24); transform-origin: center bottom; animation: culprit-jolt 100ms steps(2) 8; }
+.shock-reveal .yasu .head { background: var(--sky); box-shadow: inset 4px 0 var(--blue); }
+.shock-reveal .yasu .hair { height: 15px; background: var(--black); box-shadow: 4px 9px var(--black), 18px 10px var(--black); }
+.shock-reveal .yasu .body { background: var(--navy); }
+.shock-reveal .yasu .face { left: 9px; top: -16px; width: 8px; height: 3px; background: var(--red); box-shadow: none; transform: rotate(18deg); }
+.shock-reveal .yasu .face::before { content: ""; position: absolute; left: 10px; top: -3px; width: 8px; height: 3px; background: var(--red); transform: rotate(-36deg); }
+.shock-reveal .yasu .face::after { left: 7px; top: 10px; width: 10px; height: 3px; background: var(--black); transform: rotate(-18deg); }
+.shock-reveal .desk { background: var(--blue); box-shadow: 0 7px var(--navy); }
+.shock-reveal .desk::before, .shock-reveal .desk::after { background: var(--navy); }
+.shock-lines { position: absolute; z-index: 2; right: 24px; top: 5px; width: 105px; height: 105px; border: 5px dashed var(--red); transform: rotate(9deg); animation: danger-turn 180ms steps(3) infinite; }
+.dread-shadow { position: absolute; z-index: 1; left: 4px; bottom: 42px; width: 78px; height: 42px; background: var(--black); clip-path: polygon(0 76%, 14% 45%, 37% 50%, 49% 11%, 63% 0, 72% 41%, 100% 55%, 100% 100%, 0 100%); }
+.alarm-streaks { position: absolute; z-index: 2; right: 8px; top: 0; width: 12px; height: 118px; background: var(--red); box-shadow: -20px 18px var(--white), -40px 2px var(--red), -60px 27px var(--white); animation: streak 160ms steps(2) infinite; }
 
 .dialogue-box { position: absolute; z-index: 12; left: 0; right: 0; bottom: 0; width: 256px; height: 74px; padding: 8px 13px 5px; color: var(--white); background: var(--black); text-align: left; font-size: 14px; line-height: 20px; letter-spacing: 0; }
 .dialogue-copy { display: inline; }
@@ -121,7 +141,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 
 .sprite-punchline { position: absolute; z-index: 25; right: 6px; bottom: 70px; padding: 3px 6px 5px; border: 3px solid var(--white); color: var(--yellow); background: var(--red); font-size: 21px; line-height: 24px; white-space: nowrap; text-shadow: 2px 2px var(--black); box-shadow: 3px 3px var(--black); animation: punch-in 130ms steps(4) both; transform-origin: right center; }
 
-#app.reveal-flash .game-screen::after { content: ""; position: absolute; z-index: 35; inset: 0; pointer-events: none; background: var(--white); animation: flash 480ms steps(6) forwards; }
+#app.reveal-flash .game-screen::after { content: ""; position: absolute; z-index: 35; inset: 0; pointer-events: none; background: var(--white); animation: flash 720ms steps(8) forwards; }
 
 .kana-panel { position: absolute; z-index: 15; inset: 0; display: grid; grid-template-rows: 32px 1fr 28px; gap: 3px; padding: 5px; color: var(--white); background: var(--black); }
 .answer-line { display: flex; align-items: center; justify-content: center; gap: 5px; color: var(--gold); font-size: 14px; }
@@ -156,6 +176,10 @@ button { border: 0; border-radius: 0; font: inherit; }
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink-border { 50% { border-color: var(--white); } }
 @keyframes tremble { 50% { transform: translate(3px, -1px); } }
+@keyframes scene-jolt { 50% { transform: translate(2px, -1px); } }
+@keyframes culprit-jolt { 50% { transform: scale(1.24) translate(-2px, 1px); } }
+@keyframes danger-turn { 50% { transform: rotate(-4deg) scale(1.04); } }
+@keyframes streak { 50% { transform: translateX(-4px); } }
 @keyframes punch-in { from { transform: translateX(260px) scaleX(2); } 75% { transform: translateX(-5px) scaleX(1); } to { transform: none; } }
 @keyframes flash { 0%, 34%, 68% { opacity: 1; } 17%, 51%, 100% { opacity: 0; } }
 @keyframes walk { 50% { transform: translate(4px, -2px); } }

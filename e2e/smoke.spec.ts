@@ -45,6 +45,7 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await expect(page.getByTestId('answer-slots')).toContainText('ヤス');
     await page.getByTestId('decide').click();
+    await expect(page.locator('[data-scene-mode="shock"]')).toBeVisible();
     await finishDialogue(page, 'reveal-next');
     await expect(page.getByTestId('reveal-next')).toContainText('なぜわかったんですかっ');
   });
