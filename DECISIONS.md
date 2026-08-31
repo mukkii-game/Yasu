@@ -101,3 +101,12 @@ The three local workflows are callers of the protected `ai-dev-infra@v2`
 workflows. The test suite verifies their exact references, permissions and
 concurrency settings because those caller-owned settings cannot be enforced
 inside a reusable workflow.
+
+## 2026-08-31 — The CI demo became a complete two-character mystery
+
+The paddle demo was replaced by the requested 「犯人はヤス」 adventure while
+keeping the repository's pure-logic boundary: `game.ts` now owns immutable
+story transitions, `render.ts` owns DOM output, and `main.ts` owns input and
+generated Web Audio. Visuals are original CSS shapes rather than copied game
+assets, and all gameplay remains inside the portable Vite build already used by
+the central CI and Pages workflows.

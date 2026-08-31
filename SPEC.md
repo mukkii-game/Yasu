@@ -1,61 +1,47 @@
 # SPEC.md
 
-Behaviour specification for the Yasu demo. Read this before changing behaviour;
-update it in the same change when behaviour moves.
+Behaviour specification for 「犯人はヤス」. Read this before changing behaviour and update it in the same change when behaviour moves.
 
 ## Purpose
 
-Yasu is a deliberately small Canvas game. Its primary job is to exercise the
-central CI in `mukkii-game/ai-dev-infra` end to end: install, typecheck, unit
-test, build, and browser test. Gameplay depth is explicitly a non-goal.
+「犯人はヤス」 is a very short, original parody of an 8-bit Japanese detective adventure. The joke relies on the answer already being common knowledge. It must evoke the technical and visual limits of a Famicom-era game without copying a specific game's graphics, layout, logo, characters, or audio.
 
-## Field
+## Flow
 
-- Play field is 480 x 320 logical pixels, drawn on a `<canvas>`.
-- The origin is the top-left corner; y grows downward.
-
-## Entities
-
-- **Ball** — radius 8. Starts at the centre of the field moving right and up
-  (150, -180) px/s.
-- **Paddle** — 96 x 12, fixed 16 px above the bottom edge. Starts centred
-  horizontally. Only its x position changes.
-
-## Rules
-
-1. Each simulation step advances the ball by `velocity * dt` seconds.
-2. The ball reflects off the left, right, and top edges of the field.
-3. A ball moving downward that reaches the paddle's top edge while horizontally
-   overlapping the paddle (within one ball radius of either end) reflects
-   upward and increases the score by 1.
-4. A ball that falls entirely past the bottom edge ends the game
-   (`status: 'over'`).
-5. A finished game is a fixed point: stepping it changes nothing.
-6. The paddle is always clamped inside the field.
-7. The best score is the highest score reached so far. It never decreases, and
-   a restart carries it over rather than clearing it.
+1. The title screen shows 「犯人はヤス」 and waits for tap, click, Enter, or Space.
+2. Three dialogue pages jump directly to the final deduction:
+   - Yasu says there are no more clues and the case will remain unsolved.
+   - Yasu asks whether the player has identified the culprit.
+   - The player says 「はんにんは⋯」.
+3. A katakana gojūon panel accepts exactly two characters.
+4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
+5. 「ヤス」 triggers the reveal, a generated 8-bit shock sound, and flashing effects.
+6. The ending advances through Yasu's motive, reward, and attitude. Each receives a full-screen cut-in:
+   - 「動機がヤスッ！」
+   - 「報酬もヤスッ！」
+   - 「人間としてヤスッ！」
+7. The final screen shows a large `THE END`, Yasu being led away in handcuffs, the player watching in the foreground, a looping walk animation, and looping generated ending music.
+8. 「もういちど」 returns to a clean title state.
 
 ## Controls
 
-- `ArrowLeft` / `ArrowRight` — move the paddle one step (28 px).
-- Pointer movement over the canvas — centre the paddle on the pointer.
-- `R` — restart the round. The score returns to 0; the best score is kept.
+- Tap/click dialogue windows or press Enter/Space to advance.
+- Select katakana with the on-screen panel. `Backspace` removes the last selected character.
+- 「けす」 removes one character; 「クリア」 removes both; 「けってい」 submits two characters.
+- The `♪` control toggles generated sound effects and ending music.
 
-## Displayed state
+## Presentation
 
-`Best Score` is shown at the top of the screen, above the play field. The HUD
-below the canvas shows the current score and status. The canvas also mirrors
-state onto
-`data-paddle-x` and `data-status` attributes so the end-to-end tests can assert
-on the simulation without reading pixels. These attributes are part of the
-contract with `e2e/`; renaming them requires updating those tests.
+- The game stays inside a responsive 4:3 display with scanlines, a limited navy/cream/gold/cyan/red palette, hard pixel-like edges, and CSS-built silhouettes.
+- Text remains readable and controls remain touch-sized on phones.
+- No copied screenshots, sprites, logos, characters, or music are used.
+- Animation is reduced when `prefers-reduced-motion` is enabled.
 
 ## Structure
 
-- `src/game.ts` — pure, DOM-free rules. All of the above is implemented and
-  unit-tested here.
-- `src/render.ts` — draws a `GameState` onto a canvas context.
-- `src/main.ts` — input handling and the animation loop.
+- `src/game.ts` — pure immutable state transitions, dialogue data, and kana list.
+- `src/render.ts` — turns a `GameState` into accessible DOM markup.
+- `src/main.ts` — event delegation, keyboard/touch control, generated Web Audio effects, and rendering coordination.
+- `src/style.css` — the complete 8-bit visual presentation and responsive rules.
 
-Keep the rules in `src/game.ts` pure. That separation is what makes the
-behaviour above testable under Vitest without a browser.
+Pure gameplay transitions belong in `src/game.ts` and stay DOM-free so Vitest can cover the full route to the ending.
