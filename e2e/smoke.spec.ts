@@ -22,6 +22,7 @@ test.describe('犯人はヤス', () => {
   test('shows the FC-style title and opens the kana input', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByTestId('start-button')).toContainText('犯人はヤス');
+    await expect(page.locator('.title-yasu')).toBeVisible();
     await reachInput(page);
     await expect(page.getByTestId('answer-slots')).toContainText('＿＿');
   });
@@ -61,9 +62,12 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await expect(page.getByTestId('answer-slots')).toContainText('ヤス');
     await page.getByTestId('decide').click();
-    await expect(page.locator('[data-scene-mode="nervous"]')).toBeVisible();
+    await expect(page.locator('[data-scene-mode="impact"]')).toBeVisible();
+    await expect(page.getByTestId('game-screen')).toHaveClass(/reveal-impact/);
+    await expect(page.getByTestId('reveal-next')).toHaveCount(0);
     await expect(page.locator('.face-name')).toHaveText('ヤス');
     await finishDialogue(page, 'reveal-next');
+    await expect(page.locator('[data-scene-mode="nervous"]')).toBeVisible();
     await expect(page.getByTestId('reveal-next')).toContainText('なぜわかったんですかっ');
   });
 
@@ -75,7 +79,7 @@ test.describe('犯人はヤス', () => {
     await page.getByTestId('decide').click();
     await advanceDialogue(page, 'reveal-next');
     await finishDialogue(page, 'ending-next');
-    await expect(page.getByTestId('ending-next')).toContainText('おまえのかおにかいてあるよ');
+    await expect(page.getByTestId('ending-next')).toContainText('タイトルにかいてあったから');
     await expect(page.getByTestId('punchline')).toHaveCount(0);
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('なぞときが');
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
@@ -98,7 +102,7 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ヤ', exact: true }).click();
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
-    await page.getByTestId('reveal-next').click();
+    await advanceDialogue(page, 'reveal-next');
 
     for (const hasPunchline of [true, false, true, true, true]) {
       if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');

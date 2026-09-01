@@ -18,14 +18,14 @@ export interface GameState {
 export const INTRO: readonly DialogueStep[] = [
   { speaker: 'ヤス', text: 'ボス、これいじょうのてがかりがありません。めいきゅういりです。' },
   { speaker: 'ヤス', text: 'えっ？　はんにんがわかったんですか？' },
-  { speaker: 'あなた', text: 'はんにんは⋯' },
+  { speaker: 'あなた', text: 'はんにんは・・・' },
 ];
 
 export const ENDING: readonly DialogueStep[] = [
-  { speaker: 'あなた', text: 'おまえのかおにかいてあるよ', punchline: 'なぞときがヤスッ！' },
-  { speaker: 'あなた', text: 'ヤス、なぜこんなころしをしたんだ' },
+  { speaker: 'あなた', text: 'タイトルにかいてあったから', punchline: 'なぞときがヤスッ！' },
+  { speaker: 'あなた', text: 'ヤス、なんで　ごうとうさつじんなんてしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
-  { speaker: 'ヤス', text: 'でももらったほうしゅうは３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
+  { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
   { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ', punchline: '人間としてヤスッ！' },
 ];
 

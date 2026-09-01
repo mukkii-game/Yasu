@@ -218,3 +218,14 @@ from 5.4 to 3.6 seconds, exactly 1.5× the previous speed.
 Immediately after Yasu asks how the player knew, the response is now the more
 direct `あなた「おまえのかおにかいてあるよ」`, leading into the unchanged
 two-beat 「なぞときが」「ヤスッ！」 punchline.
+
+## 2026-09-01 — The reveal earns a silent second before dialogue
+
+The correct answer now locks input for one second while the screen flashes, a
+generated low thunder crash sounds, and Yasu shakes much farther than his normal
+tremble. Only after that beat does his question begin typing. The player's clue
+is now `タイトルにかいてあったから`, and the accusation specifies
+`ごうとうさつじん`. The reward forces `３０００円` to the head of line two.
+
+Yasu's black body reaches the bottom of the room picture, while the title gains
+a small centered version without the face lettering to fill its empty skyline.
