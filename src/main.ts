@@ -24,8 +24,10 @@ let punchlineSecondTimer: number | undefined;
 let endTimer: number | undefined;
 let endSecondTimer: number | undefined;
 let endReturnTimer: number | undefined;
+let revealTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
 let endPunchlineStage: 0 | 1 | 2 = 0;
+let revealImpact = false;
 
 function getAudio(): AudioContext {
   audio ??= new AudioContext();
@@ -33,20 +35,19 @@ function getAudio(): AudioContext {
   return audio;
 }
 
-function revealFanfare(): void {
+function revealThunder(): void {
   const context = getAudio();
   const now = context.currentTime;
   const notes = [
-    { at: 0, frequency: 784, duration: 0.07, volume: 0.025 },
-    { at: 0.12, frequency: 880, duration: 0.08, volume: 0.025 },
-    { at: 0.27, frequency: 784, duration: 0.46, volume: 0.03 },
-    { at: 0.27, frequency: 988, duration: 0.46, volume: 0.024 },
-    { at: 0.27, frequency: 1175, duration: 0.46, volume: 0.018 },
+    { at: 0, frequency: 110, duration: 0.13, volume: 0.035 },
+    { at: 0.22, frequency: 73, duration: 0.72, volume: 0.04 },
+    { at: 0.22, frequency: 98, duration: 0.72, volume: 0.03 },
+    { at: 0.22, frequency: 147, duration: 0.58, volume: 0.02 },
   ];
   notes.forEach(({ at, frequency, duration, volume }) => {
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    oscillator.type = 'square';
+    oscillator.type = at === 0 ? 'square' : 'sawtooth';
     oscillator.frequency.value = frequency;
     gain.gain.setValueAtTime(volume, now + at);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + at + duration);
@@ -54,6 +55,23 @@ function revealFanfare(): void {
     oscillator.start(now + at);
     oscillator.stop(now + at + duration);
   });
+
+  const buffer = context.createBuffer(1, Math.floor(context.sampleRate * 0.78), context.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let index = 0; index < data.length; index += 1) {
+    data[index] = (Math.random() * 2 - 1) * (1 - index / data.length);
+  }
+  const noise = context.createBufferSource();
+  const filter = context.createBiquadFilter();
+  const noiseGain = context.createGain();
+  noise.buffer = buffer;
+  filter.type = 'lowpass';
+  filter.frequency.value = 900;
+  noiseGain.gain.setValueAtTime(0.045, now + 0.2);
+  noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.98);
+  noise.connect(filter).connect(noiseGain).connect(context.destination);
+  noise.start(now + 0.2);
+  noise.stop(now + 0.98);
 }
 
 function playJingle(): void {
@@ -153,7 +171,7 @@ function clearPunchlineTimers(): void {
 }
 
 function render(): void {
-  renderApp(root, state, { visibleCharacters, punchlineStage, endPunchlineStage });
+  renderApp(root, state, { visibleCharacters, punchlineStage, endPunchlineStage, revealImpact });
 }
 
 function fullDialogueLength(): number {
@@ -228,6 +246,12 @@ function clearEndTimer(): void {
   endReturnTimer = undefined;
 }
 
+function clearRevealTimer(): void {
+  if (revealTimer !== undefined) window.clearTimeout(revealTimer);
+  revealTimer = undefined;
+  revealImpact = false;
+}
+
 function scheduleEndPunchline(): void {
   clearEndTimer();
   endTimer = window.setTimeout(() => {
@@ -251,6 +275,7 @@ function scheduleEndPunchline(): void {
 function setState(next: GameState): void {
   if (next === state) return;
   clearEndTimer();
+  clearRevealTimer();
   endPunchlineStage = 0;
   state = next;
   beginTyping();
@@ -258,6 +283,7 @@ function setState(next: GameState): void {
 }
 
 function advanceOrFinish(): void {
+  if (revealImpact) return;
   const step = currentDialogue(state);
   if (step && visibleCharacters < fullDialogueLength()) {
     finishTyping();
@@ -273,7 +299,21 @@ function submit(): void {
   const next = submitAnswer(state);
   if (next === state) return;
   state = next;
-  if (next.phase === 'reveal') revealFanfare();
+  if (next.phase === 'reveal') {
+    if (typeTimer !== undefined) window.clearTimeout(typeTimer);
+    clearPunchlineTimers();
+    typeTimer = undefined;
+    visibleCharacters = 0;
+    revealImpact = true;
+    revealThunder();
+    render();
+    revealTimer = window.setTimeout(() => {
+      revealTimer = undefined;
+      revealImpact = false;
+      beginTyping();
+    }, 1000);
+    return;
+  }
   beginTyping();
 }
 

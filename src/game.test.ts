@@ -64,11 +64,12 @@ describe('game flow', () => {
     expect(state.phase).toBe('end');
   });
 
-  it('formats the speaker and quote on one continuous line', () => {
+  it('formats speaker quotes and preserves the requested reward line break', () => {
     expect(dialogueText(INTRO[0])).toBe('ヤス「ボス、これいじょうのてがかりがありません。めいきゅういりです。」');
-    expect(dialogueText(ENDING[0])).toBe('あなた「おまえのかおにかいてあるよ」');
-    expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なぜこんなころしをしたんだ」');
-    expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは３０００円でしたよ　はっはっは」');
+    expect(dialogueText(INTRO[2])).toBe('あなた「はんにんは・・・」');
+    expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあったから」');
+    expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
+    expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
   });
 
   it('restart always returns to a clean title state', () => {

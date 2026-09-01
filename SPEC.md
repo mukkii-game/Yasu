@@ -12,11 +12,11 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 2. Three dialogue pages jump directly to the final deduction:
    - Yasu says there are no more clues and the case will remain unsolved.
    - Yasu asks whether the player has identified the culprit.
-   - The player says 「はんにんは⋯」.
+   - The player says 「はんにんは・・・」.
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
-5. 「ヤス」 triggers the reveal. The room and faceless front-facing Yasu do not change color; Yasu only trembles rapidly while a quiet high-pitched two-hit-and-chord sting plays.
-6. After Yasu asks why the player knows, the player answers `あなた「おまえのかおにかいてあるよ」`. The ending then advances through the accusation, motive, reward, and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
+5. 「ヤス」 triggers a one-second reveal beat before any dialogue appears. The whole screen flashes, a low double-hit thunder crash plays, and Yasu shakes by four logical pixels. Input is ignored during this beat. After exactly one second the flash and large shake stop, Yasu returns to the smaller tremble, and `ヤス「な、なぜわかったんですかっ！？」` begins typing.
+6. The player answers `あなた「タイトルにかいてあったから」`, then asks `あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」`. The ending advances through Yasu's motive, explicitly line-broken reward (`でももらったほうしゅうは` / `３０００円でしたよ　はっはっは`), and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
    - 「なぞときが」 → 「ヤスッ！」
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」
@@ -35,9 +35,9 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 
 - The logical display is exactly 256×240 pixels and scales only by integer factors (1×, 2×, 3×), preserving hard edges on phones and desktops.
 - The CSS palette is a fixed 16-color NES-inspired subset. Scenes use flat fills; each small character sprite uses no more than four visible colors.
-- The title vignette contains only buildings, sky, and a straight sea horizon. It has no road, body outline, or person.
-- The story scene contains only one front-facing Yasu: a larger round blank head with slightly smaller white 「ヤ」「ス」 lettering separated by two logical pixels and a square upper body. The lettering has no outline, and the face has no eyes or mouth. There is no boss, foreground player, or desk. Yasu stops trembling once the first punchline appears.
-- Japanese dialogue stays in one continuous `話者「本文」` string and only wraps naturally at the screen edge.
+- The title vignette contains buildings, sky, a straight sea horizon, and one small centered Yasu without face lettering. It has no road or body outline.
+- The story scene contains only one front-facing Yasu: a larger round blank head with slightly smaller white 「ヤ」「ス」 lettering separated by two logical pixels and a black square body extending to the bottom of the picture. The lettering has no outline, and the face has no eyes or mouth. There is no boss, foreground player, or desk. Yasu stops trembling once the first punchline appears.
+- Japanese dialogue normally stays in one continuous `話者「本文」` string and wraps naturally at the screen edge. The reward line contains one intentional hard break before `３０００円`.
 - Every dialogue page is absolutely pinned two pixels below the scene boundary. Its animated ▼ is inline immediately after the completed closing quote.
 - Text remains readable and all kana input remains available by touch on phones.
 - No copied screenshots, sprites, logos, characters, or music are used.
@@ -47,7 +47,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 
 - `src/game.ts` — pure immutable state transitions, dialogue data, and kana list.
 - `src/render.ts` — turns a `GameState` into accessible DOM markup.
-- `src/main.ts` — global click/key control, character-by-character timing and blips, delayed two-stage punchlines, the high reveal chord, comic fanfare playback, the final sting, and rendering coordination.
+- `src/main.ts` — global click/key control, character-by-character timing and blips, the locked one-second flash/thunder reveal, delayed two-stage punchlines, comic fanfare playback, the final sting, and rendering coordination.
 - `src/style.css` — the complete 256×240 presentation, 16-color palette, CSS pixel scenes, and integer scaling rules.
 
 Pure gameplay transitions belong in `src/game.ts` and stay DOM-free so Vitest can cover the full route to the ending.
