@@ -237,3 +237,10 @@ horizon. His face outline is reduced to one pixel, and his black outfit now carr
 a short white tie matching the room-scene design. The room-scene tie is reduced from
 68 pixels to 22 pixels (roughly one third) so it reads as a necktie rather than a
 full-length white stripe.
+
+## 2026-09-01 — Shorten the escort lead-in again
+
+The escort pair now starts at X=41, halfway between its previous X=82 position
+and the left edge. Its route is reduced from 127 to 86 pixels and takes 2.4
+seconds instead of 3.6, preserving roughly the same walking speed while reaching
+the final two-beat caption 1.2 seconds earlier.

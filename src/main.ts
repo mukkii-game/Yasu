@@ -269,7 +269,7 @@ function scheduleEndPunchline(): void {
         setState(restart());
       }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 4200);
     }, 700);
-  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1250 : 4850);
+  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1250 : 3650);
 }
 
 function setState(next: GameState): void {

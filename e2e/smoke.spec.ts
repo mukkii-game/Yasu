@@ -127,6 +127,16 @@ test.describe('犯人はヤス', () => {
     }
 
     await expect(page.getByTestId('the-end')).toBeVisible();
+    const escortTiming = await page.evaluate(() => {
+      const escortRule = Array.from(document.styleSheets)
+        .flatMap((sheet) => Array.from(sheet.cssRules))
+        .find((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule && rule.selectorText === '.walkers');
+      return {
+        left: escortRule?.style.left,
+        duration: escortRule?.style.animationDuration,
+      };
+    });
+    expect(escortTiming).toEqual({ left: '41px', duration: '2.4s' });
     await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('このゲーム⋯', { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);

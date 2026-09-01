@@ -117,7 +117,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 .end-building.b { right: 0; width: 50px; height: 101px; }
 .end-building.c { right: 56px; width: 32px; height: 65px; }
 .end-road { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 52px; background: var(--brown); }
-.walkers { position: absolute; z-index: 5; left: 82px; bottom: 34px; width: 34px; height: 39px; animation: escort-walk 3.6s steps(24) 1 forwards; }
+.walkers { position: absolute; z-index: 5; left: 41px; bottom: 34px; width: 34px; height: 39px; animation: escort-walk 2.4s steps(16) 1 forwards; }
 .walkers i { position: absolute; bottom: 0; width: 13px; height: 23px; background: var(--black); }
 .walkers i::before { content: ""; position: absolute; left: 2px; top: -10px; width: 9px; height: 10px; background: var(--black); }
 .walkers .escort { left: 0; }
@@ -140,7 +140,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes final-pop { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes end-screen-fade { from { opacity: 1; } to { opacity: 0; } }
-@keyframes escort-walk { 0% { transform: translate(0, 0); } 12% { transform: translate(-15px, -1px); } 25% { transform: translate(-31px, 0); } 38% { transform: translate(-47px, -1px); } 50% { transform: translate(-63px, 0); } 62% { transform: translate(-79px, -1px); } 75% { transform: translate(-95px, 0); } 88% { transform: translate(-111px, -1px); } 100% { transform: translate(-127px, 0); } }
+@keyframes escort-walk { 0% { transform: translate(0, 0); } 12% { transform: translate(-10px, -1px); } 25% { transform: translate(-21px, 0); } 38% { transform: translate(-32px, -1px); } 50% { transform: translate(-43px, 0); } 62% { transform: translate(-54px, -1px); } 75% { transform: translate(-64px, 0); } 88% { transform: translate(-75px, -1px); } 100% { transform: translate(-86px, 0); } }
 
 .reveal-impact::after { content: ""; position: absolute; z-index: 40; inset: 0; pointer-events: none; background: var(--white); animation: reveal-flash 1s steps(1) both; }
 
