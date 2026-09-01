@@ -32,6 +32,14 @@ test.describe('犯人はヤス', () => {
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
     await expect(page.getByTestId('dialogue-next')).toContainText('えっ？');
+    await finishDialogue(page, 'dialogue-next');
+    const gap = await page.evaluate(() => {
+      const scene = document.querySelector('.office-scene')!.getBoundingClientRect();
+      const copy = document.querySelector('.dialogue-copy')!.getBoundingClientRect();
+      return copy.top - scene.bottom;
+    });
+    expect(gap).toBeLessThanOrEqual(5);
+    await expect(page.getByTestId('dialogue-next').locator('.dialogue-copy > .next-mark')).toBeVisible();
   });
 
   test('rejects a wrong name and allows another try', async ({ page }) => {
@@ -68,7 +76,7 @@ test.describe('犯人はヤス', () => {
     await advanceDialogue(page, 'reveal-next');
     await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('punchline')).toHaveCount(0);
-    await expect(page.getByTestId('punchline').locator('span')).toHaveText('トリックが');
+    await expect(page.getByTestId('punchline').locator('span')).toHaveText('なぞときが');
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
     await expect(page.locator('[data-scene-mode="settled"]')).toBeVisible();
   });
@@ -83,25 +91,25 @@ test.describe('犯人はヤス', () => {
   });
 
   test('overlays and fades the final comeback after the escort leaves', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     await reachInput(page);
     await page.getByRole('button', { name: 'ヤ', exact: true }).click();
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
     await page.getByTestId('reveal-next').click();
-    await page.getByTestId('reveal-next').click();
 
     for (const hasPunchline of [true, false, true, true, true]) {
-      await page.getByTestId('ending-next').click();
       if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
       await page.getByTestId('ending-next').click();
     }
 
     await expect(page.getByTestId('the-end')).toBeVisible();
-    await expect(page.getByTestId('end-punchline')).toContainText('このゲームのつくり', { timeout: 10_000 });
+    await expect(page.getByTestId('end-punchline')).toContainText('このゲームじたいが⋯', { timeout: 10_000 });
     await expect(page.getByTestId('end-punchline')).toContainText('ヤスッ！！！！');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-    await expect(page.getByTestId('end-punchline')).toHaveCSS('opacity', '0', { timeout: 5_000 });
+    await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade');
+    await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 6_000 });
   });
 
   test('keeps the complete kana controls inside a phone viewport', async ({ page }) => {

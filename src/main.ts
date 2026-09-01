@@ -22,6 +22,7 @@ let typeTimer: number | undefined;
 let punchlineTimer: number | undefined;
 let punchlineSecondTimer: number | undefined;
 let endTimer: number | undefined;
+let endReturnTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
 let endPunchlineVisible = false;
 
@@ -73,6 +74,52 @@ function textBlip(): void {
   oscillator.stop(now + 0.018);
 }
 
+function selectionBlip(): void {
+  const context = getAudio();
+  const now = context.currentTime;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = 'square';
+  oscillator.frequency.value = 523;
+  gain.gain.setValueAtTime(0.022, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+  oscillator.connect(gain).connect(context.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.045);
+}
+
+function decisionBlip(): void {
+  const context = getAudio();
+  const now = context.currentTime;
+  [523, 659].forEach((frequency, index) => {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.022, now + index * 0.07);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.07 + 0.065);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start(now + index * 0.07);
+    oscillator.stop(now + index * 0.07 + 0.065);
+  });
+}
+
+function punchlineLeadBlip(): void {
+  const context = getAudio();
+  const now = context.currentTime;
+  [659, 784].forEach((frequency, index) => {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.018, now + index * 0.055);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.055 + 0.05);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start(now + index * 0.055);
+    oscillator.stop(now + index * 0.055 + 0.05);
+  });
+}
+
 function playBigJingle(): void {
   playJingle();
   const context = getAudio();
@@ -119,6 +166,7 @@ function schedulePunchline(): void {
   punchlineTimer = window.setTimeout(() => {
     punchlineTimer = undefined;
     punchlineStage = 1;
+    punchlineLeadBlip();
     render();
     punchlineSecondTimer = window.setTimeout(() => {
       punchlineSecondTimer = undefined;
@@ -126,7 +174,7 @@ function schedulePunchline(): void {
       playJingle();
       render();
     }, 700);
-  }, 750);
+  }, 1250);
 }
 
 function finishTyping(): void {
@@ -172,7 +220,9 @@ function beginTyping(): void {
 
 function clearEndTimer(): void {
   if (endTimer !== undefined) window.clearTimeout(endTimer);
+  if (endReturnTimer !== undefined) window.clearTimeout(endReturnTimer);
   endTimer = undefined;
+  endReturnTimer = undefined;
 }
 
 function scheduleEndPunchline(): void {
@@ -182,6 +232,10 @@ function scheduleEndPunchline(): void {
     endPunchlineVisible = true;
     playBigJingle();
     render();
+    endReturnTimer = window.setTimeout(() => {
+      endReturnTimer = undefined;
+      setState(restart());
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 4200);
   }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1600 : 7200);
 }
 
@@ -222,10 +276,15 @@ root.addEventListener('click', (event) => {
   }
   const action = target.dataset.action;
   if (action === 'start') { getAudio(); setState(startGame(state)); return; }
-  if (action === 'kana') { setState(chooseKana(state, target.dataset.kana ?? '')); return; }
+  if (action === 'kana') {
+    const next = chooseKana(state, target.dataset.kana ?? '');
+    if (next !== state) selectionBlip();
+    setState(next);
+    return;
+  }
   if (action === 'delete') { setState(deleteKana(state)); return; }
   if (action === 'clear') { setState(clearAnswer(state)); return; }
-  if (action === 'submit') { submit(); return; }
+  if (action === 'submit') { decisionBlip(); submit(); return; }
   if (action === 'advance') { advanceOrFinish(); return; }
   if (action === 'restart') { setState(restart()); }
 });
@@ -242,7 +301,7 @@ document.addEventListener('keydown', (event) => {
   if (event.key !== 'Enter' && event.key !== ' ') return;
   event.preventDefault();
   if (state.phase === 'title') { getAudio(); setState(startGame(state)); }
-  else if (state.phase === 'input') submit();
+  else if (state.phase === 'input' && state.answer.length === 2) { decisionBlip(); submit(); }
 });
 
 render();

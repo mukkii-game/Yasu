@@ -23,8 +23,7 @@ function dialogue(state: GameState, options: RenderOptions): string {
     punchline = `<div class="sprite-punchline split stage-${options.punchlineStage}" data-testid="punchline"><span>${escapeHtml(prefix)}</span>${options.punchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</div>`;
   }
   return `${punchline}<button class="dialogue-box screen-button" data-testid="${testId}" data-action="advance" type="button" aria-label="${escapeHtml(fullText)}">
-    <span class="dialogue-copy">${escapeHtml(visibleText)}</span>
-    ${complete ? '<span class="next-mark" aria-hidden="true">▼</span>' : ''}
+    <span class="dialogue-copy">${escapeHtml(visibleText)}${complete ? '<span class="next-mark" aria-hidden="true">▼</span>' : ''}</span>
   </button>`;
 }
 
@@ -70,9 +69,9 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     content = titleScreen();
   } else if (state.phase === 'end') {
     const finalPunchline = options.endPunchlineVisible
-      ? '<span class="end-final" data-testid="end-punchline"><small>このゲームのつくり</small><strong>ヤスッ！！！！</strong></span>'
+      ? '<span class="end-final" data-testid="end-punchline"><small>このゲームじたいが⋯</small><strong>ヤスッ！！！！</strong></span>'
       : '';
-    content = `<button class="end-screen screen-button" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
+    content = `<button class="end-screen screen-button${options.endPunchlineVisible ? ' finale' : ''}" data-testid="end-screen" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const sceneMode = comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
