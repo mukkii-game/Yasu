@@ -3,7 +3,7 @@ import { KANA, currentDialogue, dialogueText, type GameState } from './game';
 export interface RenderOptions {
   readonly visibleCharacters: number;
   readonly punchlineStage: 0 | 1 | 2;
-  readonly endPunchlineVisible: boolean;
+  readonly endPunchlineStage: 0 | 1 | 2;
 }
 
 function escapeHtml(value: string): string {
@@ -68,10 +68,10 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
   if (state.phase === 'title') {
     content = titleScreen();
   } else if (state.phase === 'end') {
-    const finalPunchline = options.endPunchlineVisible
-      ? '<span class="end-final" data-testid="end-punchline"><small>このゲームじたいが⋯</small><strong>ヤスッ！！！！</strong></span>'
+    const finalPunchline = options.endPunchlineStage > 0
+      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span>このゲームじたい</span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！！！！</strong>' : ''}</span>`
       : '';
-    content = `<button class="end-screen screen-button${options.endPunchlineVisible ? ' finale' : ''}" data-testid="end-screen" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
+    content = `<button class="end-screen screen-button${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const sceneMode = comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';

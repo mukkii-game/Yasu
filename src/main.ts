@@ -22,9 +22,10 @@ let typeTimer: number | undefined;
 let punchlineTimer: number | undefined;
 let punchlineSecondTimer: number | undefined;
 let endTimer: number | undefined;
+let endSecondTimer: number | undefined;
 let endReturnTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
-let endPunchlineVisible = false;
+let endPunchlineStage: 0 | 1 | 2 = 0;
 
 function getAudio(): AudioContext {
   audio ??= new AudioContext();
@@ -152,7 +153,7 @@ function clearPunchlineTimers(): void {
 }
 
 function render(): void {
-  renderApp(root, state, { visibleCharacters, punchlineStage, endPunchlineVisible });
+  renderApp(root, state, { visibleCharacters, punchlineStage, endPunchlineStage });
 }
 
 function fullDialogueLength(): number {
@@ -220,8 +221,10 @@ function beginTyping(): void {
 
 function clearEndTimer(): void {
   if (endTimer !== undefined) window.clearTimeout(endTimer);
+  if (endSecondTimer !== undefined) window.clearTimeout(endSecondTimer);
   if (endReturnTimer !== undefined) window.clearTimeout(endReturnTimer);
   endTimer = undefined;
+  endSecondTimer = undefined;
   endReturnTimer = undefined;
 }
 
@@ -229,20 +232,26 @@ function scheduleEndPunchline(): void {
   clearEndTimer();
   endTimer = window.setTimeout(() => {
     endTimer = undefined;
-    endPunchlineVisible = true;
-    playBigJingle();
+    endPunchlineStage = 1;
+    punchlineLeadBlip();
     render();
-    endReturnTimer = window.setTimeout(() => {
-      endReturnTimer = undefined;
-      setState(restart());
-    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 4200);
-  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1600 : 7200);
+    endSecondTimer = window.setTimeout(() => {
+      endSecondTimer = undefined;
+      endPunchlineStage = 2;
+      playBigJingle();
+      render();
+      endReturnTimer = window.setTimeout(() => {
+        endReturnTimer = undefined;
+        setState(restart());
+      }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 4200);
+    }, 700);
+  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1250 : 8250);
 }
 
 function setState(next: GameState): void {
   if (next === state) return;
   clearEndTimer();
-  endPunchlineVisible = false;
+  endPunchlineStage = 0;
   state = next;
   beginTyping();
   if (next.phase === 'end') scheduleEndPunchline();
