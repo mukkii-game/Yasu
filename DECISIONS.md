@@ -198,3 +198,10 @@ To make the final timing unmistakable, its setup and payoff no longer coexist:
 the oversized 「このゲーム⋯」 cut is replaced after 700 ms by an even larger
 「ヤスッ！！」 cut. The payoff alone remains during the one-second hold and the
 subsequent full-screen fade to title.
+
+## 2026-09-01 — The escort crosses once and never respawns
+
+The pair now begins just left of the centered sun, walks a shorter 5.4-second
+route with a restrained one-pixel bob, and fully clears the left edge. Final
+caption renders omit the walkers from the DOM, preventing the CSS entrance
+animation from restarting when either caption cut appears.

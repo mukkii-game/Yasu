@@ -21,7 +21,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」
    - 「人間として」 → 「ヤスッ！」
-7. The final screen is a sunset city with a lighter road and a centered sun half below the horizon. A small anonymous escort and the handcuffed detective Yasu walk slowly from right to left. There is no foreground player. `THE END` is thick plain white text and there is no ending music. After both figures leave, two separate oversized cuts reuse the usual punchline interval: 「このゲーム⋯」 enters with the lead pop, disappears after 700 ms, and is replaced by 「ヤスッ！！」 with the exaggerated final sting. One second after the payoff appears, the entire ending begins a slow fade and then returns to the title automatically.
+7. The final screen is a sunset city with a lighter road and a centered sun half below the horizon. A small anonymous escort and the handcuffed detective Yasu start just left of the sun, bob by one logical pixel, and cross a shorter distance until they disappear beyond the left edge. They are removed before any final caption renders, so rerendering can never restart the walk. There is no foreground player. `THE END` is thick plain white text and there is no ending music. After both figures leave, two separate oversized cuts reuse the usual punchline interval: 「このゲーム⋯」 enters with the lead pop, disappears after 700 ms, and is replaced by 「ヤスッ！！」 with the exaggerated final sting. One second after the payoff appears, the entire ending begins a slow fade and then returns to the title automatically.
 8. Any tap, click, or unmodified key on `THE END` returns to a clean title state; no retry button is shown.
 
 ## Controls

@@ -34,9 +34,9 @@ function officeScene(mode: 'plain' | 'nervous' | 'settled'): string {
   </div>`;
 }
 
-function endScene(): string {
+function endScene(hideWalkers: boolean): string {
   return `<div class="end-city" aria-hidden="true"><i class="setting-sun"></i><i class="end-building a"></i><i class="end-building b"></i><i class="end-building c"></i><i class="end-road"></i></div>
-    <div class="walkers" aria-hidden="true"><i class="escort"></i><i class="cuffed-yasu"></i><b class="handcuff"></b></div>`;
+    ${hideWalkers ? '' : '<div class="walkers" aria-hidden="true"><i class="escort"></i><i class="cuffed-yasu"></i><b class="handcuff"></b></div>'}`;
 }
 
 function kanaPanel(state: GameState): string {
@@ -71,7 +71,7 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     const finalPunchline = options.endPunchlineStage > 0
       ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline">${options.endPunchlineStage === 1 ? '<span>このゲーム⋯</span>' : '<strong>ヤスッ！！</strong>'}</span>`
       : '';
-    content = `<button class="end-screen screen-button${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
+    content = `<button class="end-screen screen-button${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene(options.endPunchlineStage > 0)}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const sceneMode = comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
