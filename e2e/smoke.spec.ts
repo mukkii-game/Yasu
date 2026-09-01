@@ -23,6 +23,22 @@ test.describe('犯人はヤス', () => {
     await page.goto('/');
     await expect(page.getByTestId('start-button')).toContainText('犯人はヤス');
     await expect(page.locator('.title-yasu')).toBeVisible();
+    const titleYasu = await page.evaluate(() => {
+      const city = document.querySelector('.title-city')!.getBoundingClientRect();
+      const head = document.querySelector('.title-yasu b')!.getBoundingClientRect();
+      const headStyle = getComputedStyle(document.querySelector('.title-yasu b')!);
+      const tieStyle = getComputedStyle(document.querySelector('.title-yasu em')!, '::after');
+      const scale = city.width / 216;
+      return {
+        headCenter: (head.top + head.bottom) / 2,
+        horizon: city.top + 93 * scale,
+        headBorder: headStyle.borderTopWidth,
+        tieHeight: tieStyle.height,
+      };
+    });
+    expect(Math.abs(titleYasu.headCenter - titleYasu.horizon)).toBeLessThanOrEqual(2);
+    expect(titleYasu.headBorder).toBe('1px');
+    expect(titleYasu.tieHeight).toBe('8px');
     await reachInput(page);
     await expect(page.getByTestId('answer-slots')).toContainText('＿＿');
   });
@@ -30,6 +46,7 @@ test.describe('犯人はヤス', () => {
   test('advances dialogue when the room itself is clicked', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('start-button').click();
+    await expect.poll(() => page.locator('.yasu .body').evaluate((body) => getComputedStyle(body, '::before').height)).toBe('22px');
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
     await expect(page.getByTestId('dialogue-next')).toContainText('えっ？');

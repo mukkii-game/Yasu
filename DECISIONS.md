@@ -229,3 +229,11 @@ is now `タイトルにかいてあったから`, and the accusation specifies
 
 Yasu's black body reaches the bottom of the room picture, while the title gains
 a small centered version without the face lettering to fill its empty skyline.
+
+# 2026-09-01: Align title Yasu to the horizon and shorten the tie
+
+The small title-screen Yasu is lowered so the center of his face sits on the sea
+horizon. His face outline is reduced to one pixel, and his black outfit now carries
+a short white tie matching the room-scene design. The room-scene tie is reduced from
+68 pixels to 22 pixels (roughly one third) so it reads as a necktie rather than a
+full-length white stripe.
