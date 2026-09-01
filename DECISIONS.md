@@ -299,3 +299,11 @@ The one-second correct-answer beat keeps its low thunder, locked input, and larg
 Yasu shake, but no longer paints the screen white. The room colors and background
 remain unchanged throughout, avoiding an uncomfortable full-screen flash before
 Yasu begins speaking.
+
+## 2026-09-01 — Use one symmetric Yasu design on the title and in the room
+
+The asymmetric 7:3 hair is superseded by a blocky center part: equal 21-pixel
+fringes fall in matching two-step shapes on the left and right, leaving a small
+central gap. The title character now uses the same visual parts at roughly half
+scale—a 29×39-pixel body, 25-pixel round head, matching center-parted hair, and
+short tie—while continuing to omit the face lettering as previously requested.
