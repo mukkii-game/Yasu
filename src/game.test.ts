@@ -60,7 +60,7 @@ describe('game flow', () => {
       if (step?.punchline) punchlines.push(step.punchline);
       state = advance(state);
     }
-    expect(punchlines).toEqual(['なぞときがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人間としてヤスッ！']);
+    expect(punchlines).toEqual(['なぞときがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人としてヤスッ！']);
     expect(state.phase).toBe('end');
   });
 
