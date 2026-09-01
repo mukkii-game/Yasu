@@ -123,9 +123,8 @@ button { border: 0; border-radius: 0; font: inherit; }
 .the-end { position: absolute; z-index: 10; left: 0; right: 0; top: 25px; color: var(--white); font-size: 40px; font-weight: 900; line-height: 46px; letter-spacing: 3px; text-shadow: 1px 0 var(--white), -1px 0 var(--white), 0 1px var(--white), 0 -1px var(--white); }
 .end-final { position: absolute; z-index: 20; inset: 82px 0 0; display: flex; flex-direction: column; align-items: center; background: transparent; color: var(--white); }
 .end-final > span, .end-final strong { display: block; color: var(--white); font-weight: 900; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
-.end-final > span { font-size: 31px; line-height: 39px; animation: punch-pop 140ms steps(3) both; }
-.end-final.stage-2 > span { animation: none; }
-.end-final strong { margin-top: 8px; font-size: 39px; line-height: 43px; letter-spacing: -2px; animation: punch-pop 140ms steps(3) both; }
+.end-final > span { font-size: 38px; line-height: 48px; letter-spacing: -1px; animation: punch-pop 140ms steps(3) both; }
+.end-final strong { font-size: 50px; line-height: 60px; letter-spacing: -2px; animation: punch-pop 140ms steps(3) both; }
 
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink-border { 50% { border-color: var(--white); } }

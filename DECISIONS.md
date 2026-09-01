@@ -191,3 +191,10 @@ The finale now stages 「このゲームじたい」 first with the same lead po
 Both use the established white text and one-pixel pink outline. Only after the
 payoff has remained fully visible for one second does the whole sunset begin its
 slow fade to the automatically restored title.
+
+## 2026-09-01 — The finale uses two exclusive cuts
+
+To make the final timing unmistakable, its setup and payoff no longer coexist:
+the oversized 「このゲーム⋯」 cut is replaced after 700 ms by an even larger
+「ヤスッ！！」 cut. The payoff alone remains during the one-second hold and the
+subsequent full-screen fade to title.
