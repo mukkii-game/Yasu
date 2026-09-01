@@ -100,6 +100,7 @@ test.describe('犯人はヤス', () => {
     await page.getByTestId('decide').click();
     await expect(page.locator('[data-scene-mode="impact"]')).toBeVisible();
     await expect(page.getByTestId('game-screen')).toHaveClass(/reveal-impact/);
+    await expect.poll(() => page.getByTestId('game-screen').evaluate((screen) => getComputedStyle(screen, '::after').content)).toBe('none');
     await expect(page.getByTestId('reveal-next')).toHaveCount(0);
     await expect(page.locator('.face-name')).toHaveText('ヤス');
     await finishDialogue(page, 'reveal-next');
