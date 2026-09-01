@@ -112,7 +112,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 .end-building.b { right: 0; width: 50px; height: 101px; }
 .end-building.c { right: 56px; width: 32px; height: 65px; }
 .end-road { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 52px; background: var(--brown); }
-.walkers { position: absolute; z-index: 5; right: 14px; bottom: 34px; width: 34px; height: 39px; animation: escort-walk 7s steps(48) 1 forwards; }
+.walkers { position: absolute; z-index: 5; left: 82px; bottom: 34px; width: 34px; height: 39px; animation: escort-walk 5.4s steps(36) 1 forwards; }
 .walkers i { position: absolute; bottom: 0; width: 13px; height: 23px; background: var(--black); }
 .walkers i::before { content: ""; position: absolute; left: 2px; top: -10px; width: 9px; height: 10px; background: var(--black); }
 .walkers .escort { left: 0; }
@@ -132,7 +132,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes final-pop { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes end-screen-fade { from { opacity: 1; } to { opacity: 0; } }
-@keyframes escort-walk { 0% { transform: translateX(0); } 48% { transform: translateX(-118px) translateY(-1px); } 50% { transform: translateX(-122px); } 100% { transform: translateX(-254px); } }
+@keyframes escort-walk { 0% { transform: translate(0, 0); } 12% { transform: translate(-15px, -1px); } 25% { transform: translate(-31px, 0); } 38% { transform: translate(-47px, -1px); } 50% { transform: translate(-63px, 0); } 62% { transform: translate(-79px, -1px); } 75% { transform: translate(-95px, 0); } 88% { transform: translate(-111px, -1px); } 100% { transform: translate(-127px, 0); } }
 
 @media (min-width: 540px) and (min-height: 520px) { :root { --scale: 2; } }
 @media (min-width: 820px) and (min-height: 760px) { :root { --scale: 3; } }
