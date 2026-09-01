@@ -334,3 +334,17 @@ Yasu now uses the same reference-inspired palette and outfit at both scales: a
 muted yellow face, rounded black center-parted hair, blue jacket, white shirt and
 collars, and a red tie slightly longer than the former white strip. The final
 setup is also tightened once more to `ゲーム全体が` before `ヤスッ！`.
+
+## 2026-09-01 — Give the final payoff a dedicated third line
+
+The final setup now enters as two simultaneous lines, `このゲーム` and
+`ぜんたいが`. After the established interval, `ヤスッ！` lands on a third line
+at 60 pixels, substantially larger than either setup line. Yasu's reference-led
+silhouette is refined at the same time with an octagonal hair cap, a softly
+squared face, and shoulder-shaped jacket at both title and room scales.
+
+## 2026-09-01 — Make the last setup deliberately repetitive
+
+The two simultaneous final setup lines are finalized as `このゲームの` and
+`ぜんぶがぜんぶ`. The pause, oversized third-line `ヤスッ！`, input lock, and
+automatic fade remain unchanged.

@@ -58,9 +58,9 @@ button { border: 0; border-radius: 0; font: inherit; }
 .building-b { right: 0; width: 44px; height: 62px; }
 .building-c { right: 48px; width: 32px; height: 47px; }
 .title-yasu { position: absolute; z-index: 4; left: 91px; bottom: -17px; width: 29px; height: 39px; }
-.title-yasu b { position: absolute; left: 2px; top: -25px; width: 25px; height: 25px; border: 1px solid var(--black); border-radius: 50%; background: var(--skin); }
-.title-yasu .title-hair { position: absolute; z-index: 2; left: 0; top: -3px; width: 23px; height: 13px; border-radius: 50% 50% 0 0 / 42% 42% 0 0; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
-.title-yasu em { position: absolute; inset: 0; background: var(--jacket); }
+.title-yasu b { position: absolute; left: 2px; top: -25px; width: 25px; height: 25px; border: 1px solid var(--black); border-radius: 42% 42% 48% 48% / 38% 38% 58% 58%; background: var(--skin); }
+.title-yasu .title-hair { position: absolute; z-index: 2; left: 0; top: -3px; width: 23px; height: 13px; background: var(--black); clip-path: polygon(12% 0, 88% 0, 96% 12%, 100% 30%, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%, 0 30%, 4% 12%); }
+.title-yasu em { position: absolute; inset: 0; background: var(--jacket); clip-path: polygon(18% 0, 82% 0, 100% 12%, 100% 100%, 0 100%, 0 12%); }
 .title-yasu em::before { content: ""; position: absolute; z-index: 1; left: 10px; top: 0; width: 9px; height: 16px; background: var(--white); }
 .title-yasu em::after { content: ""; position: absolute; z-index: 3; left: 13px; top: 3px; width: 3px; height: 13px; background: var(--red); clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); }
 .title-yasu .collar { position: absolute; z-index: 2; top: 0; width: 8px; height: 7px; background: var(--white); }
@@ -78,9 +78,9 @@ button { border: 0; border-radius: 0; font: inherit; }
 .window::before { content: ""; position: absolute; left: 5px; top: 0; width: 3px; height: 27px; background: var(--silver); box-shadow: 8px 0 var(--silver), 16px 0 var(--silver), 24px 0 var(--silver), 32px 0 var(--silver); }
 .window::after, .window i { display: none; }
 .yasu { position: absolute; z-index: 3; left: 89px; bottom: 0; width: 58px; height: 78px; }
-.yasu .head { position: absolute; z-index: 2; left: 4px; top: -51px; width: 50px; height: 50px; border: 2px solid var(--black); border-radius: 50%; background: var(--skin); }
-.yasu .hair { position: absolute; z-index: 2; left: 1px; top: -5px; width: 44px; height: 24px; border-radius: 50% 50% 0 0 / 42% 42% 0 0; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
-.yasu .body { position: absolute; inset: 0; background: var(--jacket); }
+.yasu .head { position: absolute; z-index: 2; left: 4px; top: -51px; width: 50px; height: 50px; border: 2px solid var(--black); border-radius: 42% 42% 48% 48% / 38% 38% 58% 58%; background: var(--skin); }
+.yasu .hair { position: absolute; z-index: 2; left: 1px; top: -5px; width: 44px; height: 24px; background: var(--black); clip-path: polygon(12% 0, 88% 0, 96% 12%, 100% 30%, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%, 0 30%, 4% 12%); }
+.yasu .body { position: absolute; inset: 0; background: var(--jacket); clip-path: polygon(18% 0, 82% 0, 100% 12%, 100% 100%, 0 100%, 0 12%); }
 .yasu .body::before { content: ""; position: absolute; z-index: 1; left: 19px; top: 0; width: 20px; height: 32px; background: var(--white); }
 .yasu .body::after { content: ""; position: absolute; z-index: 3; left: 26px; top: 4px; width: 6px; height: 26px; background: var(--red); clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); }
 .yasu .collar { position: absolute; z-index: 2; top: 0; width: 15px; height: 14px; background: var(--white); }
@@ -134,11 +134,12 @@ button { border: 0; border-radius: 0; font: inherit; }
 .walkers .cuffed-yasu::before { background: var(--gray); }
 .handcuff { position: absolute; left: 11px; top: 18px; width: 13px; height: 3px; border-left: 3px solid var(--silver); border-right: 3px solid var(--silver); background: var(--silver); }
 .the-end { position: absolute; z-index: 10; left: 0; right: 0; top: 25px; color: var(--white); font-size: 40px; font-weight: 900; line-height: 46px; letter-spacing: 3px; text-shadow: 1px 0 var(--white), -1px 0 var(--white), 0 1px var(--white), 0 -1px var(--white); }
-.end-final { position: absolute; z-index: 20; inset: 82px 0 0; display: flex; flex-direction: column; align-items: center; background: transparent; color: var(--white); white-space: nowrap; }
+.end-final { position: absolute; z-index: 20; inset: 76px 0 0; display: flex; flex-direction: column; align-items: center; background: transparent; color: var(--white); white-space: nowrap; }
 .end-final > span, .end-final strong { display: block; color: var(--white); font-weight: 900; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
-.end-final > span { font-size: 38px; line-height: 46px; letter-spacing: 0; animation: punch-pop 140ms steps(3) both; }
+.end-final > .end-setup { font-size: 34px; line-height: 38px; letter-spacing: 0; animation: punch-pop 140ms steps(3) both; }
+.end-final .end-setup b { display: block; font: inherit; }
 .end-final.stage-2 > span { animation: none; }
-.end-final strong { margin-top: 0; font-size: 49px; line-height: 54px; letter-spacing: 0; animation: punch-pop 140ms steps(3) both; }
+.end-final strong { margin-top: 0; font-size: 60px; line-height: 64px; letter-spacing: -1px; animation: punch-pop 140ms steps(3) both; }
 
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink-border { 50% { border-color: var(--white); } }

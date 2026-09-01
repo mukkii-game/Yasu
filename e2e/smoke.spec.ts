@@ -31,7 +31,7 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.title-yasu b')).toHaveCSS('width', '25px');
     await expect(page.locator('.title-yasu .title-hair')).toHaveCount(1);
     await expect(page.locator('.title-yasu .title-hair')).toHaveCSS('width', '23px');
-    await expect(page.locator('.title-yasu .title-hair')).toHaveCSS('clip-path', 'polygon(0px 0px, 100% 0px, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0px 82%)');
+    await expect(page.locator('.title-yasu .title-hair')).toHaveCSS('clip-path', 'polygon(12% 0px, 88% 0px, 96% 12%, 100% 30%, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0px 82%, 0px 30%, 4% 12%)');
     await expect(page.locator('.title-yasu em')).toHaveCSS('background-color', 'rgb(60, 64, 252)');
     await expect.poll(() => page.locator('.title-city').evaluate((city) => getComputedStyle(city, '::after').content)).toBe('none');
     const screenRatio = await page.locator('.screen-frame').evaluate((frame) => {
@@ -72,7 +72,7 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.yasu .hair')).toHaveCSS('width', '44px');
     await expect(page.locator('.yasu .hair')).toHaveCSS('left', '1px');
     await expect(page.locator('.yasu .hair')).toHaveCSS('top', '-5px');
-    await expect(page.locator('.yasu .hair')).toHaveCSS('clip-path', 'polygon(0px 0px, 100% 0px, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0px 82%)');
+    await expect(page.locator('.yasu .hair')).toHaveCSS('clip-path', 'polygon(12% 0px, 88% 0px, 96% 12%, 100% 30%, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0px 82%, 0px 30%, 4% 12%)');
     await expect(page.locator('.yasu .face-name')).toHaveCSS('font-size', '14px');
     await expect(page.locator('.yasu .face-name')).toHaveCSS('top', '17px');
     await expect(page.locator('.yasu .body')).toHaveCSS('background-color', 'rgb(60, 64, 252)');
@@ -189,11 +189,12 @@ test.describe('犯人はヤス', () => {
       };
     });
     expect(escortTiming).toEqual({ left: '41px', duration: '2.4s' });
-    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('ゲーム全体が', { timeout: 10_000 });
+    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲームの', 'ぜんぶがぜんぶ'], { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
-    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('ゲーム全体が');
+    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲームの', 'ぜんぶがぜんぶ']);
+    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCSS('font-size', '60px');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('white-space', 'nowrap');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
     await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade');
