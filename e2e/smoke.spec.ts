@@ -27,15 +27,20 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', shareDescription);
     await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute('content', shareDescription);
     await expect(page.locator('.title-yasu')).toBeVisible();
+    const screenRatio = await page.locator('.screen-frame').evaluate((frame) => {
+      const rect = frame.getBoundingClientRect();
+      return rect.width / rect.height;
+    });
+    expect(screenRatio).toBeCloseTo(4 / 3, 2);
     const titleYasu = await page.evaluate(() => {
       const city = document.querySelector('.title-city')!.getBoundingClientRect();
       const head = document.querySelector('.title-yasu b')!.getBoundingClientRect();
       const headStyle = getComputedStyle(document.querySelector('.title-yasu b')!);
       const tieStyle = getComputedStyle(document.querySelector('.title-yasu em')!, '::after');
-      const scale = city.width / 216;
+      const scale = city.height / 128;
       return {
         headCenter: (head.top + head.bottom) / 2,
-        horizon: city.top + 93 * scale,
+        horizon: city.top + 91 * scale,
         headBorder: headStyle.borderTopWidth,
         tieHeight: tieStyle.height,
       };
@@ -50,15 +55,19 @@ test.describe('犯人はヤス', () => {
   test('advances dialogue when the room itself is clicked', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('start-button').click();
+    await expect(page.locator('.command-window')).toContainText('ばしょいどう');
+    await expect(page.locator('.command-window')).toContainText('たいほ　する');
     await expect.poll(() => page.locator('.yasu .body').evaluate((body) => getComputedStyle(body, '::before').height)).toBe('22px');
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
     await expect(page.getByTestId('dialogue-next')).toContainText('えっ？');
     await finishDialogue(page, 'dialogue-next');
     const gap = await page.evaluate(() => {
+      const screen = document.querySelector('.game-screen')!.getBoundingClientRect();
       const scene = document.querySelector('.office-scene')!.getBoundingClientRect();
       const copy = document.querySelector('.dialogue-copy')!.getBoundingClientRect();
-      return copy.top - scene.bottom;
+      const verticalScale = screen.height / 240;
+      return (copy.top - scene.bottom) / verticalScale;
     });
     expect(gap).toBeLessThanOrEqual(5);
     await expect(page.getByTestId('dialogue-next').locator('.dialogue-copy > .next-mark')).toBeVisible();
@@ -100,7 +109,8 @@ test.describe('犯人はヤス', () => {
     await page.getByTestId('decide').click();
     await advanceDialogue(page, 'reveal-next');
     await finishDialogue(page, 'ending-next');
-    await expect(page.getByTestId('ending-next')).toContainText('タイトルにかいてあったから');
+    await expect(page.getByTestId('ending-next')).toContainText('タイトルにかいてあった');
+    await expect(page.getByTestId('ending-next')).not.toContainText('タイトルにかいてあったから');
     await expect(page.getByTestId('punchline')).toHaveCount(0);
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('なぞときが');
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');

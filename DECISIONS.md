@@ -251,3 +251,20 @@ The standard page description, Open Graph description, and X/Twitter description
 now all read 「あなたはこの謎が解けるか？　推理アドベンチャー。」. The former
 「2文字で終わる」 phrasing was removed because it gives away how quickly the
 mystery resolves instead of inviting the player to deduce it.
+
+## 2026-09-01 — Tighten the title-clue retort
+
+The player's answer to Yasu is shortened from
+`あなた「タイトルにかいてあったから」` to
+`あなた「タイトルにかいてあった」`. The following two-beat
+「なぞときが」「ヤスッ！」 punchline is unchanged.
+
+## 2026-09-01 — Strengthen the early-FC adventure silhouette
+
+The game keeps its lightweight CSS artwork and 16-color palette, but adopts the
+most recognizable shared layout from early Famicom mysteries: a small framed
+scene at upper left, a narrow command list at upper right, and a broad dialogue
+field below. The room is rebuilt from larger flat color blocks and Yasu gains a
+simple stepped hair cap without changing the blank 「ヤ」「ス」 face gag. The
+256×240 logical canvas receives a 1.25× horizontal display correction so the
+presented frame is 4:3 while vertical scaling stays integer-only.

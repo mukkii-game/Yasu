@@ -67,7 +67,7 @@ describe('game flow', () => {
   it('formats speaker quotes and preserves the requested reward line break', () => {
     expect(dialogueText(INTRO[0])).toBe('ヤス「ボス、これいじょうのてがかりがありません。めいきゅういりです。」');
     expect(dialogueText(INTRO[2])).toBe('あなた「はんにんは・・・」');
-    expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあったから」');
+    expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあった」');
     expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
     expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
   });
