@@ -212,3 +212,9 @@ The setup 「このゲーム⋯」 now stays visible after the usual 700 ms inte
 with 「ヤスッ！」 added beneath it rather than replacing it. The shorter wording
 keeps the larger 38 px and 50 px sizes. The escort crossing is also accelerated
 from 5.4 to 3.6 seconds, exactly 1.5× the previous speed.
+
+## 2026-09-01 — The face clue is phrased as a direct retort
+
+Immediately after Yasu asks how the player knew, the response is now the more
+direct `あなた「おまえのかおにかいてあるよ」`, leading into the unchanged
+two-beat 「なぞときが」「ヤスッ！」 punchline.

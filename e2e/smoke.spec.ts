@@ -75,6 +75,7 @@ test.describe('犯人はヤス', () => {
     await page.getByTestId('decide').click();
     await advanceDialogue(page, 'reveal-next');
     await finishDialogue(page, 'ending-next');
+    await expect(page.getByTestId('ending-next')).toContainText('おまえのかおにかいてあるよ');
     await expect(page.getByTestId('punchline')).toHaveCount(0);
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('なぞときが');
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');

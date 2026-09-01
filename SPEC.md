@@ -16,7 +16,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
 5. 「ヤス」 triggers the reveal. The room and faceless front-facing Yasu do not change color; Yasu only trembles rapidly while a quiet high-pitched two-hit-and-chord sting plays.
-6. After Yasu asks why the player knows, the player answers `あなた「かおにかいてあるから」`. The ending then advances through the accusation, motive, reward, and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
+6. After Yasu asks why the player knows, the player answers `あなた「おまえのかおにかいてあるよ」`. The ending then advances through the accusation, motive, reward, and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
    - 「なぞときが」 → 「ヤスッ！」
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」
