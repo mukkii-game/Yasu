@@ -189,11 +189,11 @@ test.describe('犯人はヤス', () => {
       };
     });
     expect(escortTiming).toEqual({ left: '41px', duration: '2.4s' });
-    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'ぜんたいが'], { timeout: 10_000 });
+    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲームの', 'ぜんぶがぜんぶ'], { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
-    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'ぜんたいが']);
+    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲームの', 'ぜんぶがぜんぶ']);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCSS('font-size', '60px');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('white-space', 'nowrap');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');

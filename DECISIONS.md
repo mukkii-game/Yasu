@@ -342,3 +342,9 @@ The final setup now enters as two simultaneous lines, `このゲーム` and
 at 60 pixels, substantially larger than either setup line. Yasu's reference-led
 silhouette is refined at the same time with an octagonal hair cap, a softly
 squared face, and shoulder-shaped jacket at both title and room scales.
+
+## 2026-09-01 — Make the last setup deliberately repetitive
+
+The two simultaneous final setup lines are finalized as `このゲームの` and
+`ぜんぶがぜんぶ`. The pause, oversized third-line `ヤスッ！`, input lock, and
+automatic fade remain unchanged.
