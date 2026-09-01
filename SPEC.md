@@ -16,7 +16,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
 5. 「ヤス」 triggers a one-second reveal beat before any dialogue appears. The whole screen flashes, a low double-hit thunder crash plays, and Yasu shakes by four logical pixels. Input is ignored during this beat. After exactly one second the flash and large shake stop, Yasu returns to the smaller tremble, and `ヤス「な、なぜわかったんですかっ！？」` begins typing.
-6. The player answers `あなた「タイトルにかいてあったから」`, then asks `あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」`. The ending advances through Yasu's motive, explicitly line-broken reward (`でももらったほうしゅうは` / `３０００円でしたよ　はっはっは`), and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
+6. The player answers `あなた「タイトルにかいてあった」`, then asks `あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」`. The ending advances through Yasu's motive, explicitly line-broken reward (`でももらったほうしゅうは` / `３０００円でしたよ　はっはっは`), and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
    - 「なぞときが」 → 「ヤスッ！」
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」
@@ -37,10 +37,10 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 - The small title-screen Yasu is lowered until the center of his face meets the sea horizon. His circular face uses a one-pixel black outline, and his black outfit includes the same short white tie as the in-game figure.
 - In the room scene, Yasu's white tie is 22 pixels tall (about one third of its former length); the black torso still extends to the bottom of the picture.
 
-- The logical display is exactly 256×240 pixels and scales only by integer factors (1×, 2×, 3×), preserving hard edges on phones and desktops.
+- The logical display is exactly 256×240 pixels. Vertical scaling remains integer-only (1×, 2×, 3×), while a 1.25× horizontal pixel-aspect correction presents the complete screen at 4:3 like a consumer CRT; scale breakpoints account for the wider frame so portrait phones do not overflow.
 - The CSS palette is a fixed 16-color NES-inspired subset. Scenes use flat fills; each small character sprite uses no more than four visible colors.
 - The title vignette contains buildings, sky, a straight sea horizon, and one small centered Yasu without face lettering. It has no road or body outline.
-- The story scene contains only one front-facing Yasu: a larger round blank head with slightly smaller white 「ヤ」「ス」 lettering separated by two logical pixels and a black square body extending to the bottom of the picture. The lettering has no outline, and the face has no eyes or mouth. There is no boss, foreground player, or desk. Yasu stops trembling once the first punchline appears.
+- The story screen follows the recognizable early FC adventure partition: a 174×128 framed room scene at upper left, a bordered six-line command list at upper right, and a 100-pixel-tall dialogue area below. The room uses flat color blocks, a barred window, and no desk. It contains only one front-facing Yasu: blocky black hair, a round blank head with white 「ヤ」「ス」 lettering separated by two logical pixels, a black square body reaching the picture bottom, and a short white tie. The lettering has no outline, and the face has no eyes or mouth. There is no boss or foreground player. Yasu stops trembling once the first punchline appears.
 - Japanese dialogue normally stays in one continuous `話者「本文」` string and wraps naturally at the screen edge. The reward line contains one intentional hard break before `３０００円`.
 - Every dialogue page is absolutely pinned two pixels below the scene boundary. Its animated ▼ is inline immediately after the completed closing quote.
 - Text remains readable and all kana input remains available by touch on phones.
