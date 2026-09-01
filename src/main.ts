@@ -86,7 +86,7 @@ function textBlip(): void {
   const gain = context.createGain();
   oscillator.type = 'square';
   oscillator.frequency.value = visibleCharacters % 4 === 0 ? 392 : 330;
-  gain.gain.setValueAtTime(0.011, now);
+  gain.gain.setValueAtTime(0.018, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
   oscillator.connect(gain).connect(context.destination);
   oscillator.start(now);
@@ -340,7 +340,7 @@ root.addEventListener('click', (event) => {
 
 document.addEventListener('keydown', (event) => {
   if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.key === 'Tab') return;
-  if (state.phase === 'end') { event.preventDefault(); setState(restart()); return; }
+  if (state.phase === 'end') { event.preventDefault(); return; }
   if (state.phase === 'input' && event.key === 'Backspace') {
     event.preventDefault(); setState(deleteKana(state)); return;
   }

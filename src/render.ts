@@ -28,8 +28,8 @@ function dialogue(state: GameState, options: RenderOptions): string {
   </button>`;
 }
 
-function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled'): string {
-  return `<div class="scene office-scene ${mode}" data-scene-mode="${mode}" aria-hidden="true">
+function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled', laughing: boolean): string {
+  return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
     <div class="yasu"><span class="head"><i class="hair"></i><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"></span></div>
   </div>`;
@@ -71,13 +71,15 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     content = titleScreen();
   } else if (state.phase === 'end') {
     const finalPunchline = options.endPunchlineStage > 0
-      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span>このゲームじたいが</span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</span>`
+      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span>このゲームが</span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</span>`
       : '';
-    content = `<button class="end-screen screen-button${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene(options.endPunchlineStage > 0)}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
+    content = `<div class="end-screen${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" aria-label="エンディング">${endScene(options.endPunchlineStage > 0)}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</div>`;
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const sceneMode = options.revealImpact ? 'impact' : comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
-    const scene = officeScene(sceneMode);
+    const step = currentDialogue(state);
+    const shownText = step ? Array.from(dialogueText(step)).slice(0, options.visibleCharacters).join('') : '';
+    const scene = officeScene(sceneMode, state.phase === 'ending' && state.endingIndex === 3 && shownText.includes('はっはっは'));
     content = state.phase === 'input' ? scene + kanaPanel(state) : options.revealImpact ? scene : scene + dialogue(state, options);
   }
 

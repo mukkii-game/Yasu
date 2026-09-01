@@ -314,3 +314,16 @@ The finale's first caption changes from `このゲーム⋯` to
 `このゲームじたいが`. It stays visible on the upper line while the unchanged
 `ヤスッ！` payoff enters below after the established interval; the sound and
 fade timings remain unchanged.
+
+## 2026-09-01 — Refine the final joke and Yasu's center part
+
+The title and room sprites now share one continuous symmetric center-part shape
+with fine diagonal fringes instead of a stepped pair with a rectangular gap. The
+face lettering moves two pixels upward, and Yasu's torso bobs by two pixels while
+`はっはっは` is visible. Dialogue blips rise to the first punchline cue's 0.018
+gain, while the payoff remains deliberately much louder.
+
+The last setup is shortened to `このゲームが`, kept on one line, and styled as
+a proportional enlargement of the room punchline before the unchanged second
+beat `ヤスッ！`. All clicks and keys are ignored during `THE END`; only the
+scheduled fade may return the game to its title.

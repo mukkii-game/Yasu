@@ -58,9 +58,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 .building-c { right: 48px; width: 32px; height: 47px; }
 .title-yasu { position: absolute; z-index: 4; left: 91px; bottom: -17px; width: 29px; height: 39px; }
 .title-yasu b { position: absolute; left: 2px; top: -25px; width: 25px; height: 25px; border: 1px solid var(--black); border-radius: 50%; background: var(--skin); }
-.title-yasu .title-hair { position: absolute; z-index: 2; left: 1px; top: -2px; width: 20px; height: 4px; background: var(--black); }
-.title-yasu .title-hair::before { content: ""; position: absolute; left: -2px; top: 4px; width: 11px; height: 3px; background: var(--black); box-shadow: 0 3px var(--black); }
-.title-yasu .title-hair::after { content: ""; position: absolute; right: -2px; top: 4px; width: 11px; height: 3px; background: var(--black); box-shadow: 0 3px var(--black); }
+.title-yasu .title-hair { position: absolute; z-index: 2; left: 0; top: -2px; width: 23px; height: 12px; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
 .title-yasu em { position: absolute; inset: 0; background: var(--black); }
 .title-yasu em::after { content: ""; position: absolute; left: 12px; top: 2px; width: 5px; height: 11px; background: var(--white); }
 .title-main { position: absolute; left: 0; right: 0; top: 154px; color: var(--white); font-size: 30px; line-height: 32px; letter-spacing: 1px; text-shadow: 2px 0 var(--black), -2px 0 var(--black), 0 2px var(--black), 3px 3px var(--red); }
@@ -76,15 +74,14 @@ button { border: 0; border-radius: 0; font: inherit; }
 .window::after, .window i { display: none; }
 .yasu { position: absolute; z-index: 3; left: 89px; bottom: 0; width: 58px; height: 78px; }
 .yasu .head { position: absolute; z-index: 2; left: 4px; top: -51px; width: 50px; height: 50px; border: 2px solid var(--black); border-radius: 50%; background: var(--skin); }
-.yasu .hair { position: absolute; z-index: 2; left: 4px; top: -3px; width: 38px; height: 7px; background: var(--black); }
-.yasu .hair::before { content: ""; position: absolute; left: -3px; top: 6px; width: 21px; height: 6px; background: var(--black); box-shadow: -1px 6px var(--black); }
-.yasu .hair::after { content: ""; position: absolute; right: -3px; top: 6px; width: 21px; height: 6px; background: var(--black); box-shadow: 1px 6px var(--black); }
+.yasu .hair { position: absolute; z-index: 2; left: 1px; top: -3px; width: 44px; height: 22px; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
 .yasu .body { position: absolute; inset: 0; background: var(--black); }
 .yasu .body::before { content: ""; position: absolute; left: 25px; top: 0; width: 8px; height: 22px; background: var(--white); }
-.yasu .face-name { position: absolute; z-index: 1; left: 0; right: 0; top: 19px; bottom: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: var(--white); font-size: 14px; font-style: normal; font-weight: 900; line-height: 14px; }
+.yasu .face-name { position: absolute; z-index: 1; left: 0; right: 0; top: 17px; bottom: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: var(--white); font-size: 14px; font-style: normal; font-weight: 900; line-height: 14px; }
 .yasu .face-name b { font: inherit; }
 .nervous .yasu { animation: tremble 75ms steps(2) infinite; }
 .impact .yasu { animation: impact-tremble 55ms steps(2) infinite; }
+.laughing .yasu .body { animation: laugh-bob 180ms steps(2) infinite; }
 
 .dialogue-box { position: absolute; z-index: 12; left: 0; right: 0; bottom: 0; width: 256px; height: 80px; padding: 2px 13px 5px; color: var(--white); background: var(--black); text-align: left; font-size: 13px; line-height: 20px; letter-spacing: 0; }
 .dialogue-copy { position: absolute; left: 13px; right: 8px; top: 2px; display: block; white-space: pre-wrap; }
@@ -128,16 +125,17 @@ button { border: 0; border-radius: 0; font: inherit; }
 .walkers .cuffed-yasu::before { background: var(--gray); }
 .handcuff { position: absolute; left: 11px; top: 18px; width: 13px; height: 3px; border-left: 3px solid var(--silver); border-right: 3px solid var(--silver); background: var(--silver); }
 .the-end { position: absolute; z-index: 10; left: 0; right: 0; top: 25px; color: var(--white); font-size: 40px; font-weight: 900; line-height: 46px; letter-spacing: 3px; text-shadow: 1px 0 var(--white), -1px 0 var(--white), 0 1px var(--white), 0 -1px var(--white); }
-.end-final { position: absolute; z-index: 20; inset: 82px 0 0; display: flex; flex-direction: column; align-items: center; background: transparent; color: var(--white); }
+.end-final { position: absolute; z-index: 20; inset: 82px 0 0; display: flex; flex-direction: column; align-items: center; background: transparent; color: var(--white); white-space: nowrap; }
 .end-final > span, .end-final strong { display: block; color: var(--white); font-weight: 900; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
-.end-final > span { font-size: 38px; line-height: 48px; letter-spacing: -1px; animation: punch-pop 140ms steps(3) both; }
+.end-final > span { font-size: 38px; line-height: 46px; letter-spacing: 0; animation: punch-pop 140ms steps(3) both; }
 .end-final.stage-2 > span { animation: none; }
-.end-final strong { margin-top: 6px; font-size: 50px; line-height: 60px; letter-spacing: -2px; animation: punch-pop 140ms steps(3) both; }
+.end-final strong { margin-top: 0; font-size: 49px; line-height: 54px; letter-spacing: 0; animation: punch-pop 140ms steps(3) both; }
 
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink-border { 50% { border-color: var(--white); } }
 @keyframes tremble { 50% { transform: translate(2px, -1px); } }
 @keyframes impact-tremble { 0% { transform: translate(-4px, 2px); } 50% { transform: translate(4px, -2px); } }
+@keyframes laugh-bob { 50% { transform: translateY(2px); } }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes final-pop { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes end-screen-fade { from { opacity: 1; } to { opacity: 0; } }

@@ -30,6 +30,8 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.title-yasu')).toHaveCSS('width', '29px');
     await expect(page.locator('.title-yasu b')).toHaveCSS('width', '25px');
     await expect(page.locator('.title-yasu .title-hair')).toHaveCount(1);
+    await expect(page.locator('.title-yasu .title-hair')).toHaveCSS('width', '23px');
+    await expect(page.locator('.title-yasu .title-hair')).toHaveCSS('clip-path', 'polygon(0px 0px, 100% 0px, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0px 82%)');
     await expect.poll(() => page.locator('.title-city').evaluate((city) => getComputedStyle(city, '::after').content)).toBe('none');
     const screenRatio = await page.locator('.screen-frame').evaluate((frame) => {
       const rect = frame.getBoundingClientRect();
@@ -66,11 +68,12 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.command-window')).toHaveCount(0);
     await expect(page.locator('.office-scene')).toHaveCSS('width', '236px');
     await expect(page.locator('.yasu .head')).toHaveCSS('width', '50px');
-    await expect(page.locator('.yasu .hair')).toHaveCSS('width', '38px');
-    await expect(page.locator('.yasu .hair')).toHaveCSS('left', '4px');
+    await expect(page.locator('.yasu .hair')).toHaveCSS('width', '44px');
+    await expect(page.locator('.yasu .hair')).toHaveCSS('left', '1px');
     await expect(page.locator('.yasu .hair')).toHaveCSS('top', '-3px');
+    await expect(page.locator('.yasu .hair')).toHaveCSS('clip-path', 'polygon(0px 0px, 100% 0px, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0px 82%)');
     await expect(page.locator('.yasu .face-name')).toHaveCSS('font-size', '14px');
-    await expect(page.locator('.yasu .face-name')).toHaveCSS('top', '19px');
+    await expect(page.locator('.yasu .face-name')).toHaveCSS('top', '17px');
     await expect.poll(() => page.locator('.yasu .body').evaluate((body) => getComputedStyle(body, '::before').height)).toBe('22px');
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
@@ -162,11 +165,17 @@ test.describe('犯人はヤス', () => {
     await page.getByTestId('decide').click();
     await advanceDialogue(page, 'reveal-next');
 
-    for (const hasPunchline of [true, false, true, true, true]) {
+    for (const [index, hasPunchline] of [true, false, true, true, true].entries()) {
       if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
+      if (index === 3) await expect(page.locator('.office-scene')).toHaveClass(/laughing/);
+      if (index === 4) await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
       await page.getByTestId('ending-next').click();
     }
 
+    await expect(page.getByTestId('the-end')).toBeVisible();
+    await expect(page.getByTestId('end-screen')).not.toHaveAttribute('data-action');
+    await page.getByTestId('end-screen').click({ position: { x: 120, y: 100 } });
+    await page.keyboard.press('Enter');
     await expect(page.getByTestId('the-end')).toBeVisible();
     const escortTiming = await page.evaluate(() => {
       const escortRule = Array.from(document.styleSheets)
@@ -178,11 +187,12 @@ test.describe('犯人はヤス', () => {
       };
     });
     expect(escortTiming).toEqual({ left: '41px', duration: '2.4s' });
-    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('このゲームじたいが', { timeout: 10_000 });
+    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('このゲームが', { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
-    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('このゲームじたいが');
+    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('このゲームが');
+    await expect(page.getByTestId('end-punchline')).toHaveCSS('white-space', 'nowrap');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
     await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade');
     await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 6_000 });
