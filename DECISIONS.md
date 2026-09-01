@@ -391,3 +391,12 @@ the clue reply to `タイトルにかいてあったよ`. After the final `人�
 clack, and enter the sunset screen automatically. On sub-660-pixel portrait
 viewports, continuously scale the unchanged 256×240 game to the full available
 width instead of leaving the former margins.
+
+## 2026-09-01 — Replace the major cues with the author's free audio
+
+Play the supplied anxious piano once when the opening Yasu line begins. Replace
+the generated reveal crash with `ショック1.mp3`, every ordinary second-beat
+`ヤスッ！` jingle with `ビシッとツッコミ2.mp3`, and the final oversized
+`ヤスッ！` sting with `ドーン.mp3`. Keep the small synthesized setup pop,
+typing blips, input clicks, and handcuff clack unchanged. The supplied temple
+bell is deliberately left unused because no scene was assigned to it.

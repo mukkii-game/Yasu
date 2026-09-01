@@ -15,13 +15,13 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
    - The player says 「はんにんは・・・」.
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
-5. 「ヤス」 triggers a one-second reveal beat before any dialogue appears. The background and screen colors remain unchanged: a low double-hit thunder crash plays and Yasu shakes by four logical pixels, with no full-screen flash. Input is ignored during this beat. After exactly one second the large shake stops, Yasu returns to the smaller tremble, and `ヤス「な、なぜわかったんですかっ！？」` begins typing.
-6. The player answers `あなた「タイトルにかいてあったよ」`, then asks `あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」`. The ending advances through Yasu's motive, explicitly line-broken reward (`でももらったほうしゅうは` / `３０００円でしたよ　はっはっは`), and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
+5. 「ヤス」 triggers a one-second reveal beat before any dialogue appears. The background and screen colors remain unchanged: the supplied `ショック1.mp3` effect plays and Yasu shakes by four logical pixels, with no full-screen flash. Input is ignored during this beat. After exactly one second the large shake stops, Yasu returns to the smaller tremble, and `ヤス「な、なぜわかったんですかっ！？」` begins typing.
+6. The player answers `あなた「タイトルにかいてあったよ」`, then asks `あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」`. The ending advances through Yasu's motive, explicitly line-broken reward (`でももらったほうしゅうは` / `３０００円でしたよ　はっはっは`), and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with the supplied `ビシッとツッコミ2.mp3` effect. Both are thick white text with a fine one-pixel pink outline and no box:
    - 「なぞときが」 → 「ヤスッ！」
    - 「動機がヤスッ！」
    - 「報酬もヤスッ！」
    - 「人として」 → 「ヤスッ！」
-7. After 「人として」 / 「ヤスッ！」 appears, input is locked. Exactly one second later a short synthesized 8-bit handcuff clack plays and the sunset final screen begins. A small anonymous escort and the handcuffed detective Yasu start at X=41 pixels—halfway between their former X=82 position and the left edge—bob by one logical pixel, and walk for 2.4 seconds until they disappear beyond the left edge. They are removed before any final caption renders, so rerendering can never restart the walk. There is no foreground player. `THE END` is thick plain white text and there is no ending music. After both figures leave, 「このゲーム」 and 「なにもかも」 enter together on two lines with the lead pop. The usual 700 ms later, a notably larger 60-pixel 「ヤスッ！」 appears on a third line with the exaggerated final sting while both setup lines remain above it. All three lines are nowrap enlargements of the room punchline typography. One second after the payoff appears, the entire ending begins a slow fade and then returns to the title automatically.
+7. After 「人として」 / 「ヤスッ！」 appears, input is locked. Exactly one second later a short synthesized 8-bit handcuff clack plays and the sunset final screen begins. A small anonymous escort and the handcuffed detective Yasu start at X=41 pixels—halfway between their former X=82 position and the left edge—bob by one logical pixel, and walk for 2.4 seconds until they disappear beyond the left edge. They are removed before any final caption renders, so rerendering can never restart the walk. There is no foreground player. `THE END` is thick plain white text and there is no ending music. After both figures leave, 「このゲーム」 and 「なにもかも」 enter together on two lines with the lead pop. The usual 700 ms later, a notably larger 60-pixel 「ヤスッ！」 appears on a third line with the supplied `ドーン.mp3` effect while both setup lines remain above it. All three lines are nowrap enlargements of the room punchline typography. One second after the payoff appears, the entire ending begins a slow fade and then returns to the title automatically.
 8. Taps, clicks, and unmodified keys are ignored throughout `THE END`, preventing the player from skipping the final joke. Input becomes active again only after the automatic return to a clean title state; no retry button is shown.
 
 ## Controls
@@ -29,7 +29,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 - Dialogue is typed one character at a time. Any click anywhere in the game or any unmodified non-Tab key completes the current line first, then advances on the next input.
 - Select katakana with the on-screen panel. `Backspace` removes the last selected character.
 - 「けす」 removes one character; 「ぜんぶけす」 removes both; 「けってい」 submits two characters.
-- There is no sound control. Character-by-character dialogue has a square-wave blip at the same 0.018 gain as the first punchline cue. Kana choices make a short click and 「けってい」 makes a two-note confirmation. Ordinary dialogue navigation remains silent; the reveal, both halves of each punchline, and the finale have their own effects. The second punchline cue remains intentionally much louder.
+- There is no sound control. The supplied `不安（ピアノ演奏）.mp3` starts once at the beginning of the opening Yasu dialogue. Character-by-character dialogue has a square-wave blip at the same 0.018 gain as the first punchline cue. Kana choices make a short click and 「けってい」 makes a two-note confirmation. Ordinary dialogue navigation remains silent; the reveal, both halves of each punchline, and the finale have their own effects. The second punchline cue remains intentionally much louder.
 
 ## Presentation
 
@@ -53,7 +53,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 
 - `src/game.ts` — pure immutable state transitions, dialogue data, and kana list.
 - `src/render.ts` — turns a `GameState` into accessible DOM markup.
-- `src/main.ts` — global click/key control, character-by-character timing and blips, the locked one-second thunder/shake reveal, delayed two-stage punchlines, comic fanfare playback, the final sting, and rendering coordination.
+- `src/main.ts` — global click/key control, character-by-character timing and blips, playback of the supplied opening/reveal/punchline/finale effects, the locked one-second reveal shake, delayed two-stage punchlines, and rendering coordination.
 - `src/style.css` — the complete 256×240 presentation, 16-color palette, CSS pixel scenes, and integer scaling rules.
 
 Pure gameplay transitions belong in `src/game.ts` and stay DOM-free so Vitest can cover the full route to the ending.
