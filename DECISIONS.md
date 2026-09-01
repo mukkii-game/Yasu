@@ -307,3 +307,10 @@ fringes fall in matching two-step shapes on the left and right, leaving a small
 central gap. The title character now uses the same visual parts at roughly half
 scale—a 29×39-pixel body, 25-pixel round head, matching center-parted hair, and
 short tie—while continuing to omit the face lettering as previously requested.
+
+## 2026-09-01 — Complete the final setup phrase
+
+The finale's first caption changes from `このゲーム⋯` to
+`このゲームじたいが`. It stays visible on the upper line while the unchanged
+`ヤスッ！` payoff enters below after the established interval; the sound and
+fade timings remain unchanged.
