@@ -1,5 +1,5 @@
 import {
-  advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText,
+  ENDING, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText,
   restart, startGame, submitAnswer, type GameState,
 } from './game';
 import { renderApp } from './render';
@@ -25,6 +25,7 @@ let endTimer: number | undefined;
 let endSecondTimer: number | undefined;
 let endReturnTimer: number | undefined;
 let revealTimer: number | undefined;
+let custodyTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
 let endPunchlineStage: 0 | 1 | 2 = 0;
 let revealImpact = false;
@@ -123,6 +124,26 @@ function decisionBlip(): void {
   });
 }
 
+function handcuffClack(): void {
+  const context = getAudio();
+  const now = context.currentTime;
+  [
+    { at: 0, frequency: 1760, duration: 0.045, volume: 0.04 },
+    { at: 0.075, frequency: 880, duration: 0.065, volume: 0.045 },
+  ].forEach(({ at, frequency, duration, volume }) => {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(frequency, now + at);
+    oscillator.frequency.exponentialRampToValueAtTime(frequency / 2, now + at + duration);
+    gain.gain.setValueAtTime(volume, now + at);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + at + duration);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start(now + at);
+    oscillator.stop(now + at + duration);
+  });
+}
+
 function punchlineLeadBlip(): void {
   const context = getAudio();
   const now = context.currentTime;
@@ -170,6 +191,25 @@ function clearPunchlineTimers(): void {
   punchlineSecondTimer = undefined;
 }
 
+function isFinalEndingPage(): boolean {
+  return state.phase === 'ending' && state.endingIndex === ENDING.length - 1;
+}
+
+function clearCustodyTimer(): void {
+  if (custodyTimer !== undefined) window.clearTimeout(custodyTimer);
+  custodyTimer = undefined;
+}
+
+function scheduleCustodyTransition(): void {
+  clearCustodyTimer();
+  custodyTimer = window.setTimeout(() => {
+    custodyTimer = undefined;
+    if (!isFinalEndingPage() || punchlineStage < 2) return;
+    handcuffClack();
+    setState(advance(state));
+  }, 1000);
+}
+
 function render(): void {
   renderApp(root, state, { visibleCharacters, punchlineStage, endPunchlineStage, revealImpact });
 }
@@ -192,6 +232,7 @@ function schedulePunchline(): void {
       punchlineStage = 2;
       playJingle();
       render();
+      if (isFinalEndingPage()) scheduleCustodyTransition();
     }, 700);
   }, 1250);
 }
@@ -274,6 +315,7 @@ function scheduleEndPunchline(): void {
 
 function setState(next: GameState): void {
   if (next === state) return;
+  clearCustodyTimer();
   clearEndTimer();
   clearRevealTimer();
   endPunchlineStage = 0;
@@ -291,6 +333,7 @@ function advanceOrFinish(): void {
   }
   if (step?.punchline) {
     if (punchlineStage < 2) return;
+    if (isFinalEndingPage()) return;
   }
   setState(advance(state));
 }
@@ -354,3 +397,18 @@ document.addEventListener('keydown', (event) => {
 });
 
 render();
+
+function updatePhoneScale(): void {
+  const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  if (viewportWidth < 660) {
+    const scale = Math.min(viewportWidth / 320, viewportHeight / 240);
+    document.documentElement.style.setProperty('--scale', String(scale));
+  } else {
+    document.documentElement.style.removeProperty('--scale');
+  }
+}
+
+updatePhoneScale();
+window.addEventListener('resize', updatePhoneScale);
+window.visualViewport?.addEventListener('resize', updatePhoneScale);

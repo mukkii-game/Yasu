@@ -30,6 +30,7 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.title-yasu')).toHaveCSS('width', '32px');
     await expect(page.locator('.title-yasu')).toHaveCSS('height', '48px');
     await expect(page.locator('.title-yasu img')).toHaveCSS('image-rendering', 'pixelated');
+    await expect.poll(() => page.locator('.title-yasu').evaluate((sprite) => getComputedStyle(sprite, '::after').height)).toBe('5px');
     await expect.poll(() => page.locator('.title-city').evaluate((city) => getComputedStyle(city, '::after').content)).toBe('none');
     const screenRatio = await page.locator('.screen-frame').evaluate((frame) => {
       const rect = frame.getBoundingClientRect();
@@ -64,16 +65,22 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.command-window')).toHaveCount(0);
     await expect(page.locator('.office-scene')).toHaveCSS('width', '236px');
     await expect(page.locator('.yasu')).toHaveCSS('width', '64px');
-    await expect(page.locator('.yasu')).toHaveCSS('height', '96px');
+    await expect(page.locator('.yasu')).toHaveCSS('height', '132px');
     await expect(page.locator('.yasu .head')).toHaveCSS('width', '64px');
     await expect(page.locator('.yasu .head')).toHaveCSS('height', '52px');
-    await expect(page.locator('.yasu .body')).toHaveCSS('height', '44px');
+    await expect(page.locator('.yasu .body')).toHaveCSS('height', '80px');
     await expect(page.locator('.yasu img')).toHaveCount(2);
     await expect(page.locator('.yasu img').first()).toHaveCSS('image-rendering', 'pixelated');
     await expect(page.locator('.yasu .face-name')).toHaveCSS('font-size', '13px');
     await expect(page.locator('.yasu .face-name')).toHaveCSS('top', '16px');
     const spriteSources = await page.locator('.yasu img').evaluateAll((images) => images.map((image) => (image as HTMLImageElement).src));
     expect(new Set(spriteSources).size).toBe(1);
+    const bodyReachesSceneBottom = await page.evaluate(() => {
+      const body = document.querySelector('.yasu .body')!.getBoundingClientRect();
+      const scene = document.querySelector('.office-scene')!.getBoundingClientRect();
+      return Math.abs(body.bottom - scene.bottom) <= 4;
+    });
+    expect(bodyReachesSceneBottom).toBe(true);
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
     await expect(page.getByTestId('dialogue-next')).toContainText('えっ？');
@@ -176,6 +183,9 @@ test.describe('犯人はヤス', () => {
         await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
       }
       await page.getByTestId('ending-next').click();
+      if (index === 4) {
+        await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
+      }
     }
 
     await expect(page.getByTestId('the-end')).toBeVisible();
@@ -209,6 +219,8 @@ test.describe('犯人はヤス', () => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto('/');
     await expect(page.getByTestId('game-screen')).toHaveCSS('width', '256px');
+    const phoneFrame = await page.locator('.screen-frame').boundingBox();
+    expect(phoneFrame?.width).toBeCloseTo(360, 0);
     await reachInput(page);
     await expect(page.getByRole('button', { name: 'ン', exact: true })).toBeVisible();
     await expect(page.getByTestId('decide')).toBeVisible();
