@@ -205,3 +205,10 @@ The pair now begins just left of the centered sun, walks a shorter 5.4-second
 route with a restrained one-pixel bob, and fully clears the left edge. Final
 caption renders omit the walkers from the DOM, preventing the CSS entrance
 animation from restarting when either caption cut appears.
+
+## 2026-09-01 — The final setup remains above its payoff
+
+The setup 「このゲーム⋯」 now stays visible after the usual 700 ms interval,
+with 「ヤスッ！」 added beneath it rather than replacing it. The shorter wording
+keeps the larger 38 px and 50 px sizes. The escort crossing is also accelerated
+from 5.4 to 3.6 seconds, exactly 1.5× the previous speed.
