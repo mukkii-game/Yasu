@@ -7,13 +7,15 @@
 - License: SIL Open Font License 1.1
 - Bundled files: `public/fonts/DotGothic16-Regular.ttf`, `public/fonts/OFL-DotGothic16.txt`
 
-## 8-bit sound effects
-
-- **The Essential Retro Video Game Sound Effects Collection [512 sounds]** by Juhani Junkala
-- Source: https://opengameart.org/content/512-sound-effects-8-bit-style
-- License: CC0 1.0
-- Selected original file: `sfx_sounds_fanfare1.wav`
-- Bundled as: `public/audio/jingle.wav`
-- The author's original release note is preserved as `public/audio/SOURCE.txt`.
-
 No graphics, characters, logo treatments, interface captures, or audio from an existing commercial game are included.
+
+## Additional sound effects
+
+The game author supplied the following royalty-free MP3 effects for this project:
+
+- `不安（ピアノ演奏）.mp3` — bundled as `public/audio/anxiety.mp3`
+- `ビシッとツッコミ2.mp3` — bundled as `public/audio/punchline-hit.mp3`
+- `ショック1.mp3` — bundled as `public/audio/reveal-shock.mp3`
+- `ドーン.mp3` — bundled as `public/audio/final-boom.mp3`
+
+`お寺の鐘.mp3` was supplied at the same time but is not used in the game.

@@ -18,6 +18,12 @@ async function reachInput(page: import('@playwright/test').Page) {
   await expect(page.getByTestId('kana-panel')).toBeVisible();
 }
 
+async function playedSoundFiles(page: import('@playwright/test').Page) {
+  return page.evaluate(() => (
+    window as typeof window & { __playedSounds: string[] }
+  ).__playedSounds.map((source) => new URL(source).pathname.split('/').pop()));
+}
+
 test.describe('犯人はヤス', () => {
   test('shows the FC-style title and opens the kana input', async ({ page }) => {
     await page.goto('/');
@@ -162,13 +168,32 @@ test.describe('犯人はヤス', () => {
     expect(errors).toEqual([]);
   });
 
+  test('serves every supplied MP3 cue', async ({ request }) => {
+    for (const filename of ['anxiety.mp3', 'punchline-hit.mp3', 'reveal-shock.mp3', 'final-boom.mp3']) {
+      const response = await request.get(`/audio/${filename}`);
+      expect(response.ok()).toBe(true);
+      expect(response.headers()['content-type']).toContain('audio/mpeg');
+      expect((await response.body()).length).toBeGreaterThan(10_000);
+    }
+  });
+
   test('overlays and fades the final comeback after the escort leaves', async ({ page }) => {
+    await page.addInitScript(() => {
+      const playedSounds: string[] = [];
+      Object.defineProperty(window, '__playedSounds', { value: playedSounds });
+      HTMLMediaElement.prototype.play = function play() {
+        playedSounds.push(this.src);
+        return Promise.resolve();
+      };
+    });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     await reachInput(page);
+    expect(await playedSoundFiles(page)).toContain('anxiety.mp3');
     await page.getByRole('button', { name: 'ヤ', exact: true }).click();
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
+    expect(await playedSoundFiles(page)).toContain('reveal-shock.mp3');
     await advanceDialogue(page, 'reveal-next');
 
     for (const [index, hasPunchline] of [true, false, true, true, true].entries()) {
@@ -179,6 +204,7 @@ test.describe('犯人はヤス', () => {
         await expect(page.locator('.yasu .body')).not.toHaveCSS('animation-name', 'nod-twice');
       }
       if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
+      if (hasPunchline) expect(await playedSoundFiles(page)).toContain('punchline-hit.mp3');
       if (index === 4) {
         await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
       }
@@ -207,6 +233,7 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
+    expect(await playedSoundFiles(page)).toContain('final-boom.mp3');
     await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも']);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCSS('font-size', '60px');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('white-space', 'nowrap');

@@ -11,9 +11,20 @@ function required<T>(value: T | null, message: string): T {
 }
 
 const root = required(document.querySelector<HTMLElement>('#app'), 'Game root is missing');
-const jingle = new Audio(`${import.meta.env.BASE_URL}audio/jingle.wav`);
-jingle.preload = 'auto';
-jingle.volume = 0.24;
+const anxiety = new Audio(`${import.meta.env.BASE_URL}audio/anxiety.mp3`);
+const punchlineHit = new Audio(`${import.meta.env.BASE_URL}audio/punchline-hit.mp3`);
+const revealShock = new Audio(`${import.meta.env.BASE_URL}audio/reveal-shock.mp3`);
+const finalBoom = new Audio(`${import.meta.env.BASE_URL}audio/final-boom.mp3`);
+
+[
+  { sound: anxiety, volume: 0.65 },
+  { sound: punchlineHit, volume: 0.8 },
+  { sound: revealShock, volume: 0.85 },
+  { sound: finalBoom, volume: 1 },
+].forEach(({ sound, volume }) => {
+  sound.preload = 'auto';
+  sound.volume = volume;
+});
 
 let state: GameState = createGame();
 let audio: AudioContext | undefined;
@@ -36,48 +47,10 @@ function getAudio(): AudioContext {
   return audio;
 }
 
-function revealThunder(): void {
-  const context = getAudio();
-  const now = context.currentTime;
-  const notes = [
-    { at: 0, frequency: 110, duration: 0.13, volume: 0.035 },
-    { at: 0.22, frequency: 73, duration: 0.72, volume: 0.04 },
-    { at: 0.22, frequency: 98, duration: 0.72, volume: 0.03 },
-    { at: 0.22, frequency: 147, duration: 0.58, volume: 0.02 },
-  ];
-  notes.forEach(({ at, frequency, duration, volume }) => {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = at === 0 ? 'square' : 'sawtooth';
-    oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(volume, now + at);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + at + duration);
-    oscillator.connect(gain).connect(context.destination);
-    oscillator.start(now + at);
-    oscillator.stop(now + at + duration);
-  });
-
-  const buffer = context.createBuffer(1, Math.floor(context.sampleRate * 0.78), context.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let index = 0; index < data.length; index += 1) {
-    data[index] = (Math.random() * 2 - 1) * (1 - index / data.length);
-  }
-  const noise = context.createBufferSource();
-  const filter = context.createBiquadFilter();
-  const noiseGain = context.createGain();
-  noise.buffer = buffer;
-  filter.type = 'lowpass';
-  filter.frequency.value = 900;
-  noiseGain.gain.setValueAtTime(0.045, now + 0.2);
-  noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.98);
-  noise.connect(filter).connect(noiseGain).connect(context.destination);
-  noise.start(now + 0.2);
-  noise.stop(now + 0.98);
-}
-
-function playJingle(): void {
-  jingle.currentTime = 0;
-  void jingle.play().catch(() => undefined);
+function playSound(sound: HTMLAudioElement): void {
+  sound.pause();
+  sound.currentTime = 0;
+  void sound.play().catch(() => undefined);
 }
 
 function textBlip(): void {
@@ -160,30 +133,6 @@ function punchlineLeadBlip(): void {
   });
 }
 
-function playBigJingle(): void {
-  playJingle();
-  const context = getAudio();
-  const now = context.currentTime;
-  const notes = [
-    { at: 0, frequency: 392, duration: 0.14, volume: 0.022 },
-    { at: 0.16, frequency: 523, duration: 0.16, volume: 0.024 },
-    { at: 0.35, frequency: 523, duration: 0.85, volume: 0.024 },
-    { at: 0.35, frequency: 659, duration: 0.85, volume: 0.02 },
-    { at: 0.35, frequency: 784, duration: 0.85, volume: 0.017 },
-  ];
-  notes.forEach(({ at, frequency, duration, volume }) => {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = 'square';
-    oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(volume, now + at);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + at + duration);
-    oscillator.connect(gain).connect(context.destination);
-    oscillator.start(now + at);
-    oscillator.stop(now + at + duration);
-  });
-}
-
 function clearPunchlineTimers(): void {
   if (punchlineTimer !== undefined) window.clearTimeout(punchlineTimer);
   if (punchlineSecondTimer !== undefined) window.clearTimeout(punchlineSecondTimer);
@@ -230,7 +179,7 @@ function schedulePunchline(): void {
     punchlineSecondTimer = window.setTimeout(() => {
       punchlineSecondTimer = undefined;
       punchlineStage = 2;
-      playJingle();
+      playSound(punchlineHit);
       render();
       if (isFinalEndingPage()) scheduleCustodyTransition();
     }, 700);
@@ -303,7 +252,7 @@ function scheduleEndPunchline(): void {
     endSecondTimer = window.setTimeout(() => {
       endSecondTimer = undefined;
       endPunchlineStage = 2;
-      playBigJingle();
+      playSound(finalBoom);
       render();
       endReturnTimer = window.setTimeout(() => {
         endReturnTimer = undefined;
@@ -348,7 +297,7 @@ function submit(): void {
     typeTimer = undefined;
     visibleCharacters = 0;
     revealImpact = true;
-    revealThunder();
+    playSound(revealShock);
     render();
     revealTimer = window.setTimeout(() => {
       revealTimer = undefined;
@@ -367,7 +316,7 @@ root.addEventListener('click', (event) => {
     return;
   }
   const action = target.dataset.action;
-  if (action === 'start') { getAudio(); setState(startGame(state)); return; }
+  if (action === 'start') { getAudio(); playSound(anxiety); setState(startGame(state)); return; }
   if (action === 'kana') {
     const next = chooseKana(state, target.dataset.kana ?? '');
     if (next !== state) selectionBlip();
@@ -392,7 +341,7 @@ document.addEventListener('keydown', (event) => {
   }
   if (event.key !== 'Enter' && event.key !== ' ') return;
   event.preventDefault();
-  if (state.phase === 'title') { getAudio(); setState(startGame(state)); }
+  if (state.phase === 'title') { getAudio(); playSound(anxiety); setState(startGame(state)); }
   else if (state.phase === 'input' && state.answer.length === 2) { decisionBlip(); submit(); }
 });
 
