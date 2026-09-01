@@ -33,6 +33,9 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 
 ## Presentation
 
+- The small title-screen Yasu is lowered until the center of his face meets the sea horizon. His circular face uses a one-pixel black outline, and his black outfit includes the same short white tie as the in-game figure.
+- In the room scene, Yasu's white tie is 22 pixels tall (about one third of its former length); the black torso still extends to the bottom of the picture.
+
 - The logical display is exactly 256×240 pixels and scales only by integer factors (1×, 2×, 3×), preserving hard edges on phones and desktops.
 - The CSS palette is a fixed 16-color NES-inspired subset. Scenes use flat fills; each small character sprite uses no more than four visible colors.
 - The title vignette contains buildings, sky, a straight sea horizon, and one small centered Yasu without face lettering. It has no road or body outline.
