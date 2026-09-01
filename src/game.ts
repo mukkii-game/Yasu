@@ -29,7 +29,7 @@ export const ENDING: readonly DialogueStep[] = [
   { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ', punchline: '人間としてヤスッ！' },
 ];
 
-export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。' };
+export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。やっぱめいきゅういりですよ。' };
 export const REVEAL: DialogueStep = { speaker: 'ヤス', text: 'な、なぜわかったんですかっ！？' };
 
 export const KANA = [

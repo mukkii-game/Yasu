@@ -27,6 +27,7 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', shareDescription);
     await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute('content', shareDescription);
     await expect(page.locator('.title-yasu')).toBeVisible();
+    await expect.poll(() => page.locator('.title-city').evaluate((city) => getComputedStyle(city, '::after').content)).toBe('none');
     const screenRatio = await page.locator('.screen-frame').evaluate((frame) => {
       const rect = frame.getBoundingClientRect();
       return rect.width / rect.height;
@@ -55,8 +56,10 @@ test.describe('犯人はヤス', () => {
   test('advances dialogue when the room itself is clicked', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('start-button').click();
-    await expect(page.locator('.command-window')).toContainText('ばしょいどう');
-    await expect(page.locator('.command-window')).toContainText('たいほ　する');
+    await expect(page.locator('.command-window')).toHaveCount(0);
+    await expect(page.locator('.office-scene')).toHaveCSS('width', '236px');
+    await expect(page.locator('.yasu .head')).toHaveCSS('width', '50px');
+    await expect(page.locator('.yasu .face-name')).toHaveCSS('font-size', '14px');
     await expect.poll(() => page.locator('.yasu .body').evaluate((body) => getComputedStyle(body, '::before').height)).toBe('22px');
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
@@ -80,7 +83,7 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'イ', exact: true }).click();
     await page.getByTestId('decide').click();
     await finishDialogue(page, 'wrong-next');
-    await expect(page.getByTestId('wrong-next')).toContainText('ちがうでしょう');
+    await expect(page.getByTestId('wrong-next')).toContainText('いや、ちがうでしょう。やっぱめいきゅういりですよ。');
     await page.getByTestId('wrong-next').click();
     await expect(page.getByTestId('kana-panel')).toBeVisible();
   });
@@ -115,6 +118,16 @@ test.describe('犯人はヤス', () => {
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('なぞときが');
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
     await expect(page.locator('[data-scene-mode="settled"]')).toBeVisible();
+    const punchlineBounds = await page.evaluate(() => {
+      const scene = document.querySelector('.office-scene')!.getBoundingClientRect();
+      const punchline = document.querySelector('.sprite-punchline')!.getBoundingClientRect();
+      const dialogue = document.querySelector('.dialogue-box')!.getBoundingClientRect();
+      return {
+        insideScene: punchline.top >= scene.top && punchline.bottom <= scene.bottom,
+        aboveDialogue: punchline.bottom <= dialogue.top,
+      };
+    });
+    expect(punchlineBounds).toEqual({ insideScene: true, aboveDialogue: true });
   });
 
   test('boots without console errors', async ({ page }) => {
