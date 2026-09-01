@@ -33,6 +33,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 
 ## Presentation
 
+- Link previews use the title 「犯人はヤス」 and the spoiler-free description 「あなたはこの謎が解けるか？　推理アドベンチャー。」 consistently for standard, Open Graph, and X/Twitter metadata.
 - The small title-screen Yasu is lowered until the center of his face meets the sea horizon. His circular face uses a one-pixel black outline, and his black outfit includes the same short white tie as the in-game figure.
 - In the room scene, Yasu's white tie is 22 pixels tall (about one third of its former length); the black torso still extends to the bottom of the picture.
 
