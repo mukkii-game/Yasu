@@ -268,3 +268,12 @@ field below. The room is rebuilt from larger flat color blocks and Yasu gains a
 simple stepped hair cap without changing the blank 「ヤ」「ス」 face gag. The
 256×240 logical canvas receives a 1.25× horizontal display correction so the
 presented frame is 4:3 while vertical scaling stays integer-only.
+
+## 2026-09-01 — Prefer the game-specific scene over an unused command menu
+
+The title's abstract red sun is removed. The noninteractive command list is also
+removed because this short game never uses it; the room picture expands to
+236×150 and Yasu remains centered. His head grows to 50 pixels while the face
+letters shrink and are inset below the hair. The dialogue area moves down and
+punchlines move up so both punchline stages remain wholly inside the picture.
+Wrong guesses now receive `いや、ちがうでしょう。やっぱめいきゅういりですよ。`.

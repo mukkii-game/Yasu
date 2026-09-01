@@ -51,7 +51,6 @@ button { border: 0; border-radius: 0; font: inherit; }
 .title-screen { position: absolute; inset: 0; width: 256px; height: 240px; padding: 0; background: var(--black); text-align: center; }
 .title-city { position: absolute; left: 20px; top: 12px; width: 216px; height: 128px; overflow: hidden; border: 2px solid var(--white); background: var(--sky); }
 .title-city::before { content: ""; position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 35px; border-top: 3px solid var(--white); background: var(--blue); box-shadow: inset 0 -12px var(--navy); }
-.title-city::after { content: ""; position: absolute; z-index: 1; left: 158px; top: 17px; width: 10px; height: 8px; background: var(--orange); box-shadow: -2px 2px var(--pink), 2px 2px var(--red); }
 .building { position: absolute; z-index: 2; bottom: 35px; background: var(--white); box-shadow: inset -6px 0 var(--silver); }
 .building::before { content: ""; position: absolute; left: 7px; top: 12px; width: 9px; height: 7px; background: var(--blue); box-shadow: 0 15px var(--blue), 0 30px var(--blue); }
 .building-a { left: 0; width: 42px; height: 76px; }
@@ -64,33 +63,29 @@ button { border: 0; border-radius: 0; font: inherit; }
 .title-main { position: absolute; left: 0; right: 0; top: 154px; color: var(--white); font-size: 30px; line-height: 32px; letter-spacing: 1px; text-shadow: 2px 0 var(--black), -2px 0 var(--black), 0 2px var(--black), 3px 3px var(--red); }
 .press-start { position: absolute; left: 0; right: 0; bottom: 22px; color: var(--gold); font-size: 12px; letter-spacing: 2px; animation: blink 900ms steps(1) infinite; }
 
-/* FC adventure layout: framed scene, right command list, and a broad lower text area. */
-.scene { position: absolute; z-index: 0; left: 10px; top: 10px; width: 174px; height: 128px; overflow: hidden; border: 2px solid var(--white); }
+/* FC adventure layout: one broad framed scene above the lower text area. */
+.scene { position: absolute; z-index: 0; left: 10px; top: 8px; width: 236px; height: 150px; overflow: hidden; border: 2px solid var(--white); }
 .office-scene { background: var(--sky); }
 .office-scene::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 25px; background: var(--cyan); box-shadow: inset -7px 0 var(--orange); }
 .office-scene::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 20px; background: var(--silver); }
-.window { position: absolute; right: 10px; top: 12px; width: 46px; height: 35px; border: 4px solid var(--brown); background: var(--navy); }
+.window { position: absolute; right: 14px; top: 12px; width: 46px; height: 35px; border: 4px solid var(--brown); background: var(--navy); }
 .window::before { content: ""; position: absolute; left: 5px; top: 0; width: 3px; height: 27px; background: var(--silver); box-shadow: 8px 0 var(--silver), 16px 0 var(--silver), 24px 0 var(--silver), 32px 0 var(--silver); }
 .window::after, .window i { display: none; }
-.yasu { position: absolute; z-index: 3; left: 57px; bottom: 0; width: 58px; height: 72px; }
-.yasu .head { position: absolute; z-index: 2; left: 8px; top: -43px; width: 42px; height: 42px; border: 2px solid var(--black); border-radius: 50%; background: var(--skin); }
-.yasu .head::before { content: ""; position: absolute; left: 3px; top: -2px; width: 32px; height: 8px; background: var(--black); box-shadow: -3px 5px var(--black), 3px 5px var(--black); }
+.yasu { position: absolute; z-index: 3; left: 89px; bottom: 0; width: 58px; height: 78px; }
+.yasu .head { position: absolute; z-index: 2; left: 4px; top: -51px; width: 50px; height: 50px; border: 2px solid var(--black); border-radius: 50%; background: var(--skin); }
+.yasu .head::before { content: ""; position: absolute; left: 4px; top: -2px; width: 38px; height: 9px; background: var(--black); box-shadow: -3px 5px var(--black), 3px 5px var(--black); }
 .yasu .body { position: absolute; inset: 0; background: var(--black); }
 .yasu .body::before { content: ""; position: absolute; left: 25px; top: 0; width: 8px; height: 22px; background: var(--white); }
-.yasu .face-name { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--white); font-size: 18px; font-style: normal; font-weight: 900; line-height: 17px; }
+.yasu .face-name { position: absolute; z-index: 1; left: 0; right: 0; top: 13px; bottom: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: var(--white); font-size: 14px; font-style: normal; font-weight: 900; line-height: 14px; }
 .yasu .face-name b { font: inherit; }
 .nervous .yasu { animation: tremble 75ms steps(2) infinite; }
 .impact .yasu { animation: impact-tremble 55ms steps(2) infinite; }
 
-.command-window { position: absolute; z-index: 2; left: 190px; top: 10px; width: 58px; height: 128px; padding: 5px 2px 3px 9px; border: 2px solid var(--white); color: var(--white); background: var(--black); font-size: 10px; font-style: normal; line-height: 18px; text-align: left; white-space: nowrap; }
-.command-window span { position: relative; display: block; }
-.command-window .command-active::before { content: "▶"; position: absolute; left: -8px; color: var(--white); }
-
-.dialogue-box { position: absolute; z-index: 12; left: 0; right: 0; bottom: 0; width: 256px; height: 100px; padding: 2px 13px 5px; color: var(--white); background: var(--black); text-align: left; font-size: 13px; line-height: 20px; letter-spacing: 0; }
+.dialogue-box { position: absolute; z-index: 12; left: 0; right: 0; bottom: 0; width: 256px; height: 80px; padding: 2px 13px 5px; color: var(--white); background: var(--black); text-align: left; font-size: 13px; line-height: 20px; letter-spacing: 0; }
 .dialogue-copy { position: absolute; left: 13px; right: 8px; top: 2px; display: block; white-space: pre-wrap; }
 .next-mark { display: inline-block; margin-left: 3px; color: var(--white); animation: blink 700ms steps(1) infinite; }
 
-.sprite-punchline { position: absolute; z-index: 25; left: 0; right: 0; top: 72px; color: var(--white); background: transparent; text-align: center; font-size: 31px; font-weight: 900; line-height: 39px; white-space: nowrap; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
+.sprite-punchline { position: absolute; z-index: 25; left: 0; right: 0; top: 38px; color: var(--white); background: transparent; text-align: center; font-size: 31px; font-weight: 900; line-height: 39px; white-space: nowrap; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
 .sprite-punchline.split { display: flex; flex-direction: column; align-items: center; }
 .sprite-punchline span, .sprite-punchline strong { display: block; font-weight: 900; }
 .sprite-punchline span { animation: punch-pop 140ms steps(3) both; }

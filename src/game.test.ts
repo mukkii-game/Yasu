@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ENDING, INTRO, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
+import { ENDING, INTRO, WRONG, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
 
 function reachInput() {
   let state = startGame(createGame());
@@ -67,6 +67,7 @@ describe('game flow', () => {
   it('formats speaker quotes and preserves the requested reward line break', () => {
     expect(dialogueText(INTRO[0])).toBe('ヤス「ボス、これいじょうのてがかりがありません。めいきゅういりです。」');
     expect(dialogueText(INTRO[2])).toBe('あなた「はんにんは・・・」');
+    expect(dialogueText(WRONG)).toBe('ヤス「いや、ちがうでしょう。やっぱめいきゅういりですよ。」');
     expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあった」');
     expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
     expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
