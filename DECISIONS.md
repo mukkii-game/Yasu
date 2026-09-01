@@ -381,3 +381,13 @@ Render it unmodified at 1× on the title and at an exact pixelated 2× in the ro
 Split the room rendering at source row 26 so the existing body laugh and head
 nod remain independent. Overlay the white vertical `ヤ` / `ス` only on the
 room sprite, bounded inside the yellow face.
+
+## 2026-09-01 — Extend the supplied torso and delay the arrest cut
+
+Repeat the supplied sprite's final source row straight down so the room torso
+reaches the scene bottom; add only five continuation pixels on the title. Change
+the clue reply to `タイトルにかいてあったよ`. After the final `人として` /
+`ヤスッ！`, lock input, wait one second, play a synthesized two-click handcuff
+clack, and enter the sunset screen automatically. On sub-660-pixel portrait
+viewports, continuously scale the unchanged 256×240 game to the full available
+width instead of leaving the former margins.

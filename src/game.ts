@@ -22,7 +22,7 @@ export const INTRO: readonly DialogueStep[] = [
 ];
 
 export const ENDING: readonly DialogueStep[] = [
-  { speaker: 'あなた', text: 'タイトルにかいてあった', punchline: 'なぞときがヤスッ！' },
+  { speaker: 'あなた', text: 'タイトルにかいてあったよ', punchline: 'なぞときがヤスッ！' },
   { speaker: 'あなた', text: 'ヤス、なんで　ごうとうさつじんなんてしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
