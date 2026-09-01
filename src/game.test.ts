@@ -66,7 +66,7 @@ describe('game flow', () => {
 
   it('formats the speaker and quote on one continuous line', () => {
     expect(dialogueText(INTRO[0])).toBe('ヤス「ボス、これいじょうのてがかりがありません。めいきゅういりです。」');
-    expect(dialogueText(ENDING[0])).toBe('あなた「かおにかいてあるから」');
+    expect(dialogueText(ENDING[0])).toBe('あなた「おまえのかおにかいてあるよ」');
     expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なぜこんなころしをしたんだ」');
     expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは３０００円でしたよ　はっはっは」');
   });
