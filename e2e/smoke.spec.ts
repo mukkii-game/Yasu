@@ -22,6 +22,10 @@ test.describe('犯人はヤス', () => {
   test('shows the FC-style title and opens the kana input', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByTestId('start-button')).toContainText('犯人はヤス');
+    const shareDescription = 'あなたはこの謎が解けるか？　推理アドベンチャー。';
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', shareDescription);
+    await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', shareDescription);
+    await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute('content', shareDescription);
     await expect(page.locator('.title-yasu')).toBeVisible();
     const titleYasu = await page.evaluate(() => {
       const city = document.querySelector('.title-city')!.getBoundingClientRect();

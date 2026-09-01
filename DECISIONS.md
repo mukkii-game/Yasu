@@ -244,3 +244,10 @@ The escort pair now starts at X=41, halfway between its previous X=82 position
 and the left edge. Its route is reduced from 127 to 86 pixels and takes 2.4
 seconds instead of 3.6, preserving roughly the same walking speed while reaching
 the final two-beat caption 1.2 seconds earlier.
+
+## 2026-09-01 — Keep link previews spoiler-free
+
+The standard page description, Open Graph description, and X/Twitter description
+now all read 「あなたはこの謎が解けるか？　推理アドベンチャー。」. The former
+「2文字で終わる」 phrasing was removed because it gives away how quickly the
+mystery resolves instead of inviting the player to deduce it.
