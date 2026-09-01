@@ -59,7 +59,7 @@ function titleScreen(): string {
   return `<button class="title-screen screen-button" data-testid="start-button" data-action="start" type="button" aria-label="犯人はヤス スタート">
     <span class="title-city" aria-hidden="true">
       <i class="building building-a"></i><i class="building building-b"></i><i class="building building-c"></i>
-      <i class="title-yasu"><b></b><em></em></i>
+      <i class="title-yasu"><b><i class="title-hair"></i></b><em></em></i>
     </span>
     <span class="title-main">犯人はヤス</span><span class="press-start">▶ スタート</span>
   </button>`;

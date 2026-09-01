@@ -27,6 +27,9 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', shareDescription);
     await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute('content', shareDescription);
     await expect(page.locator('.title-yasu')).toBeVisible();
+    await expect(page.locator('.title-yasu')).toHaveCSS('width', '29px');
+    await expect(page.locator('.title-yasu b')).toHaveCSS('width', '25px');
+    await expect(page.locator('.title-yasu .title-hair')).toHaveCount(1);
     await expect.poll(() => page.locator('.title-city').evaluate((city) => getComputedStyle(city, '::after').content)).toBe('none');
     const screenRatio = await page.locator('.screen-frame').evaluate((frame) => {
       const rect = frame.getBoundingClientRect();
@@ -36,19 +39,23 @@ test.describe('犯人はヤス', () => {
     const titleYasu = await page.evaluate(() => {
       const city = document.querySelector('.title-city')!.getBoundingClientRect();
       const head = document.querySelector('.title-yasu b')!.getBoundingClientRect();
+      const figure = document.querySelector('.title-yasu')!.getBoundingClientRect();
       const headStyle = getComputedStyle(document.querySelector('.title-yasu b')!);
       const tieStyle = getComputedStyle(document.querySelector('.title-yasu em')!, '::after');
       const scale = city.height / 128;
       return {
         headCenter: (head.top + head.bottom) / 2,
         horizon: city.top + 91 * scale,
+        figureCenter: (figure.left + figure.right) / 2,
+        cityCenter: (city.left + city.right) / 2,
         headBorder: headStyle.borderTopWidth,
         tieHeight: tieStyle.height,
       };
     });
     expect(Math.abs(titleYasu.headCenter - titleYasu.horizon)).toBeLessThanOrEqual(2);
+    expect(Math.abs(titleYasu.figureCenter - titleYasu.cityCenter)).toBeLessThanOrEqual(2);
     expect(titleYasu.headBorder).toBe('1px');
-    expect(titleYasu.tieHeight).toBe('8px');
+    expect(titleYasu.tieHeight).toBe('11px');
     await reachInput(page);
     await expect(page.getByTestId('answer-slots')).toContainText('＿＿');
   });
@@ -60,9 +67,10 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.office-scene')).toHaveCSS('width', '236px');
     await expect(page.locator('.yasu .head')).toHaveCSS('width', '50px');
     await expect(page.locator('.yasu .hair')).toHaveCSS('width', '38px');
+    await expect(page.locator('.yasu .hair')).toHaveCSS('left', '4px');
     await expect(page.locator('.yasu .hair')).toHaveCSS('top', '-3px');
     await expect(page.locator('.yasu .face-name')).toHaveCSS('font-size', '14px');
-    await expect(page.locator('.yasu .face-name')).toHaveCSS('top', '16px');
+    await expect(page.locator('.yasu .face-name')).toHaveCSS('top', '19px');
     await expect.poll(() => page.locator('.yasu .body').evaluate((body) => getComputedStyle(body, '::before').height)).toBe('22px');
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
