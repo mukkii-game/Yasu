@@ -31,7 +31,7 @@ function dialogue(state: GameState, options: RenderOptions): string {
 function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled', laughing: boolean): string {
   return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
-    <div class="yasu"><span class="head"><i class="face-fill"></i><i class="hair"></i><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"><i class="jacket left"></i><i class="jacket right"></i><i class="shirt"></i><i class="lapel left"></i><i class="lapel right"></i><i class="collar left"></i><i class="collar right"></i><i class="tie"></i></span></div>
+    <div class="yasu"><span class="head"><i class="hair"></i><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"></span></div>
   </div>`;
 }
 
@@ -59,7 +59,7 @@ function titleScreen(): string {
   return `<button class="title-screen screen-button" data-testid="start-button" data-action="start" type="button" aria-label="犯人はヤス スタート">
     <span class="title-city" aria-hidden="true">
       <i class="building building-a"></i><i class="building building-b"></i><i class="building building-c"></i>
-      <i class="title-yasu"><b><i class="face-fill"></i><i class="title-hair"></i></b><em><i class="jacket left"></i><i class="jacket right"></i><i class="shirt"></i><i class="lapel left"></i><i class="lapel right"></i><i class="collar left"></i><i class="collar right"></i><i class="tie"></i></em></i>
+      <i class="title-yasu"><b><i class="title-hair"></i></b><em></em></i>
     </span>
     <span class="title-main">犯人はヤス</span><span class="press-start">▶ スタート</span>
   </button>`;

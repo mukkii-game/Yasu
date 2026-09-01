@@ -357,3 +357,12 @@ muted-yellow skin, octagonal center-parted hair, bright-blue jacket panels, navy
 lapels, white shirt, black-edged white collars, and black-edged red tie. The room
 sprite widens to 70 pixels for reference-like shoulders; the title version uses
 the same construction at approximately half scale and still omits face letters.
+
+## 2026-09-01 — Restore the coarse simple Yasu sprite
+
+The layered portrait above was rejected as too high-resolution and visually
+unlike an early Famicom sprite. Restore the earlier round face, stepped black
+hair, rectangular torso, and single white tie at both scales. The only change
+from that earlier sprite is replacing the black torso with palette navy
+`#00003c`. Do not add jacket outlines, lapels, collars, shirt panels, or a red
+tie.
