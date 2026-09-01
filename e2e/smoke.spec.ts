@@ -59,7 +59,10 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.command-window')).toHaveCount(0);
     await expect(page.locator('.office-scene')).toHaveCSS('width', '236px');
     await expect(page.locator('.yasu .head')).toHaveCSS('width', '50px');
+    await expect(page.locator('.yasu .hair')).toHaveCSS('width', '38px');
+    await expect(page.locator('.yasu .hair')).toHaveCSS('top', '-3px');
     await expect(page.locator('.yasu .face-name')).toHaveCSS('font-size', '14px');
+    await expect(page.locator('.yasu .face-name')).toHaveCSS('top', '16px');
     await expect.poll(() => page.locator('.yasu .body').evaluate((body) => getComputedStyle(body, '::before').height)).toBe('22px');
     await finishDialogue(page, 'dialogue-next');
     await page.locator('.office-scene').click();
@@ -120,14 +123,16 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('[data-scene-mode="settled"]')).toBeVisible();
     const punchlineBounds = await page.evaluate(() => {
       const scene = document.querySelector('.office-scene')!.getBoundingClientRect();
+      const head = document.querySelector('.yasu .head')!.getBoundingClientRect();
       const punchline = document.querySelector('.sprite-punchline')!.getBoundingClientRect();
       const dialogue = document.querySelector('.dialogue-box')!.getBoundingClientRect();
       return {
         insideScene: punchline.top >= scene.top && punchline.bottom <= scene.bottom,
+        belowFace: punchline.top >= head.bottom,
         aboveDialogue: punchline.bottom <= dialogue.top,
       };
     });
-    expect(punchlineBounds).toEqual({ insideScene: true, aboveDialogue: true });
+    expect(punchlineBounds).toEqual({ insideScene: true, belowFace: true, aboveDialogue: true });
   });
 
   test('boots without console errors', async ({ page }) => {

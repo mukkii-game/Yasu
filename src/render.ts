@@ -31,7 +31,7 @@ function dialogue(state: GameState, options: RenderOptions): string {
 function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled'): string {
   return `<div class="scene office-scene ${mode}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
-    <div class="yasu"><span class="head"><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"></span></div>
+    <div class="yasu"><span class="head"><i class="hair"></i><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"></span></div>
   </div>`;
 }
 

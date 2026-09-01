@@ -73,10 +73,12 @@ button { border: 0; border-radius: 0; font: inherit; }
 .window::after, .window i { display: none; }
 .yasu { position: absolute; z-index: 3; left: 89px; bottom: 0; width: 58px; height: 78px; }
 .yasu .head { position: absolute; z-index: 2; left: 4px; top: -51px; width: 50px; height: 50px; border: 2px solid var(--black); border-radius: 50%; background: var(--skin); }
-.yasu .head::before { content: ""; position: absolute; left: 4px; top: -2px; width: 38px; height: 9px; background: var(--black); box-shadow: -3px 5px var(--black), 3px 5px var(--black); }
+.yasu .hair { position: absolute; z-index: 2; left: 3px; top: -3px; width: 38px; height: 7px; background: var(--black); }
+.yasu .hair::before { content: ""; position: absolute; left: -3px; top: 6px; width: 29px; height: 6px; background: var(--black); box-shadow: -1px 6px var(--black); }
+.yasu .hair::after { content: ""; position: absolute; left: -3px; top: 10px; width: 7px; height: 13px; background: var(--black); }
 .yasu .body { position: absolute; inset: 0; background: var(--black); }
 .yasu .body::before { content: ""; position: absolute; left: 25px; top: 0; width: 8px; height: 22px; background: var(--white); }
-.yasu .face-name { position: absolute; z-index: 1; left: 0; right: 0; top: 13px; bottom: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: var(--white); font-size: 14px; font-style: normal; font-weight: 900; line-height: 14px; }
+.yasu .face-name { position: absolute; z-index: 1; left: 0; right: 0; top: 16px; bottom: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: var(--white); font-size: 14px; font-style: normal; font-weight: 900; line-height: 14px; }
 .yasu .face-name b { font: inherit; }
 .nervous .yasu { animation: tremble 75ms steps(2) infinite; }
 .impact .yasu { animation: impact-tremble 55ms steps(2) infinite; }
@@ -85,12 +87,12 @@ button { border: 0; border-radius: 0; font: inherit; }
 .dialogue-copy { position: absolute; left: 13px; right: 8px; top: 2px; display: block; white-space: pre-wrap; }
 .next-mark { display: inline-block; margin-left: 3px; color: var(--white); animation: blink 700ms steps(1) infinite; }
 
-.sprite-punchline { position: absolute; z-index: 25; left: 0; right: 0; top: 38px; color: var(--white); background: transparent; text-align: center; font-size: 31px; font-weight: 900; line-height: 39px; white-space: nowrap; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
+.sprite-punchline { position: absolute; z-index: 25; left: 0; right: 0; top: 82px; color: var(--white); background: transparent; text-align: center; font-size: 28px; font-weight: 900; line-height: 34px; white-space: nowrap; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
 .sprite-punchline.split { display: flex; flex-direction: column; align-items: center; }
 .sprite-punchline span, .sprite-punchline strong { display: block; font-weight: 900; }
 .sprite-punchline span { animation: punch-pop 140ms steps(3) both; }
 .sprite-punchline.stage-2 span { animation: none; }
-.sprite-punchline strong { font-size: 39px; line-height: 43px; animation: punch-pop 140ms steps(3) both; }
+.sprite-punchline strong { font-size: 36px; line-height: 40px; animation: punch-pop 140ms steps(3) both; }
 
 .kana-panel { position: absolute; z-index: 15; inset: 0; display: grid; grid-template-rows: 32px 1fr 28px; gap: 3px; padding: 5px; color: var(--white); background: var(--black); }
 .answer-line { display: flex; align-items: center; justify-content: center; gap: 5px; color: var(--gold); font-size: 14px; }

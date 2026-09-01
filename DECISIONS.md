@@ -277,3 +277,18 @@ removed because this short game never uses it; the room picture expands to
 letters shrink and are inset below the hair. The dialogue area moves down and
 punchlines move up so both punchline stages remain wholly inside the picture.
 Wrong guesses now receive `いや、ちがうでしょう。やっぱめいきゅういりですよ。`.
+
+## 2026-09-01 — Give Yasu a stepped 7:3 side part
+
+Yasu's flat centered hair cap becomes an asymmetric three-piece sprite: a high
+top cap, a wide left fringe that descends in two six-pixel steps, and a narrow
+left side lock. This places the part near the right side without adding smooth
+diagonals. The face lettering begins at Y=16, below the fringe, and keeps the
+same 14-pixel size so both characters remain between the hair and chin.
+
+## 2026-09-01 — Keep punchlines below Yasu's face
+
+All two-stage room punchlines now begin at Y=82, two logical pixels below the
+chin. Their setup and payoff sizes tighten to 28/36 pixels with 34/40-pixel line
+heights, fitting both lines between the chin and the room frame's lower edge
+without touching the ordinary dialogue area.
