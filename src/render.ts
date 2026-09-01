@@ -69,7 +69,7 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     content = titleScreen();
   } else if (state.phase === 'end') {
     const finalPunchline = options.endPunchlineStage > 0
-      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span>このゲームじたい</span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！！！！</strong>' : ''}</span>`
+      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline">${options.endPunchlineStage === 1 ? '<span>このゲーム⋯</span>' : '<strong>ヤスッ！！</strong>'}</span>`
       : '';
     content = `<button class="end-screen screen-button${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" data-action="restart" type="button" aria-label="タイトルへ戻る">${endScene()}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</button>`;
   } else {
