@@ -31,7 +31,7 @@ function dialogue(state: GameState, options: RenderOptions): string {
 function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled', laughing: boolean): string {
   return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
-    <div class="yasu"><span class="head"><i class="hair"></i><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"></span></div>
+    <div class="yasu"><span class="head"><i class="hair"></i><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"><i class="collar left"></i><i class="collar right"></i></span></div>
   </div>`;
 }
 
@@ -59,7 +59,7 @@ function titleScreen(): string {
   return `<button class="title-screen screen-button" data-testid="start-button" data-action="start" type="button" aria-label="犯人はヤス スタート">
     <span class="title-city" aria-hidden="true">
       <i class="building building-a"></i><i class="building building-b"></i><i class="building building-c"></i>
-      <i class="title-yasu"><b><i class="title-hair"></i></b><em></em></i>
+      <i class="title-yasu"><b><i class="title-hair"></i></b><em><i class="collar left"></i><i class="collar right"></i></em></i>
     </span>
     <span class="title-main">犯人はヤス</span><span class="press-start">▶ スタート</span>
   </button>`;
@@ -71,7 +71,7 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     content = titleScreen();
   } else if (state.phase === 'end') {
     const finalPunchline = options.endPunchlineStage > 0
-      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span>このゲームが</span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</span>`
+      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span>ゲーム全体が</span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</span>`
       : '';
     content = `<div class="end-screen${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" aria-label="エンディング">${endScene(options.endPunchlineStage > 0)}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</div>`;
   } else {

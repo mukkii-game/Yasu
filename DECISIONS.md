@@ -327,3 +327,10 @@ The last setup is shortened to `このゲームが`, kept on one line, and style
 a proportional enlargement of the room punchline before the unchanged second
 beat `ヤスッ！`. All clicks and keys are ignored during `THE END`; only the
 scheduled fade may return the game to its title.
+
+## 2026-09-01 — Match Yasu's detective colors across both scenes
+
+Yasu now uses the same reference-inspired palette and outfit at both scales: a
+muted yellow face, rounded black center-parted hair, blue jacket, white shirt and
+collars, and a red tie slightly longer than the former white strip. The final
+setup is also tightened once more to `ゲーム全体が` before `ヤスッ！`.

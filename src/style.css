@@ -11,6 +11,7 @@
   --black: #000000;
   --navy: #00003c;
   --blue: #0058f8;
+  --jacket: #3c40fc;
   --sky: #3cbcfc;
   --cyan: #00e8d8;
   --white: #fcfcfc;
@@ -23,7 +24,7 @@
   --gold: #f8b800;
   --yellow: #f8d878;
   --green: #00a800;
-  --skin: #fca044;
+  --skin: #f8d878;
 }
 
 * { box-sizing: border-box; }
@@ -58,9 +59,13 @@ button { border: 0; border-radius: 0; font: inherit; }
 .building-c { right: 48px; width: 32px; height: 47px; }
 .title-yasu { position: absolute; z-index: 4; left: 91px; bottom: -17px; width: 29px; height: 39px; }
 .title-yasu b { position: absolute; left: 2px; top: -25px; width: 25px; height: 25px; border: 1px solid var(--black); border-radius: 50%; background: var(--skin); }
-.title-yasu .title-hair { position: absolute; z-index: 2; left: 0; top: -2px; width: 23px; height: 12px; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
-.title-yasu em { position: absolute; inset: 0; background: var(--black); }
-.title-yasu em::after { content: ""; position: absolute; left: 12px; top: 2px; width: 5px; height: 11px; background: var(--white); }
+.title-yasu .title-hair { position: absolute; z-index: 2; left: 0; top: -3px; width: 23px; height: 13px; border-radius: 50% 50% 0 0 / 42% 42% 0 0; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
+.title-yasu em { position: absolute; inset: 0; background: var(--jacket); }
+.title-yasu em::before { content: ""; position: absolute; z-index: 1; left: 10px; top: 0; width: 9px; height: 16px; background: var(--white); }
+.title-yasu em::after { content: ""; position: absolute; z-index: 3; left: 13px; top: 3px; width: 3px; height: 13px; background: var(--red); clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); }
+.title-yasu .collar { position: absolute; z-index: 2; top: 0; width: 8px; height: 7px; background: var(--white); }
+.title-yasu .collar.left { left: 5px; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.title-yasu .collar.right { right: 5px; clip-path: polygon(0 0, 100% 0, 0 100%); }
 .title-main { position: absolute; left: 0; right: 0; top: 154px; color: var(--white); font-size: 30px; line-height: 32px; letter-spacing: 1px; text-shadow: 2px 0 var(--black), -2px 0 var(--black), 0 2px var(--black), 3px 3px var(--red); }
 .press-start { position: absolute; left: 0; right: 0; bottom: 22px; color: var(--gold); font-size: 12px; letter-spacing: 2px; animation: blink 900ms steps(1) infinite; }
 
@@ -74,9 +79,13 @@ button { border: 0; border-radius: 0; font: inherit; }
 .window::after, .window i { display: none; }
 .yasu { position: absolute; z-index: 3; left: 89px; bottom: 0; width: 58px; height: 78px; }
 .yasu .head { position: absolute; z-index: 2; left: 4px; top: -51px; width: 50px; height: 50px; border: 2px solid var(--black); border-radius: 50%; background: var(--skin); }
-.yasu .hair { position: absolute; z-index: 2; left: 1px; top: -3px; width: 44px; height: 22px; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
-.yasu .body { position: absolute; inset: 0; background: var(--black); }
-.yasu .body::before { content: ""; position: absolute; left: 25px; top: 0; width: 8px; height: 22px; background: var(--white); }
+.yasu .hair { position: absolute; z-index: 2; left: 1px; top: -5px; width: 44px; height: 24px; border-radius: 50% 50% 0 0 / 42% 42% 0 0; background: var(--black); clip-path: polygon(0 0, 100% 0, 100% 82%, 76% 72%, 50% 43%, 24% 72%, 0 82%); }
+.yasu .body { position: absolute; inset: 0; background: var(--jacket); }
+.yasu .body::before { content: ""; position: absolute; z-index: 1; left: 19px; top: 0; width: 20px; height: 32px; background: var(--white); }
+.yasu .body::after { content: ""; position: absolute; z-index: 3; left: 26px; top: 4px; width: 6px; height: 26px; background: var(--red); clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); }
+.yasu .collar { position: absolute; z-index: 2; top: 0; width: 15px; height: 14px; background: var(--white); }
+.yasu .collar.left { left: 10px; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.yasu .collar.right { right: 10px; clip-path: polygon(0 0, 100% 0, 0 100%); }
 .yasu .face-name { position: absolute; z-index: 1; left: 0; right: 0; top: 17px; bottom: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: var(--white); font-size: 14px; font-style: normal; font-weight: 900; line-height: 14px; }
 .yasu .face-name b { font: inherit; }
 .nervous .yasu { animation: tremble 75ms steps(2) infinite; }
