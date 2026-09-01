@@ -183,3 +183,11 @@ The face lettering is slightly smaller, unoutlined white, with a two-pixel gap.
 Punchline outlines shrink to one logical pixel. The last wording becomes
 「このゲームじたいが⋯　ヤスッ！！！！」; it remains visible while the whole
 sunset screen fades, after which the title returns automatically.
+
+## 2026-09-01 — The final joke reuses the exact two-beat punchline grammar
+
+The finale now stages 「このゲームじたい」 first with the same lead pop, waits
+700 ms, then adds a slightly larger 「ヤスッ！！！！」 with the final jingle.
+Both use the established white text and one-pixel pink outline. Only after the
+payoff has remained fully visible for one second does the whole sunset begin its
+slow fade to the automatically restored title.
