@@ -348,3 +348,12 @@ squared face, and shoulder-shaped jacket at both title and room scales.
 The two simultaneous final setup lines are finalized as `このゲームの` and
 `ぜんぶがぜんぶ`. The pause, oversized third-line `ヤスッ！`, input lock, and
 automatic fade remain unchanged.
+
+## 2026-09-01 — Rebuild Yasu from one outlined FC portrait system
+
+The room and title sprites no longer pair an outlined face with an unoutlined
+shirt block. Both begin with one black face/torso silhouette, then layer the same
+muted-yellow skin, octagonal center-parted hair, bright-blue jacket panels, navy
+lapels, white shirt, black-edged white collars, and black-edged red tie. The room
+sprite widens to 70 pixels for reference-like shoulders; the title version uses
+the same construction at approximately half scale and still omits face letters.
