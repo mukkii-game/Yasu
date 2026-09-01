@@ -292,3 +292,10 @@ All two-stage room punchlines now begin at Y=82, two logical pixels below the
 chin. Their setup and payoff sizes tighten to 28/36 pixels with 34/40-pixel line
 heights, fitting both lines between the chin and the room frame's lower edge
 without touching the ordinary dialogue area.
+
+## 2026-09-01 — Remove the full-screen reveal flash
+
+The one-second correct-answer beat keeps its low thunder, locked input, and large
+Yasu shake, but no longer paints the screen white. The room colors and background
+remain unchanged throughout, avoiding an uncomfortable full-screen flash before
+Yasu begins speaking.

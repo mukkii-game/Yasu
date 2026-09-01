@@ -15,7 +15,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
    - The player says 「はんにんは・・・」.
 3. A katakana gojūon panel accepts exactly two characters.
 4. A wrong answer is cleared. Yasu replies 「いや、ちがうでしょう。」 and the player returns to the panel.
-5. 「ヤス」 triggers a one-second reveal beat before any dialogue appears. The whole screen flashes, a low double-hit thunder crash plays, and Yasu shakes by four logical pixels. Input is ignored during this beat. After exactly one second the flash and large shake stop, Yasu returns to the smaller tremble, and `ヤス「な、なぜわかったんですかっ！？」` begins typing.
+5. 「ヤス」 triggers a one-second reveal beat before any dialogue appears. The background and screen colors remain unchanged: a low double-hit thunder crash plays and Yasu shakes by four logical pixels, with no full-screen flash. Input is ignored during this beat. After exactly one second the large shake stops, Yasu returns to the smaller tremble, and `ヤス「な、なぜわかったんですかっ！？」` begins typing.
 6. The player answers `あなた「タイトルにかいてあった」`, then asks `あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」`. The ending advances through Yasu's motive, explicitly line-broken reward (`でももらったほうしゅうは` / `３０００円でしたよ　はっはっは`), and attitude. Every punchline uses the same two-beat rhythm: its setup waits 1.25 seconds after the line and enters with a short 8-bit pop, then the larger 「ヤスッ！」 follows 700 ms later with a comic fanfare. Both are thick white text with a fine one-pixel pink outline and no box:
    - 「なぞときが」 → 「ヤスッ！」
    - 「動機がヤスッ！」
@@ -52,7 +52,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 
 - `src/game.ts` — pure immutable state transitions, dialogue data, and kana list.
 - `src/render.ts` — turns a `GameState` into accessible DOM markup.
-- `src/main.ts` — global click/key control, character-by-character timing and blips, the locked one-second flash/thunder reveal, delayed two-stage punchlines, comic fanfare playback, the final sting, and rendering coordination.
+- `src/main.ts` — global click/key control, character-by-character timing and blips, the locked one-second thunder/shake reveal, delayed two-stage punchlines, comic fanfare playback, the final sting, and rendering coordination.
 - `src/style.css` — the complete 256×240 presentation, 16-color palette, CSS pixel scenes, and integer scaling rules.
 
 Pure gameplay transitions belong in `src/game.ts` and stay DOM-free so Vitest can cover the full route to the ending.
