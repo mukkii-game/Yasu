@@ -366,3 +366,10 @@ hair, rectangular torso, and single white tie at both scales. The only change
 from that earlier sprite is replacing the black torso with palette navy
 `#00003c`. Do not add jacket outlines, lapels, collars, shirt panels, or a red
 tie.
+
+## 2026-09-01 — Shorten the final setup and nod twice
+
+The final setup is shortened to simultaneous lines `このゲーム` and
+`なにもかも`; the usual pause and oversized `ヤスッ！` remain unchanged. On
+the completed `まあ しょはんだし` page, only Yasu's head nods twice before the
+punchline starts. His torso remains still.
