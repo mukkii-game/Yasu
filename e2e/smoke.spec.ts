@@ -108,8 +108,8 @@ test.describe('犯人はヤス', () => {
     await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('このゲーム⋯', { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
-    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！！');
-    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveCount(0);
+    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
+    await expect(page.getByTestId('end-punchline').locator(':scope > span')).toHaveText('このゲーム⋯');
     await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
     await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade');
     await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 6_000 });

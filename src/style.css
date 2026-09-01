@@ -112,7 +112,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 .end-building.b { right: 0; width: 50px; height: 101px; }
 .end-building.c { right: 56px; width: 32px; height: 65px; }
 .end-road { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 52px; background: var(--brown); }
-.walkers { position: absolute; z-index: 5; left: 82px; bottom: 34px; width: 34px; height: 39px; animation: escort-walk 5.4s steps(36) 1 forwards; }
+.walkers { position: absolute; z-index: 5; left: 82px; bottom: 34px; width: 34px; height: 39px; animation: escort-walk 3.6s steps(24) 1 forwards; }
 .walkers i { position: absolute; bottom: 0; width: 13px; height: 23px; background: var(--black); }
 .walkers i::before { content: ""; position: absolute; left: 2px; top: -10px; width: 9px; height: 10px; background: var(--black); }
 .walkers .escort { left: 0; }
@@ -124,7 +124,8 @@ button { border: 0; border-radius: 0; font: inherit; }
 .end-final { position: absolute; z-index: 20; inset: 82px 0 0; display: flex; flex-direction: column; align-items: center; background: transparent; color: var(--white); }
 .end-final > span, .end-final strong { display: block; color: var(--white); font-weight: 900; text-shadow: 1px 0 var(--pink), -1px 0 var(--pink), 0 1px var(--pink), 0 -1px var(--pink), 1px 1px var(--pink), -1px 1px var(--pink), 1px -1px var(--pink), -1px -1px var(--pink); }
 .end-final > span { font-size: 38px; line-height: 48px; letter-spacing: -1px; animation: punch-pop 140ms steps(3) both; }
-.end-final strong { font-size: 50px; line-height: 60px; letter-spacing: -2px; animation: punch-pop 140ms steps(3) both; }
+.end-final.stage-2 > span { animation: none; }
+.end-final strong { margin-top: 6px; font-size: 50px; line-height: 60px; letter-spacing: -2px; animation: punch-pop 140ms steps(3) both; }
 
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink-border { 50% { border-color: var(--white); } }
