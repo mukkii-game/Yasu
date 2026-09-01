@@ -373,3 +373,11 @@ The final setup is shortened to simultaneous lines `このゲーム` and
 `なにもかも`; the usual pause and oversized `ヤスッ！` remain unchanged. On
 the completed `まあ しょはんだし` page, only Yasu's head nods twice before the
 punchline starts. His torso remains still.
+
+## 2026-09-01 — Use the author's 32×48 Yasu sprite directly
+
+Replace the CSS-drawn title and room figures with the supplied transparent PNG.
+Render it unmodified at 1× on the title and at an exact pixelated 2× in the room.
+Split the room rendering at source row 26 so the existing body laugh and head
+nod remain independent. Overlay the white vertical `ヤ` / `ス` only on the
+room sprite, bounded inside the yellow face.

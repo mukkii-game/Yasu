@@ -1,4 +1,5 @@
 import { KANA, currentDialogue, dialogueText, type GameState } from './game';
+import yasuSpriteUrl from './assets/yasu.png';
 
 export interface RenderOptions {
   readonly visibleCharacters: number;
@@ -31,7 +32,7 @@ function dialogue(state: GameState, options: RenderOptions): string {
 function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled', laughing: boolean, nodding: boolean): string {
   return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}${nodding ? ' nodding' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
-    <div class="yasu"><span class="head"><i class="hair"></i><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"></span></div>
+    <div class="yasu"><span class="head"><img src="${yasuSpriteUrl}" alt="" draggable="false"><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"><img src="${yasuSpriteUrl}" alt="" draggable="false"></span></div>
   </div>`;
 }
 
@@ -59,7 +60,7 @@ function titleScreen(): string {
   return `<button class="title-screen screen-button" data-testid="start-button" data-action="start" type="button" aria-label="犯人はヤス スタート">
     <span class="title-city" aria-hidden="true">
       <i class="building building-a"></i><i class="building building-b"></i><i class="building building-c"></i>
-      <i class="title-yasu"><b><i class="title-hair"></i></b><em></em></i>
+      <i class="title-yasu"><img src="${yasuSpriteUrl}" alt="" draggable="false"></i>
     </span>
     <span class="title-main">犯人はヤス</span><span class="press-start">▶ スタート</span>
   </button>`;
