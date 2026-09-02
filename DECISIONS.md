@@ -493,3 +493,21 @@ up" is a rule the unit tests can hold rather than a condition the renderer has t
 re-derive on every page. The clack fires only on the step carrying the flag, so
 moving the draw to another page moves the sound with it.
 
+The Yasu route now lands exactly one 「ヤスッ！」. It used to fire twice inside
+seven seconds — 「みとおしが ヤスッ！」 at the last line, then
+「このゲーム／なにもかも ヤスッ！」 after THE END — and the pair read as a stutter
+rather than as two jokes. The closing caption is the one that went: the comeback
+belongs on a line someone actually says, and a second one over the sunset only
+blunted the first. Instrumenting the DOM was what settled it; both really were
+on screen, four seconds apart, and neither was a rendering bug.
+
+The escort walk starts at X=152 rather than X=41. At 41 the pair began already
+left of centre and left the frame in 2.4 seconds, so the walk to custody was easy
+to miss entirely. Starting them near the right and giving the crossing 3.2 seconds
+makes it read, and they now stay on screen for the whole sunset because there is
+no caption left to clear them for.
+
+The muzzle sits at X=90 so it overlaps his jacket by about half. At 64 it floated
+clear of him and read as a prop lying in the room rather than something he is
+holding.
+

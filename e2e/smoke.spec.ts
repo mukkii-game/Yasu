@@ -184,7 +184,7 @@ test.describe('犯人はヤス', () => {
     }
   });
 
-  test('overlays and fades the final comeback after the escort leaves', async ({ page }) => {
+  test('closes on one comeback, then walks Yasu off and fades out', async ({ page }) => {
     test.setTimeout(90_000);
     await page.addInitScript(() => {
       const playedSounds: string[] = [];
@@ -263,18 +263,19 @@ test.describe('犯人はヤス', () => {
         computedDuration: walkers ? getComputedStyle(walkers).animationDuration : undefined,
       };
     });
-    expect(escortTiming).toEqual({ left: '41px', duration: '2.4s', computedDuration: '2.4s' });
-    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも'], { timeout: 10_000 });
-    await expect(page.locator('.walkers')).toHaveCount(0);
-    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
-    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
-    expect(await playedSoundFiles(page)).toContain('final-boom.mp3');
-    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも']);
-    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCSS('font-size', '60px');
-    await expect(page.getByTestId('end-punchline')).toHaveCSS('white-space', 'nowrap');
-    await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-    await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade');
-    await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 6_000 });
+    // The escort now starts at the right and crosses, rather than beginning
+    // half off the left edge where the walk was easy to miss entirely.
+    expect(escortTiming).toEqual({ left: '152px', duration: '3.2s', computedDuration: '3.2s' });
+    await expect(page.locator('.walkers')).toBeVisible();
+
+    // 「ヤスッ！」 lands exactly once on this route, on the line that earns it.
+    await expect(page.getByTestId('end-punchline')).toHaveCount(0);
+    const hitsAfterPlea = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
+    await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade', { timeout: 10_000 });
+    await expect(page.getByTestId('end-punchline')).toHaveCount(0);
+    expect((await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length)
+      .toBe(hitsAfterPlea);
+    await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 10_000 });
   });
 
   test('lets Yasu turn the confession on the boss', async ({ page }) => {
