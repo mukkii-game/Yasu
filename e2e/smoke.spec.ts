@@ -363,6 +363,22 @@ test.describe('犯人はヤス', () => {
     const hitsBeforePayoff = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
     await expect(page.getByTestId('boss-punchline').locator('.end-setup b')).toHaveText(['ボスのいのち'], { timeout: 10_000 });
     await expect(page.getByTestId('boss-punchline').locator('strong')).toHaveText('ヤスッ！');
+
+    // The payoff has to fit the screen. At 60px 「ヤスッ！」 ran 108 logical
+    // pixels off each edge and the player only ever saw 「スッ」.
+    const payoffFits = await page.evaluate(() => {
+      const screen = document.querySelector('[data-testid="game-screen"]')!.getBoundingClientRect();
+      const inside = (selector: string) => {
+        const rect = document.querySelector(selector)!.getBoundingClientRect();
+        return rect.left >= screen.left - 0.5 && rect.right <= screen.right + 0.5;
+      };
+      return {
+        payoff: inside('[data-testid="boss-punchline"] strong'),
+        setup: inside('[data-testid="boss-punchline"] .end-setup'),
+        theEnd: inside('[data-testid="the-end"]'),
+      };
+    });
+    expect(payoffFits).toEqual({ payoff: true, setup: true, theEnd: true });
     expect((await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length)
       .toBe(hitsBeforePayoff + 1);
 
