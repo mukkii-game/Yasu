@@ -1,11 +1,11 @@
 /** Pure state transitions for the two-character mystery game. */
 
-export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'ending' | 'end';
+export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'ending' | 'end' | 'boss' | 'boss-end';
 
 export interface DialogueStep {
   readonly speaker: 'ヤス' | 'あなた';
   readonly text: string;
-  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！';
+  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！' | '表現がヤスッ！';
   /** The finished line lands with the reveal's shock cue and tremble. */
   readonly impact?: true;
 }
@@ -14,6 +14,7 @@ export interface GameState {
   readonly phase: Phase;
   readonly introIndex: number;
   readonly endingIndex: number;
+  readonly bossIndex: number;
   readonly answer: readonly string[];
 }
 
@@ -25,6 +26,7 @@ export const INTRO: readonly DialogueStep[] = [
 
 export const ENDING: readonly DialogueStep[] = [
   { speaker: 'あなた', text: 'タイトルにかいてあったよ', punchline: 'なぞときがヤスッ！' },
+  { speaker: 'あなた', text: 'もじどおり　かおにもかいてある', punchline: '表現がヤスッ！' },
   { speaker: 'あなた', text: 'ヤス、なんで　ごうとうさつじんなんてしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
@@ -37,19 +39,25 @@ export const ENDING: readonly DialogueStep[] = [
   { speaker: 'ヤス', text: 'エッ？　しっこうゆうよはつかないですか！？', punchline: 'みとおしがヤスッ！' },
 ];
 
+/** Naming the boss instead of Yasu turns the confession into evidence. */
+export const BOSS: readonly DialogueStep[] = [
+  { speaker: 'ヤス', text: 'ボス　じはくとして\nろくおんさせてもらいましたよ' },
+  { speaker: 'ヤス', text: 'これで　かんぜんはんざいです\nありがとう　そしてさようなら' },
+];
+
 export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。やっぱめいきゅういりですよ。' };
 export const REVEAL: DialogueStep = { speaker: 'ヤス', text: 'な、なぜわかったんですかっ！？' };
 
 export const KANA = [
   'ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ',
   'サ', 'シ', 'ス', 'セ', 'ソ', 'タ', 'チ', 'ツ', 'テ', 'ト',
-  'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',
+  'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ボ',
   'マ', 'ミ', 'ム', 'メ', 'モ', 'ヤ', 'ユ', 'ヨ', 'ラ', 'リ',
   'ル', 'レ', 'ロ', 'ワ', 'ヲ', 'ン',
 ] as const;
 
 export function createGame(): GameState {
-  return { phase: 'title', introIndex: 0, endingIndex: 0, answer: [] };
+  return { phase: 'title', introIndex: 0, endingIndex: 0, bossIndex: 0, answer: [] };
 }
 
 export function startGame(state: GameState): GameState {
@@ -64,6 +72,11 @@ export function advance(state: GameState): GameState {
   }
   if (state.phase === 'wrong') return { ...state, phase: 'input' };
   if (state.phase === 'reveal') return { ...state, phase: 'ending', endingIndex: 0 };
+  if (state.phase === 'boss') {
+    return state.bossIndex < BOSS.length - 1
+      ? { ...state, bossIndex: state.bossIndex + 1 }
+      : { ...state, phase: 'boss-end' };
+  }
   if (state.phase === 'ending') {
     return state.endingIndex < ENDING.length - 1
       ? { ...state, endingIndex: state.endingIndex + 1 }
@@ -89,9 +102,10 @@ export function clearAnswer(state: GameState): GameState {
 
 export function submitAnswer(state: GameState): GameState {
   if (state.phase !== 'input' || state.answer.length !== 2) return state;
-  return state.answer.join('') === 'ヤス'
-    ? { ...state, phase: 'reveal' }
-    : { ...state, phase: 'wrong', answer: [] };
+  const answer = state.answer.join('');
+  if (answer === 'ヤス') return { ...state, phase: 'reveal' };
+  if (answer === 'ボス') return { ...state, phase: 'boss', bossIndex: 0 };
+  return { ...state, phase: 'wrong', answer: [] };
 }
 
 export function restart(): GameState {
@@ -103,6 +117,7 @@ export function currentDialogue(state: GameState): DialogueStep | undefined {
   if (state.phase === 'wrong') return WRONG;
   if (state.phase === 'reveal') return REVEAL;
   if (state.phase === 'ending') return ENDING[state.endingIndex];
+  if (state.phase === 'boss') return BOSS[state.bossIndex];
   return undefined;
 }
 

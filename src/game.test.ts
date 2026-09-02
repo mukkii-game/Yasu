@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ENDING, INTRO, WRONG, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
+import { BOSS, ENDING, INTRO, KANA, WRONG, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
 
 function reachInput() {
   let state = startGame(createGame());
@@ -60,7 +60,7 @@ describe('game flow', () => {
       if (step?.punchline) punchlines.push(step.punchline);
       state = advance(state);
     }
-    expect(punchlines).toEqual(['なぞときがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人としてヤスッ！', 'みとおしがヤスッ！']);
+    expect(punchlines).toEqual(['なぞときがヤスッ！', '表現がヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人としてヤスッ！', 'みとおしがヤスッ！']);
     expect(state.phase).toBe('end');
   });
 
@@ -69,8 +69,9 @@ describe('game flow', () => {
     expect(dialogueText(INTRO[2])).toBe('あなた「はんにんは・・・」');
     expect(dialogueText(WRONG)).toBe('ヤス「いや、ちがうでしょう。やっぱめいきゅういりですよ。」');
     expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあったよ」');
-    expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
-    expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
+    expect(dialogueText(ENDING[1])).toBe('あなた「もじどおり　かおにもかいてある」');
+    expect(dialogueText(ENDING[2])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
+    expect(dialogueText(ENDING[4])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
   });
 
   it('closes on the sentence, with the shock on it and the comeback on Yasu\'s plea', () => {
@@ -90,6 +91,33 @@ describe('game flow', () => {
 
     // Only the sentence carries the shock.
     expect(ENDING.filter((step) => step.impact)).toHaveLength(1);
+  });
+
+  it('offers ボ instead of ホ so the boss can be named', () => {
+    expect(KANA).toContain('ボ');
+    expect(KANA).not.toContain('ホ');
+  });
+
+  it('turns 「ボス」 into Yasu\'s own ending', () => {
+    let state = reachInput();
+    state = chooseKana(chooseKana(state, 'ボ'), 'ス');
+    state = submitAnswer(state);
+    expect(state.phase).toBe('boss');
+    expect(dialogueText(currentDialogue(state)!)).toBe('ヤス「ボス　じはくとして\nろくおんさせてもらいましたよ」');
+
+    state = advance(state);
+    expect(dialogueText(currentDialogue(state)!)).toBe('ヤス「これで　かんぜんはんざいです\nありがとう　そしてさようなら」');
+
+    state = advance(state);
+    expect(state.phase).toBe('boss-end');
+    expect(currentDialogue(state)).toBeUndefined();
+    expect(BOSS).toHaveLength(2);
+  });
+
+  it('still rejects a name that is neither ヤス nor ボス', () => {
+    let state = reachInput();
+    state = chooseKana(chooseKana(state, 'ア'), 'ス');
+    expect(submitAnswer(state).phase).toBe('wrong');
   });
 
   it('restart always returns to a clean title state', () => {
