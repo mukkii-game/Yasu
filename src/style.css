@@ -147,4 +147,3 @@ button { border: 0; border-radius: 0; font: inherit; }
 
 @media (min-width: 660px) and (min-height: 520px) { :root { --scale: 2; } }
 @media (min-width: 980px) and (min-height: 760px) { :root { --scale: 3; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }

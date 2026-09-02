@@ -205,12 +205,6 @@ function beginTyping(): void {
     render();
     return;
   }
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    visibleCharacters = total;
-    render();
-    schedulePunchline();
-    return;
-  }
   visibleCharacters = 0;
   render();
   const tick = () => {
@@ -257,9 +251,9 @@ function scheduleEndPunchline(): void {
       endReturnTimer = window.setTimeout(() => {
         endReturnTimer = undefined;
         setState(restart());
-      }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 4200);
+      }, 4200);
     }, 700);
-  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1250 : 3650);
+  }, 3650);
 }
 
 function setState(next: GameState): void {

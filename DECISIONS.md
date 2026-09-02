@@ -400,3 +400,12 @@ the generated reveal crash with `ショック1.mp3`, every ordinary second-beat
 `ヤスッ！` sting with `ドーン.mp3`. Keep the small synthesized setup pop,
 typing blips, input clicks, and handcuff clack unchanged. The supplied temple
 bell is deliberately left unused because no scene was assigned to it.
+
+## 2026-09-02 — Keep essential game motion identical on every device
+
+Do not shorten timers, skip character animation, or collapse the escort walk in
+response to `prefers-reduced-motion`. The shake, laugh, nod, punchline entries,
+typing rhythm, sound triggers, escort walk, and final fade are essential comedy
+and story beats. Their programmed timing must remain the same on Android, iOS,
+Windows, and macOS, including devices whose accessibility settings request less
+interface motion.

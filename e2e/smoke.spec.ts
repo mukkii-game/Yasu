@@ -178,6 +178,7 @@ test.describe('犯人はヤス', () => {
   });
 
   test('overlays and fades the final comeback after the escort leaves', async ({ page }) => {
+    test.setTimeout(90_000);
     await page.addInitScript(() => {
       const playedSounds: string[] = [];
       Object.defineProperty(window, '__playedSounds', { value: playedSounds });
@@ -197,13 +198,14 @@ test.describe('犯人はヤス', () => {
     await advanceDialogue(page, 'reveal-next');
 
     for (const [index, hasPunchline] of [true, false, true, true, true].entries()) {
+      await finishDialogue(page, 'ending-next');
       if (index === 3) await expect(page.locator('.office-scene')).toHaveClass(/laughing/);
       if (index === 4) {
         await expect(page.locator('.office-scene')).toHaveClass(/nodding/);
         await expect(page.locator('.yasu .head')).toHaveCSS('animation-name', 'nod-twice');
         await expect(page.locator('.yasu .body')).not.toHaveCSS('animation-name', 'nod-twice');
       }
-      if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
+      if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！', { timeout: 10_000 });
       if (hasPunchline) expect(await playedSoundFiles(page)).toContain('punchline-hit.mp3');
       if (index === 4) {
         await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
@@ -220,15 +222,17 @@ test.describe('犯人はヤス', () => {
     await page.keyboard.press('Enter');
     await expect(page.getByTestId('the-end')).toBeVisible();
     const escortTiming = await page.evaluate(() => {
+      const walkers = document.querySelector('.walkers');
       const escortRule = Array.from(document.styleSheets)
         .flatMap((sheet) => Array.from(sheet.cssRules))
         .find((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule && rule.selectorText === '.walkers');
       return {
         left: escortRule?.style.left,
         duration: escortRule?.style.animationDuration,
+        computedDuration: walkers ? getComputedStyle(walkers).animationDuration : undefined,
       };
     });
-    expect(escortTiming).toEqual({ left: '41px', duration: '2.4s' });
+    expect(escortTiming).toEqual({ left: '41px', duration: '2.4s', computedDuration: '2.4s' });
     await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも'], { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
