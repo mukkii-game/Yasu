@@ -47,7 +47,7 @@ Behaviour specification for 「犯人はヤス」. Read this before changing beh
 - Every dialogue page is absolutely pinned two pixels below the scene boundary. Its animated ▼ is inline immediately after the completed closing quote.
 - Text remains readable and all kana input remains available by touch on phones.
 - No copied screenshots, sprites, logos, characters, or music are used.
-- Animation is reduced when `prefers-reduced-motion` is enabled.
+- Story timing, character animation, the escort walk, text typing, punchline cues, and sound triggers remain identical across phones and desktop browsers even when the operating system reports `prefers-reduced-motion: reduce`. These movements carry the joke and are treated as essential game content rather than optional interface motion.
 
 ## Structure
 
