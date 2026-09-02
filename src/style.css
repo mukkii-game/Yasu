@@ -147,7 +147,9 @@ button { border: 0; border-radius: 0; font: inherit; }
 .end-final > .end-setup { font-size: 34px; line-height: 38px; letter-spacing: 0; animation: punch-pop 140ms steps(3) both; }
 .end-final .end-setup b { display: block; font: inherit; }
 .end-final.stage-2 > span { animation: none; }
-.end-final strong { margin-top: 0; font-size: 60px; line-height: 64px; letter-spacing: -1px; animation: punch-pop 140ms steps(3) both; }
+/* 60px ran 「ヤスッ！」 off both edges of a 256-pixel screen; 36px is the
+   widest that fits, and matches the comeback the room already uses. */
+.end-final strong { margin-top: 0; font-size: 36px; line-height: 40px; letter-spacing: -1px; animation: punch-pop 140ms steps(3) both; }
 
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink-border { 50% { border-color: var(--white); } }

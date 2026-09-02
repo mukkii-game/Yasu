@@ -511,3 +511,11 @@ The muzzle sits at X=90 so it overlaps his jacket by about half. At 64 it floate
 clear of him and read as a prop lying in the room rather than something he is
 holding.
 
+The finale comeback is 36 pixels, not 60. At 60 the boss route's 「ヤスッ！」 was
+735 pixels wide inside a 520-pixel screen — it ran 108 pixels off each edge, so
+the player only ever saw 「スッ」. The old Yasu-route caption was clipped the same
+way for as long as it existed; nothing caught it because the test pinned the font
+size rather than checking the text fit. The browser test now asserts the payoff,
+its setup and THE END all sit inside the screen rectangle, which is the property
+that actually matters and holds at every scale.
+
