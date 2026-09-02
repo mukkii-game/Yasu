@@ -513,11 +513,22 @@ The muzzle sits at X=90 so it overlaps his jacket by about half. At 64 it floate
 clear of him and read as a prop lying in the room rather than something he is
 holding.
 
-The finale comeback is 36 pixels, not 60. At 60 the boss route's 「ヤスッ！」 was
-735 pixels wide inside a 520-pixel screen — it ran 108 pixels off each edge, so
-the player only ever saw 「スッ」. The old Yasu-route caption was clipped the same
-way for as long as it existed; nothing caught it because the test pinned the font
-size rather than checking the text fit. The browser test now asserts the payoff,
-its setup and THE END all sit inside the screen rectangle, which is the property
-that actually matters and holds at every scale.
+The finale comeback stays at 60 pixels. I shrank it to 36 on a measurement that
+was simply wrong: getBoundingClientRect() includes transforms, and I read it
+while `punch-pop` still had `scale(2.4)` applied, so a caption that occupies 236
+of 256 logical pixels reported as 735 of 520 and looked like it overflowed. The
+fit checks now use offsetWidth, which is the layout box and ignores the pop.
 
+The shock moved off the sentence and onto the plea. Stating the sentence is the
+setup; 「エッ？　しっこうゆうよはつかないですか！？」 is where the floor drops out,
+so the cue and the tremble belong there, with the comeback following on the
+ordinary rhythm.
+
+The handcuff clack moved from a beat after the payoff to the start of the walk.
+A second after a landed 「ヤスッ！」 it read as a stray blip with nothing to
+explain it; on the sunset it lands with the escort setting off, which is what it
+was always depicting. Nothing now sounds between the comeback and the walk.
+
+The escort geometry is back to X=41 over 2.4 seconds. That had been tuned by hand
+over several passes and my change to X=152 over 3.2 seconds was not an
+improvement anyone asked for.
