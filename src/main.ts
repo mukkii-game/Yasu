@@ -37,9 +37,15 @@ let endSecondTimer: number | undefined;
 let endReturnTimer: number | undefined;
 let revealTimer: number | undefined;
 let custodyTimer: number | undefined;
+let fadeTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
 let endPunchlineStage: 0 | 1 | 2 = 0;
 let revealImpact = false;
+let punchlineImpact = false;
+let fadeOut = false;
+
+/** Matches the verdict-fade animation in style.css. */
+const FADE_MS = 1800;
 
 function getAudio(): AudioContext {
   audio ??= new AudioContext();
@@ -146,21 +152,34 @@ function isFinalEndingPage(): boolean {
 
 function clearCustodyTimer(): void {
   if (custodyTimer !== undefined) window.clearTimeout(custodyTimer);
+  if (fadeTimer !== undefined) window.clearTimeout(fadeTimer);
   custodyTimer = undefined;
+  fadeTimer = undefined;
 }
 
+/**
+ * The sentence beat holds on the tremble, then the room drains of colour and
+ * light before the sunset ending takes over.
+ */
 function scheduleCustodyTransition(): void {
   clearCustodyTimer();
   custodyTimer = window.setTimeout(() => {
     custodyTimer = undefined;
     if (!isFinalEndingPage() || punchlineStage < 2) return;
     handcuffClack();
-    setState(advance(state));
+    fadeOut = true;
+    render();
+    fadeTimer = window.setTimeout(() => {
+      fadeTimer = undefined;
+      setState(advance(state));
+    }, FADE_MS);
   }, 1000);
 }
 
 function render(): void {
-  renderApp(root, state, { visibleCharacters, punchlineStage, endPunchlineStage, revealImpact });
+  renderApp(root, state, {
+    visibleCharacters, punchlineStage, endPunchlineStage, revealImpact, punchlineImpact, fadeOut,
+  });
 }
 
 function fullDialogueLength(): number {
@@ -179,7 +198,13 @@ function schedulePunchline(): void {
     punchlineSecondTimer = window.setTimeout(() => {
       punchlineSecondTimer = undefined;
       punchlineStage = 2;
-      playSound(punchlineHit);
+      // The sentence lands like the reveal did: same shock cue, same tremble.
+      if (step.impact) {
+        punchlineImpact = true;
+        playSound(revealShock);
+      } else {
+        playSound(punchlineHit);
+      }
       render();
       if (isFinalEndingPage()) scheduleCustodyTransition();
     }, 700);
@@ -199,6 +224,7 @@ function beginTyping(): void {
   clearPunchlineTimers();
   typeTimer = undefined;
   punchlineStage = 0;
+  punchlineImpact = false;
   const total = fullDialogueLength();
   if (!total) {
     visibleCharacters = Number.POSITIVE_INFINITY;
@@ -262,13 +288,15 @@ function setState(next: GameState): void {
   clearEndTimer();
   clearRevealTimer();
   endPunchlineStage = 0;
+  punchlineImpact = false;
+  fadeOut = false;
   state = next;
   beginTyping();
   if (next.phase === 'end') scheduleEndPunchline();
 }
 
 function advanceOrFinish(): void {
-  if (revealImpact) return;
+  if (revealImpact || punchlineImpact) return;
   const step = currentDialogue(state);
   if (step && visibleCharacters < fullDialogueLength()) {
     finishTyping();

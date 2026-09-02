@@ -60,7 +60,7 @@ describe('game flow', () => {
       if (step?.punchline) punchlines.push(step.punchline);
       state = advance(state);
     }
-    expect(punchlines).toEqual(['なぞときがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人としてヤスッ！']);
+    expect(punchlines).toEqual(['なぞときがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人としてヤスッ！', '刑期の見積もりがヤスッ！']);
     expect(state.phase).toBe('end');
   });
 
@@ -71,6 +71,14 @@ describe('game flow', () => {
     expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあったよ」');
     expect(dialogueText(ENDING[1])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
     expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
+  });
+
+  it('closes the ending on the sentence beat, which alone carries the impact cue', () => {
+    const sentence = ENDING[ENDING.length - 1];
+    expect(dialogueText(sentence)).toBe('あなた「ごうとうさつじんは\nしけいか　むきちょうえきだぞ？」');
+    expect(sentence.punchline).toBe('刑期の見積もりがヤスッ！');
+    expect(sentence.impact).toBe(true);
+    expect(ENDING.slice(0, -1).some((step) => step.impact)).toBe(false);
   });
 
   it('restart always returns to a clean title state', () => {

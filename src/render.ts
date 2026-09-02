@@ -6,10 +6,23 @@ export interface RenderOptions {
   readonly punchlineStage: 0 | 1 | 2;
   readonly endPunchlineStage: 0 | 1 | 2;
   readonly revealImpact: boolean;
+  /** The sentence punchline is landing: same tremble as the reveal, box hidden. */
+  readonly punchlineImpact: boolean;
+  /** The screen is draining to black on the way to the ending. */
+  readonly fadeOut: boolean;
 }
 
 function escapeHtml(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+}
+
+function punchlineMarkup(state: GameState, options: RenderOptions): string {
+  const step = currentDialogue(state);
+  if (!step?.punchline || options.punchlineStage === 0) return '';
+  const complete = Array.from(dialogueText(step)).length <= options.visibleCharacters;
+  if (!complete && !options.punchlineImpact) return '';
+  const prefix = step.punchline.replace('ヤスッ！', '');
+  return `<div class="sprite-punchline split stage-${options.punchlineStage}" data-testid="punchline"><span>${escapeHtml(prefix)}</span>${options.punchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</div>`;
 }
 
 function dialogue(state: GameState, options: RenderOptions): string {
@@ -19,12 +32,7 @@ function dialogue(state: GameState, options: RenderOptions): string {
   const visibleText = Array.from(fullText).slice(0, options.visibleCharacters).join('');
   const complete = visibleText === fullText;
   const testId = state.phase === 'wrong' ? 'wrong-next' : state.phase === 'reveal' ? 'reveal-next' : state.phase === 'ending' ? 'ending-next' : 'dialogue-next';
-  let punchline = '';
-  if (complete && step.punchline && options.punchlineStage > 0) {
-    const prefix = step.punchline.replace('ヤスッ！', '');
-    punchline = `<div class="sprite-punchline split stage-${options.punchlineStage}" data-testid="punchline"><span>${escapeHtml(prefix)}</span>${options.punchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</div>`;
-  }
-  return `${punchline}<button class="dialogue-box screen-button" data-testid="${testId}" data-action="advance" type="button" aria-label="${escapeHtml(fullText)}">
+  return `${punchlineMarkup(state, options)}<button class="dialogue-box screen-button" data-testid="${testId}" data-action="advance" type="button" aria-label="${escapeHtml(fullText)}">
     <span class="dialogue-copy">${escapeHtml(visibleText)}${complete ? '<span class="next-mark" aria-hidden="true">▼</span>' : ''}</span>
   </button>`;
 }
@@ -77,17 +85,25 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     content = `<div class="end-screen${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" aria-label="エンディング">${endScene(options.endPunchlineStage > 0)}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</div>`;
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
-    const sceneMode = options.revealImpact ? 'impact' : comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
+    const shaking = options.revealImpact || options.punchlineImpact;
+    const sceneMode = shaking ? 'impact' : comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
     const step = currentDialogue(state);
     const shownText = step ? Array.from(dialogueText(step)).slice(0, options.visibleCharacters).join('') : '';
     const laughing = state.phase === 'ending' && state.endingIndex === 3 && shownText.includes('はっはっは');
     const nodding = state.phase === 'ending' && state.endingIndex === 4 && step !== undefined
       && shownText === dialogueText(step) && options.punchlineStage === 0;
     const scene = officeScene(sceneMode, laughing, nodding);
-    content = state.phase === 'input' ? scene + kanaPanel(state) : options.revealImpact ? scene : scene + dialogue(state, options);
+    content = state.phase === 'input'
+      ? scene + kanaPanel(state)
+      : options.revealImpact
+        ? scene
+        : options.punchlineImpact
+          ? scene + punchlineMarkup(state, options)
+          : scene + dialogue(state, options);
   }
 
-  root.innerHTML = `<main class="game-shell"><div class="screen-frame"><section class="game-screen phase-${state.phase}${options.revealImpact ? ' reveal-impact' : ''}" data-testid="game-screen">
+  const screenModifiers = `${options.revealImpact ? ' reveal-impact' : ''}${options.punchlineImpact ? ' punchline-impact' : ''}${options.fadeOut ? ' fading' : ''}`;
+  root.innerHTML = `<main class="game-shell"><div class="screen-frame"><section class="game-screen phase-${state.phase}${screenModifiers}" data-testid="game-screen">
     ${content}
   </section></div></main>`;
 }

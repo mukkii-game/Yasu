@@ -197,6 +197,8 @@ test.describe('犯人はヤス', () => {
     expect(await playedSoundFiles(page)).toContain('reveal-shock.mp3');
     await advanceDialogue(page, 'reveal-next');
 
+    const shocksBeforeSentence = (await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length;
+
     for (const [index, hasPunchline] of [true, false, true, true, true].entries()) {
       await finishDialogue(page, 'ending-next');
       if (index === 3) await expect(page.locator('.office-scene')).toHaveClass(/laughing/);
@@ -211,12 +213,22 @@ test.describe('犯人はヤス', () => {
         await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
       }
       await page.getByTestId('ending-next').click();
-      if (index === 4) {
-        await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
-      }
     }
 
-    await expect(page.getByTestId('the-end')).toBeVisible();
+    // The sentence beat closes the room: same shock cue and tremble as the reveal.
+    await finishDialogue(page, 'ending-next');
+    await expect(page.getByTestId('ending-next')).toContainText('むきちょうえき');
+    await expect(page.getByTestId('punchline').locator('span')).toHaveText('刑期の見積もりが', { timeout: 10_000 });
+    await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
+    await expect(page.locator('.office-scene')).toHaveClass(/impact/);
+    await expect(page.locator('.yasu')).toHaveCSS('animation-name', 'impact-tremble');
+    await expect(page.getByTestId('ending-next')).toHaveCount(0);
+    expect((await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length)
+      .toBe(shocksBeforeSentence + 1);
+
+    // Then the room drains of colour and light on the way to the sunset.
+    await expect(page.getByTestId('game-screen')).toHaveCSS('animation-name', 'verdict-fade', { timeout: 10_000 });
+    await expect(page.getByTestId('the-end')).toBeVisible({ timeout: 10_000 });
     await expect(page.getByTestId('end-screen')).not.toHaveAttribute('data-action');
     await page.getByTestId('end-screen').click({ position: { x: 120, y: 100 } });
     await page.keyboard.press('Enter');
