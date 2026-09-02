@@ -421,3 +421,19 @@ callback read as deliberate.
 The drain to black is a single `filter` animation losing saturation and
 brightness together, applied to the whole screen rather than to any one element,
 so the room dims as one picture on the way to the sunset.
+
+## 2026-09-02 — One comeback per setup, and the shock belongs to the line
+
+「まあ しょはんだし すぐでてこれますよねｗ」 lost its own 「人としてヤスッ！」. The
+player's correction is the answer to that boast, so landing a comeback on the
+boast and another on the correction punched the same setup twice and blunted
+both. The boast now just sits there, which is funnier.
+
+The correction's shock moved off its comeback and onto the line: the cue and the
+tremble fire the instant 「むきちょうえきだぞ？」 finishes typing, and the comeback
+that follows uses the same lead blip and hit as every other one. A repeating gag
+reads as a repeat only when it sounds like one, so the callback is carried by the
+shock on the line rather than by a different-sounding punchline.
+
+A landed 「ヤスッ！」 is held for 900 ms against input. The two-beat rhythm is the
+joke, and letting a tap cut it short threw away the beat it was building.
