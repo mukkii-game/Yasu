@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOSS, ENDING, HINT_KANA, INTRO, KANA, WRONG, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
+import { BOSS, ENDING, HINT_KANA, INTRO, KANA, WRONG, gunDrawn, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
 
 function reachInput() {
   let state = startGame(createGame());
@@ -117,13 +117,35 @@ describe('game flow', () => {
     expect(spoken).toEqual([
       'ヤス「ボス　じはくとして\nろくおんさせてもらいましたよ」',
       'ヤス「それ　そのままじじつに\nさせてもらいますわ」',
-      'ヤス「ひぎしゃ　ていこうのため\nやむなくせいあつ」',
+      'ヤス「はんにん　ていこうのため\nやむなくせいあつ」',
       'ヤス「ボス　ありがとう\nそしてさようなら」',
     ]);
 
     state = advance(state);
     expect(state.phase).toBe('boss-end');
     expect(currentDialogue(state)).toBeUndefined();
+  });
+
+  it('draws the gun on the line that justifies it and keeps it up', () => {
+    let state = reachInput();
+    state = submitAnswer(chooseKana(chooseKana(state, 'ボ'), 'ス'));
+
+    const drawnAt = BOSS.findIndex((step) => step.gun);
+    expect(BOSS[drawnAt].text.startsWith('はんにん')).toBe(true);
+    expect(BOSS.filter((step) => step.gun)).toHaveLength(1);
+
+    for (let index = 0; index < BOSS.length; index += 1) {
+      expect(gunDrawn(state)).toBe(index >= drawnAt);
+      state = advance(state);
+    }
+    // It cannot go back in the pocket for the shot.
+    expect(state.phase).toBe('boss-end');
+    expect(gunDrawn(state)).toBe(true);
+  });
+
+  it('never shows the gun outside the boss route', () => {
+    expect(gunDrawn(createGame())).toBe(false);
+    expect(gunDrawn(reachInput())).toBe(false);
   });
 
   it('opens the boss route on the unease cue and laughs on it again', () => {

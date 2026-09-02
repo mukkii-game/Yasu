@@ -1,4 +1,4 @@
-import { HINT_KANA, KANA, currentDialogue, dialogueText, type GameState } from './game';
+import { HINT_KANA, KANA, currentDialogue, dialogueText, gunDrawn, type GameState } from './game';
 import yasuSpriteUrl from './assets/yasu.png';
 
 export interface RenderOptions {
@@ -122,7 +122,8 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     // The boss route's laugh starts only once the line has finished landing.
     const shoulderLaugh = state.phase === 'boss' && step?.laugh === true
       && shownText === dialogueText(step);
-    const scene = officeScene(sceneMode, laughing, nodding, false, shoulderLaugh);
+    // He draws on the line that justifies it, not once the screen has gone.
+    const scene = officeScene(sceneMode, laughing, nodding, gunDrawn(state), shoulderLaugh);
     content = state.phase === 'input'
       ? scene + kanaPanel(state)
       : options.revealImpact

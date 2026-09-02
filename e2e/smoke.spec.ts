@@ -313,8 +313,9 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
 
-    // The route opens on the cue Yasu first walked in on.
+    // The route opens on the cue Yasu first walked in on, with no gun yet.
     await expect(page.getByTestId('boss-next')).toContainText('ろくおんさせて');
+    await expect(page.getByTestId('gun')).toHaveCount(0);
     expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
       .toBe(uneaseBeforeRoute + 1);
     await advanceDialogue(page, 'boss-next');
@@ -329,16 +330,19 @@ test.describe('犯人はヤス', () => {
       .toBe(uneaseBeforeRoute + 2);
     await page.getByTestId('boss-next').click();
 
-    // The report he will file, then the sign-off.
+    // He draws on the line that justifies it, not once the screen has gone.
+    await expect(page.getByTestId('boss-next')).toContainText('はんにん');
+    await expect(page.getByTestId('gun')).toBeVisible();
     await finishDialogue(page, 'boss-next');
     await expect(page.getByTestId('boss-next')).toContainText('やむなくせいあつ');
     await page.getByTestId('boss-next').click();
 
+    // It stays up through the sign-off rather than going back in the pocket.
     await finishDialogue(page, 'boss-next');
     await expect(page.getByTestId('boss-next')).toContainText('ボス　ありがとう');
+    await expect(page.getByTestId('gun')).toBeVisible();
     await page.getByTestId('boss-next').click();
 
-    // The gun is out before anything else happens.
     await expect(page.getByTestId('gun')).toBeVisible();
     await expect(page.getByTestId('the-end')).toHaveCount(0);
 

@@ -262,7 +262,9 @@ function beginTyping(): void {
     return;
   }
   visibleCharacters = 0;
-  if (currentDialogue(state)?.unease) playSound(anxiety);
+  const opening = currentDialogue(state);
+  if (opening?.unease) playSound(anxiety);
+  if (opening?.gun) handcuffClack();
   render();
   const tick = () => {
     visibleCharacters += 1;
@@ -305,7 +307,6 @@ function clearBossTimers(): void {
 function scheduleBossEnd(): void {
   clearBossTimers();
   bossStage = 0;
-  handcuffClack();
   render();
   const at = (delay: number, step: () => void) => {
     bossTimers.push(window.setTimeout(step, delay));
