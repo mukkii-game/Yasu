@@ -184,7 +184,7 @@ test.describe('犯人はヤス', () => {
     }
   });
 
-  test('closes on one comeback, then walks Yasu off and fades out', async ({ page }) => {
+  test('lands each comeback exactly once, then walks Yasu off', async ({ page }) => {
     test.setTimeout(90_000);
     await page.addInitScript(() => {
       const playedSounds: string[] = [];
@@ -193,6 +193,16 @@ test.describe('犯人はヤス', () => {
         playedSounds.push(this.src);
         return Promise.resolve();
       };
+      // Every 「ヤスッ！」 that pops, so a re-render replaying one is caught.
+      const pops: string[] = [];
+      Object.defineProperty(window, '__pops', { value: pops });
+      document.addEventListener('animationstart', (event) => {
+        const animation = event as AnimationEvent;
+        if (animation.animationName !== 'punch-pop') return;
+        const element = animation.target as HTMLElement;
+        if (!element.textContent?.includes('ヤスッ')) return;
+        pops.push(element.closest('[data-testid]')?.getAttribute('data-testid') ?? '?');
+      }, true);
     });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
@@ -263,19 +273,32 @@ test.describe('犯人はヤス', () => {
         computedDuration: walkers ? getComputedStyle(walkers).animationDuration : undefined,
       };
     });
-    // The escort now starts at the right and crosses, rather than beginning
-    // half off the left edge where the walk was easy to miss entirely.
+    // The escort starts near the right and crosses, rather than beginning half
+    // off the left edge where the walk was easy to miss entirely.
     expect(escortTiming).toEqual({ left: '152px', duration: '3.2s', computedDuration: '3.2s' });
-    await expect(page.locator('.walkers')).toBeVisible();
+    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも'], { timeout: 10_000 });
+    await expect(page.locator('.walkers')).toHaveCount(0);
+    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
+    await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
+    expect(await playedSoundFiles(page)).toContain('final-boom.mp3');
+    await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも']);
+    const endFits = await page.evaluate(() => {
+      const screen = document.querySelector('[data-testid="game-screen"]')!.getBoundingClientRect();
+      const rect = document.querySelector('[data-testid="end-punchline"] strong')!.getBoundingClientRect();
+      return rect.left >= screen.left - 0.5 && rect.right <= screen.right + 0.5;
+    });
+    expect(endFits).toBe(true);
 
-    // 「ヤスッ！」 lands exactly once on this route, on the line that earns it.
-    await expect(page.getByTestId('end-punchline')).toHaveCount(0);
-    const hitsAfterPlea = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
-    await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade', { timeout: 10_000 });
-    await expect(page.getByTestId('end-punchline')).toHaveCount(0);
-    expect((await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length)
-      .toBe(hitsAfterPlea);
-    await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 10_000 });
+    // Both comebacks stay, and each lands once. Re-rendering used to recreate
+    // the node and restart its animation, so 「みとおしが ヤスッ！」 popped a
+    // second time when the custody transition redrew the page.
+    const pops = await page.evaluate(() => (window as typeof window & { __pops: string[] }).__pops);
+    expect(pops.filter((where) => where === 'punchline')).toHaveLength(6);
+    expect(pops.filter((where) => where === 'end-punchline')).toHaveLength(1);
+    await expect(page.getByTestId('end-punchline')).toHaveCSS('white-space', 'nowrap');
+    await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade');
+    await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 6_000 });
   });
 
   test('lets Yasu turn the confession on the boss', async ({ page }) => {

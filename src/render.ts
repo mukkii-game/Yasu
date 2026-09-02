@@ -4,8 +4,9 @@ import yasuSpriteUrl from './assets/yasu.png';
 export interface RenderOptions {
   readonly visibleCharacters: number;
   readonly punchlineStage: 0 | 1 | 2;
-  /** The sunset ending is draining out on its way back to the title. */
-  readonly endFading: boolean;
+  /** The payoff has already played its pop; a re-render must not replay it. */
+  readonly payoffPopped: boolean;
+  readonly endPunchlineStage: 0 | 1 | 2;
   readonly revealImpact: boolean;
   /** The finished line is landing its shock: same tremble as the reveal. */
   readonly impactShake: boolean;
@@ -24,7 +25,7 @@ function punchlineMarkup(state: GameState, options: RenderOptions): string {
   if (!step?.punchline || options.punchlineStage === 0) return '';
   if (Array.from(dialogueText(step)).length > options.visibleCharacters) return '';
   const prefix = step.punchline.replace('ヤスッ！', '');
-  return `<div class="sprite-punchline split stage-${options.punchlineStage}" data-testid="punchline"><span>${escapeHtml(prefix)}</span>${options.punchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</div>`;
+  return `<div class="sprite-punchline split stage-${options.punchlineStage}${options.payoffPopped ? ' settled' : ''}" data-testid="punchline"><span>${escapeHtml(prefix)}</span>${options.punchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</div>`;
 }
 
 function dialogue(state: GameState, options: RenderOptions): string {
@@ -104,9 +105,10 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
   } else if (state.phase === 'boss-end') {
     content = bossEndScreen(options);
   } else if (state.phase === 'end') {
-    // One 「ヤスッ！」 closes the route, on the line that earns it. The sunset
-    // holds the walk and THE END, then drains out on its own.
-    content = `<div class="end-screen${options.endFading ? ' finale' : ''}" data-testid="end-screen" aria-label="エンディング">${endScene(false)}<span class="the-end" data-testid="the-end">THE END</span></div>`;
+    const finalPunchline = options.endPunchlineStage > 0
+      ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span class="end-setup"><b>このゲーム</b><b>なにもかも</b></span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</span>`
+      : '';
+    content = `<div class="end-screen${options.endPunchlineStage > 1 ? ' finale' : ''}" data-testid="end-screen" aria-label="エンディング">${endScene(options.endPunchlineStage > 0)}<span class="the-end" data-testid="the-end">THE END</span>${finalPunchline}</div>`;
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const shaking = options.revealImpact || options.impactShake;

@@ -493,13 +493,15 @@ up" is a rule the unit tests can hold rather than a condition the renderer has t
 re-derive on every page. The clack fires only on the step carrying the flag, so
 moving the draw to another page moves the sound with it.
 
-The Yasu route now lands exactly one 「ヤスッ！」. It used to fire twice inside
-seven seconds — 「みとおしが ヤスッ！」 at the last line, then
-「このゲーム／なにもかも ヤスッ！」 after THE END — and the pair read as a stutter
-rather than as two jokes. The closing caption is the one that went: the comeback
-belongs on a line someone actually says, and a second one over the sunset only
-blunted the first. Instrumenting the DOM was what settled it; both really were
-on screen, four seconds apart, and neither was a rendering bug.
+Both closing comebacks stay, and each lands once. 「みとおしが ヤスッ！」 was
+popping twice — once when it landed, and again exactly a second later. Removing
+the second caption was my reading of that and it was wrong; the report was about
+the repeat, not about having two jokes. The real cause is that render() replaces
+innerHTML, so a redraw recreates the node and restarts its CSS pop. The custody
+transition redraws the page one second after the payoff lands, which replayed it.
+A landed payoff is now latched so any later redraw leaves it standing, the same
+guard the setup line already had. The browser test counts pops rather than
+checking text, because the text never changed — only the animation restarted.
 
 The escort walk starts at X=152 rather than X=41. At 41 the pair began already
 left of centre and left the frame in 2.4 seconds, so the walk to custody was easy

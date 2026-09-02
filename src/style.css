@@ -107,6 +107,9 @@ button { border: 0; border-radius: 0; font: inherit; }
 .sprite-punchline span, .sprite-punchline strong { display: block; font-weight: 900; }
 .sprite-punchline span { animation: punch-pop 140ms steps(3) both; }
 .sprite-punchline.stage-2 span { animation: none; }
+/* Re-rendering recreates the node and restarts the pop, so 「ヤスッ！」 landed
+   a second time when the custody transition redrew the page. */
+.sprite-punchline.settled span, .sprite-punchline.settled strong { animation: none; }
 .sprite-punchline strong { font-size: 36px; line-height: 40px; animation: punch-pop 140ms steps(3) both; }
 
 .kana-panel { position: absolute; z-index: 15; inset: 0; display: grid; grid-template-rows: 32px 1fr 28px; gap: 3px; padding: 5px; color: var(--white); background: var(--black); }
