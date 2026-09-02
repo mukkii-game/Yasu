@@ -437,3 +437,15 @@ shock on the line rather than by a different-sounding punchline.
 
 A landed 「ヤスッ！」 is held for 900 ms against input. The two-beat rhythm is the
 joke, and letting a tap cut it short threw away the beat it was building.
+
+## 2026-09-02 — The sentence and the plea are two pages, not one
+
+An earlier revision removed 「人としてヤスッ！」 on the theory that the player's
+correction already answered the boast. That was the wrong call: the boast is a
+joke in its own right and the author wanted it kept.
+
+The ending instead grew a beat. The player states the sentence and Yasu takes the
+shock on that line; Yasu then pleads for a suspended sentence, and the final
+comeback lands on the plea rather than on the statement. Splitting them gives the
+shock a page of its own to breathe in and puts the comeback on the line that
+actually earns it.

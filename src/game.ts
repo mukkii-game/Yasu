@@ -28,13 +28,13 @@ export const ENDING: readonly DialogueStep[] = [
   { speaker: 'あなた', text: 'ヤス、なんで　ごうとうさつじんなんてしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
-  { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ' },
+  { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ', punchline: '人としてヤスッ！' },
   {
     speaker: 'あなた',
-    text: 'ごうとうさつじんは\nしけいか　むきちょうえきだぞ？',
-    punchline: 'みとおしがヤスッ！',
+    text: 'ごうとうさつじんだから\nしけいか　むきちょうえきだぞ',
     impact: true,
   },
+  { speaker: 'ヤス', text: 'エッ？　しっこうゆうよはつかないですか！？', punchline: 'みとおしがヤスッ！' },
 ];
 
 export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。やっぱめいきゅういりですよ。' };

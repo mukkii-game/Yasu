@@ -60,7 +60,7 @@ describe('game flow', () => {
       if (step?.punchline) punchlines.push(step.punchline);
       state = advance(state);
     }
-    expect(punchlines).toEqual(['なぞときがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', 'みとおしがヤスッ！']);
+    expect(punchlines).toEqual(['なぞときがヤスッ！', '動機がヤスッ！', '報酬もヤスッ！', '人としてヤスッ！', 'みとおしがヤスッ！']);
     expect(state.phase).toBe('end');
   });
 
@@ -73,16 +73,23 @@ describe('game flow', () => {
     expect(dialogueText(ENDING[3])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
   });
 
-  it('answers 「しょはんだし」 with the correction rather than a second comeback', () => {
-    const boast = ENDING[ENDING.length - 2];
+  it('closes on the sentence, with the shock on it and the comeback on Yasu\'s plea', () => {
+    const boast = ENDING[ENDING.length - 3];
     expect(dialogueText(boast)).toBe('ヤス「まあ しょはんだし すぐでてこれますよねｗ」');
-    expect(boast.punchline).toBeUndefined();
+    expect(boast.punchline).toBe('人としてヤスッ！');
 
-    const sentence = ENDING[ENDING.length - 1];
-    expect(dialogueText(sentence)).toBe('あなた「ごうとうさつじんは\nしけいか　むきちょうえきだぞ？」');
-    expect(sentence.punchline).toBe('みとおしがヤスッ！');
+    const sentence = ENDING[ENDING.length - 2];
+    expect(dialogueText(sentence)).toBe('あなた「ごうとうさつじんだから\nしけいか　むきちょうえきだぞ」');
     expect(sentence.impact).toBe(true);
-    expect(ENDING.slice(0, -1).some((step) => step.impact)).toBe(false);
+    expect(sentence.punchline).toBeUndefined();
+
+    const plea = ENDING[ENDING.length - 1];
+    expect(dialogueText(plea)).toBe('ヤス「エッ？　しっこうゆうよはつかないですか！？」');
+    expect(plea.punchline).toBe('みとおしがヤスッ！');
+    expect(plea.impact).toBeUndefined();
+
+    // Only the sentence carries the shock.
+    expect(ENDING.filter((step) => step.impact)).toHaveLength(1);
   });
 
   it('restart always returns to a clean title state', () => {
