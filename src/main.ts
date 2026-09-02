@@ -33,14 +33,13 @@ let typeTimer: number | undefined;
 let punchlineTimer: number | undefined;
 let punchlineSecondTimer: number | undefined;
 let endTimer: number | undefined;
-let endSecondTimer: number | undefined;
 let endReturnTimer: number | undefined;
 let revealTimer: number | undefined;
 let custodyTimer: number | undefined;
 let fadeTimer: number | undefined;
 let impactTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
-let endPunchlineStage: 0 | 1 | 2 = 0;
+let endFading = false;
 let revealImpact = false;
 let impactShake = false;
 let fadeOut = false;
@@ -186,7 +185,7 @@ function scheduleCustodyTransition(): void {
 
 function render(): void {
   renderApp(root, state, {
-    visibleCharacters, punchlineStage, endPunchlineStage, revealImpact, impactShake, fadeOut, bossStage,
+    visibleCharacters, punchlineStage, endFading, revealImpact, impactShake, fadeOut, bossStage,
   });
 }
 
@@ -282,10 +281,8 @@ function beginTyping(): void {
 
 function clearEndTimer(): void {
   if (endTimer !== undefined) window.clearTimeout(endTimer);
-  if (endSecondTimer !== undefined) window.clearTimeout(endSecondTimer);
   if (endReturnTimer !== undefined) window.clearTimeout(endReturnTimer);
   endTimer = undefined;
-  endSecondTimer = undefined;
   endReturnTimer = undefined;
 }
 
@@ -318,24 +315,22 @@ function scheduleBossEnd(): void {
   at(8600, () => { setState(restart()); });
 }
 
-function scheduleEndPunchline(): void {
+/**
+ * The sunset holds long enough for the escort to cross and THE END to land,
+ * then drains back to the title. The comeback already happened on the line
+ * before this; a second one here only blunted it.
+ */
+function scheduleEndReturn(): void {
   clearEndTimer();
   endTimer = window.setTimeout(() => {
     endTimer = undefined;
-    endPunchlineStage = 1;
-    punchlineLeadBlip();
+    endFading = true;
     render();
-    endSecondTimer = window.setTimeout(() => {
-      endSecondTimer = undefined;
-      endPunchlineStage = 2;
-      playSound(finalBoom);
-      render();
-      endReturnTimer = window.setTimeout(() => {
-        endReturnTimer = undefined;
-        setState(restart());
-      }, 4200);
-    }, 700);
-  }, 3650);
+    endReturnTimer = window.setTimeout(() => {
+      endReturnTimer = undefined;
+      setState(restart());
+    }, 3200);
+  }, 4400);
 }
 
 function setState(next: GameState): void {
@@ -345,12 +340,12 @@ function setState(next: GameState): void {
   clearRevealTimer();
   clearImpactTimer();
   clearBossTimers();
-  endPunchlineStage = 0;
+  endFading = false;
   bossStage = 0;
   fadeOut = false;
   state = next;
   beginTyping();
-  if (next.phase === 'end') scheduleEndPunchline();
+  if (next.phase === 'end') scheduleEndReturn();
   if (next.phase === 'boss-end') scheduleBossEnd();
 }
 
