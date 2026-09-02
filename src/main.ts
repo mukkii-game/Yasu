@@ -175,7 +175,6 @@ function scheduleCustodyTransition(): void {
   custodyTimer = window.setTimeout(() => {
     custodyTimer = undefined;
     if (!isFinalEndingPage() || punchlineStage < 2) return;
-    handcuffClack();
     fadeOut = true;
     render();
     fadeTimer = window.setTimeout(() => {
@@ -324,6 +323,7 @@ function scheduleBossEnd(): void {
 
 function scheduleEndPunchline(): void {
   clearEndTimer();
+  handcuffClack();
   endTimer = window.setTimeout(() => {
     endTimer = undefined;
     endPunchlineStage = 1;

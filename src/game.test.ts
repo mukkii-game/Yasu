@@ -69,7 +69,7 @@ describe('game flow', () => {
     expect(dialogueText(INTRO[2])).toBe('あなた「はんにんは・・・」');
     expect(dialogueText(WRONG)).toBe('ヤス「いや、ちがうでしょう。やっぱめいきゅういりですよ。」');
     expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあったよ」');
-    expect(dialogueText(ENDING[1])).toBe('あなた「もじどおり　かおにもかいてある」');
+    expect(dialogueText(ENDING[1])).toBe('あなた「いわゆる　かおにかいてある\nじょうたいだよ」');
     expect(dialogueText(ENDING[2])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
     expect(dialogueText(ENDING[4])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
   });
@@ -81,15 +81,15 @@ describe('game flow', () => {
 
     const sentence = ENDING[ENDING.length - 2];
     expect(dialogueText(sentence)).toBe('あなた「ごうとうさつじんだから\nしけいか　むきちょうえきだぞ」');
-    expect(sentence.impact).toBe(true);
+    expect(sentence.impact).toBeUndefined();
     expect(sentence.punchline).toBeUndefined();
 
+    // The shock lands on the plea, not on the sentence that sets it up.
     const plea = ENDING[ENDING.length - 1];
     expect(dialogueText(plea)).toBe('ヤス「エッ？　しっこうゆうよはつかないですか！？」');
     expect(plea.punchline).toBe('みとおしがヤスッ！');
-    expect(plea.impact).toBeUndefined();
+    expect(plea.impact).toBe(true);
 
-    // Only the sentence carries the shock.
     expect(ENDING.filter((step) => step.impact)).toHaveLength(1);
   });
 

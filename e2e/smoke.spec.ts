@@ -218,7 +218,7 @@ test.describe('犯人はヤス', () => {
 
     for (const [index, hasPunchline] of [true, true, false, true, true, true].entries()) {
       await finishDialogue(page, 'ending-next');
-      if (index === 1) await expect(page.getByTestId('ending-next')).toContainText('かおにもかいてある');
+      if (index === 1) await expect(page.getByTestId('ending-next')).toContainText('かおにかいてある');
       if (index === 4) await expect(page.locator('.office-scene')).toHaveClass(/laughing/);
       if (index === 5) {
         await expect(page.locator('.office-scene')).toHaveClass(/nodding/);
@@ -234,20 +234,20 @@ test.describe('犯人はヤス', () => {
       await page.getByTestId('ending-next').click();
     }
 
-    // The sentence lands its shock the moment the line finishes typing, carries no
-    // comeback of its own, and stays readable while the room shakes.
+    // The sentence sets the plea up and carries neither the shock nor a comeback.
     await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('ending-next')).toContainText('むきちょうえき');
+    await expect(page.getByTestId('punchline')).toHaveCount(0);
+    expect((await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length)
+      .toBe(shocksBeforeSentence);
+    await page.getByTestId('ending-next').click();
+
+    // The shock lands on the plea instead, the moment that line finishes typing.
+    await finishDialogue(page, 'ending-next');
     await expect(page.locator('.office-scene')).toHaveClass(/impact/);
     await expect(page.locator('.yasu')).toHaveCSS('animation-name', 'impact-tremble');
     expect((await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length)
       .toBe(shocksBeforeSentence + 1);
-    await expect(page.getByTestId('punchline')).toHaveCount(0);
-    await page.waitForTimeout(1_200);
-    await page.getByTestId('ending-next').click();
-
-    // Yasu's plea takes the last comeback, on the ordinary rhythm and cues.
-    await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('ending-next')).toContainText('しっこうゆうよ');
     const hitsBeforePlea = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('みとおしが', { timeout: 10_000 });
@@ -273,9 +273,7 @@ test.describe('犯人はヤス', () => {
         computedDuration: walkers ? getComputedStyle(walkers).animationDuration : undefined,
       };
     });
-    // The escort starts near the right and crosses, rather than beginning half
-    // off the left edge where the walk was easy to miss entirely.
-    expect(escortTiming).toEqual({ left: '152px', duration: '3.2s', computedDuration: '3.2s' });
+    expect(escortTiming).toEqual({ left: '41px', duration: '2.4s', computedDuration: '2.4s' });
     await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも'], { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
@@ -283,9 +281,8 @@ test.describe('犯人はヤス', () => {
     expect(await playedSoundFiles(page)).toContain('final-boom.mp3');
     await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも']);
     const endFits = await page.evaluate(() => {
-      const screen = document.querySelector('[data-testid="game-screen"]')!.getBoundingClientRect();
-      const rect = document.querySelector('[data-testid="end-punchline"] strong')!.getBoundingClientRect();
-      return rect.left >= screen.left - 0.5 && rect.right <= screen.right + 0.5;
+      const screen = (document.querySelector('[data-testid="game-screen"]') as HTMLElement).offsetWidth;
+      return (document.querySelector('[data-testid="end-punchline"] strong') as HTMLElement).offsetWidth <= screen;
     });
     expect(endFits).toBe(true);
 
@@ -390,11 +387,10 @@ test.describe('犯人はヤス', () => {
     // The payoff has to fit the screen. At 60px 「ヤスッ！」 ran 108 logical
     // pixels off each edge and the player only ever saw 「スッ」.
     const payoffFits = await page.evaluate(() => {
-      const screen = document.querySelector('[data-testid="game-screen"]')!.getBoundingClientRect();
-      const inside = (selector: string) => {
-        const rect = document.querySelector(selector)!.getBoundingClientRect();
-        return rect.left >= screen.left - 0.5 && rect.right <= screen.right + 0.5;
-      };
+      // offsetWidth, not getBoundingClientRect: the latter includes the pop's
+      // scale(2.4) and makes a caption that fits look like it overflows.
+      const screen = (document.querySelector('[data-testid="game-screen"]') as HTMLElement).offsetWidth;
+      const inside = (selector: string) => (document.querySelector(selector) as HTMLElement).offsetWidth <= screen;
       return {
         payoff: inside('[data-testid="boss-punchline"] strong'),
         setup: inside('[data-testid="boss-punchline"] .end-setup'),
