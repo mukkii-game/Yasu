@@ -45,6 +45,8 @@ let revealImpact = false;
 let impactShake = false;
 let fadeOut = false;
 let punchlineHoldUntil = 0;
+let bossTimers: number[] = [];
+let bossStage: 0 | 1 | 2 | 3 | 4 = 0;
 
 /** Matches the verdict-fade animation in style.css. */
 const FADE_MS = 1800;
@@ -184,7 +186,7 @@ function scheduleCustodyTransition(): void {
 
 function render(): void {
   renderApp(root, state, {
-    visibleCharacters, punchlineStage, endPunchlineStage, revealImpact, impactShake, fadeOut,
+    visibleCharacters, punchlineStage, endPunchlineStage, revealImpact, impactShake, fadeOut, bossStage,
   });
 }
 
@@ -288,6 +290,30 @@ function clearRevealTimer(): void {
   revealImpact = false;
 }
 
+function clearBossTimers(): void {
+  bossTimers.forEach((timer) => window.clearTimeout(timer));
+  bossTimers = [];
+}
+
+/**
+ * Yasu's ending runs itself: the gun comes out, the shot lands, the room floods
+ * red, and only then does the last comeback arrive on the ordinary cue.
+ */
+function scheduleBossEnd(): void {
+  clearBossTimers();
+  bossStage = 0;
+  handcuffClack();
+  render();
+  const at = (delay: number, step: () => void) => {
+    bossTimers.push(window.setTimeout(step, delay));
+  };
+  at(700, () => { bossStage = 1; playSound(finalBoom); render(); });
+  at(2300, () => { bossStage = 2; render(); });
+  at(3700, () => { bossStage = 3; punchlineLeadBlip(); render(); });
+  at(4400, () => { bossStage = 4; playSound(punchlineHit); render(); });
+  at(8600, () => { setState(restart()); });
+}
+
 function scheduleEndPunchline(): void {
   clearEndTimer();
   endTimer = window.setTimeout(() => {
@@ -314,11 +340,14 @@ function setState(next: GameState): void {
   clearEndTimer();
   clearRevealTimer();
   clearImpactTimer();
+  clearBossTimers();
   endPunchlineStage = 0;
+  bossStage = 0;
   fadeOut = false;
   state = next;
   beginTyping();
   if (next.phase === 'end') scheduleEndPunchline();
+  if (next.phase === 'boss-end') scheduleBossEnd();
 }
 
 function advanceOrFinish(): void {
@@ -341,6 +370,10 @@ function submit(): void {
   const next = submitAnswer(state);
   if (next === state) return;
   state = next;
+  if (next.phase === 'boss') {
+    beginTyping();
+    return;
+  }
   if (next.phase === 'reveal') {
     if (typeTimer !== undefined) window.clearTimeout(typeTimer);
     clearPunchlineTimers();
@@ -382,7 +415,7 @@ root.addEventListener('click', (event) => {
 
 document.addEventListener('keydown', (event) => {
   if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.key === 'Tab') return;
-  if (state.phase === 'end') { event.preventDefault(); return; }
+  if (state.phase === 'end' || state.phase === 'boss-end') { event.preventDefault(); return; }
   if (state.phase === 'input' && event.key === 'Backspace') {
     event.preventDefault(); setState(deleteKana(state)); return;
   }

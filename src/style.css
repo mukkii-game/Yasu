@@ -86,6 +86,16 @@ button { border: 0; border-radius: 0; font: inherit; }
 .laughing .yasu .body { animation: laugh-bob 180ms steps(2) infinite; }
 .nodding .yasu .head { animation: nod-twice 900ms steps(1) 1 both; }
 
+.gun { position: absolute; z-index: 4; left: 64px; top: 92px; width: 16px; height: 16px; border-radius: 50%; background: var(--black); box-shadow: inset 0 0 0 3px var(--silver), 0 0 0 2px var(--gray); }
+
+.boss-screen { position: absolute; inset: 0; width: 256px; height: 240px; overflow: hidden; background: var(--black); }
+.boss-screen.finale { animation: end-screen-fade 3.2s linear 1s forwards; }
+.redout { position: absolute; z-index: 18; inset: 0; background: var(--red); opacity: 0; }
+.boss-screen.stage-1 .redout { animation: redout 1600ms linear forwards; }
+.boss-screen.stage-2 .redout, .boss-screen.stage-3 .redout, .boss-screen.stage-4 .redout { opacity: 1; }
+/* THE END and the payoff read on top of the flooded room, not behind it. */
+.boss-screen .the-end { z-index: 22; }
+
 .dialogue-box { position: absolute; z-index: 12; left: 0; right: 0; bottom: 0; width: 256px; height: 80px; padding: 2px 13px 5px; color: var(--white); background: var(--black); text-align: left; font-size: 13px; line-height: 20px; letter-spacing: 0; }
 .dialogue-copy { position: absolute; left: 13px; right: 8px; top: 2px; display: block; white-space: pre-wrap; }
 .next-mark { display: inline-block; margin-left: 3px; color: var(--white); animation: blink 700ms steps(1) infinite; }
@@ -145,6 +155,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes final-pop { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes end-screen-fade { from { opacity: 1; } to { opacity: 0; } }
+@keyframes redout { from { opacity: 0; } to { opacity: 1; } }
 @keyframes escort-walk { 0% { transform: translate(0, 0); } 12% { transform: translate(-10px, -1px); } 25% { transform: translate(-21px, 0); } 38% { transform: translate(-32px, -1px); } 50% { transform: translate(-43px, 0); } 62% { transform: translate(-54px, -1px); } 75% { transform: translate(-64px, 0); } 88% { transform: translate(-75px, -1px); } 100% { transform: translate(-86px, 0); } }
 
 @media (min-width: 660px) and (min-height: 520px) { :root { --scale: 2; } }

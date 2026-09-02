@@ -10,6 +10,8 @@ export interface RenderOptions {
   readonly impactShake: boolean;
   /** The screen is draining to black on the way to the ending. */
   readonly fadeOut: boolean;
+  /** Progress through the boss ending: gun, shot, red, setup, payoff. */
+  readonly bossStage: 0 | 1 | 2 | 3 | 4;
 }
 
 function escapeHtml(value: string): string {
@@ -30,15 +32,21 @@ function dialogue(state: GameState, options: RenderOptions): string {
   const fullText = dialogueText(step);
   const visibleText = Array.from(fullText).slice(0, options.visibleCharacters).join('');
   const complete = visibleText === fullText;
-  const testId = state.phase === 'wrong' ? 'wrong-next' : state.phase === 'reveal' ? 'reveal-next' : state.phase === 'ending' ? 'ending-next' : 'dialogue-next';
+  const testId = state.phase === 'wrong' ? 'wrong-next' : state.phase === 'reveal' ? 'reveal-next' : state.phase === 'ending' ? 'ending-next' : state.phase === 'boss' ? 'boss-next' : 'dialogue-next';
   return `${punchlineMarkup(state, options)}<button class="dialogue-box screen-button" data-testid="${testId}" data-action="advance" type="button" aria-label="${escapeHtml(fullText)}">
     <span class="dialogue-copy">${escapeHtml(visibleText)}${complete ? '<span class="next-mark" aria-hidden="true">▼</span>' : ''}</span>
   </button>`;
 }
 
-function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled', laughing: boolean, nodding: boolean): string {
+function officeScene(
+  mode: 'plain' | 'nervous' | 'impact' | 'settled',
+  laughing: boolean,
+  nodding: boolean,
+  gun = false,
+): string {
   return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}${nodding ? ' nodding' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
+    ${gun ? '<i class="gun" data-testid="gun"></i>' : ''}
     <div class="yasu"><span class="head"><img src="${yasuSpriteUrl}" alt="" draggable="false"><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"><img src="${yasuSpriteUrl}" alt="" draggable="false"></span></div>
   </div>`;
 }
@@ -46,6 +54,20 @@ function officeScene(mode: 'plain' | 'nervous' | 'impact' | 'settled', laughing:
 function endScene(hideWalkers: boolean): string {
   return `<div class="end-city" aria-hidden="true"><i class="setting-sun"></i><i class="end-building a"></i><i class="end-building b"></i><i class="end-building c"></i><i class="end-road"></i></div>
     ${hideWalkers ? '' : '<div class="walkers" aria-hidden="true"><i class="escort"></i><i class="cuffed-yasu"></i><b class="handcuff"></b></div>'}`;
+}
+
+/** Yasu's own ending: the confession was the recording, and you were the mark. */
+function bossEndScreen(options: RenderOptions): string {
+  const stage = options.bossStage;
+  const payoff = stage > 2
+    ? `<span class="end-final stage-${stage > 3 ? 2 : 1}" data-testid="boss-punchline"><span class="end-setup"><b>ボスのいのち</b></span>${stage > 3 ? '<strong>ヤスッ！</strong>' : ''}</span>`
+    : '';
+  return `<div class="boss-screen stage-${stage}${stage > 3 ? ' finale' : ''}" data-testid="boss-screen" aria-label="エンディング">
+    ${officeScene('plain', false, false, true)}
+    <i class="redout" aria-hidden="true"></i>
+    ${stage > 1 ? '<span class="the-end" data-testid="the-end">THE END</span>' : ''}
+    ${payoff}
+  </div>`;
 }
 
 function kanaPanel(state: GameState): string {
@@ -77,6 +99,8 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
   let content: string;
   if (state.phase === 'title') {
     content = titleScreen();
+  } else if (state.phase === 'boss-end') {
+    content = bossEndScreen(options);
   } else if (state.phase === 'end') {
     const finalPunchline = options.endPunchlineStage > 0
       ? `<span class="end-final stage-${options.endPunchlineStage}" data-testid="end-punchline"><span class="end-setup"><b>このゲーム</b><b>なにもかも</b></span>${options.endPunchlineStage > 1 ? '<strong>ヤスッ！</strong>' : ''}</span>`
@@ -88,8 +112,11 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     const sceneMode = shaking ? 'impact' : comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
     const step = currentDialogue(state);
     const shownText = step ? Array.from(dialogueText(step)).slice(0, options.visibleCharacters).join('') : '';
-    const laughing = state.phase === 'ending' && state.endingIndex === 3 && shownText.includes('はっはっは');
-    const nodding = state.phase === 'ending' && state.endingIndex === 4 && step !== undefined
+    // Keyed off the lines themselves, so inserting a page cannot silently move
+    // these onto the wrong one.
+    const laughing = state.phase === 'ending' && shownText.includes('はっはっは');
+    const nodding = state.phase === 'ending' && step !== undefined
+      && step.text.startsWith('まあ しょはんだし')
       && shownText === dialogueText(step) && options.punchlineStage === 0;
     const scene = officeScene(sceneMode, laughing, nodding);
     content = state.phase === 'input'

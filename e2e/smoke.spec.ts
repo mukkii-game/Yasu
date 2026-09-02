@@ -206,17 +206,19 @@ test.describe('犯人はヤス', () => {
 
     const shocksBeforeSentence = (await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length;
 
-    for (const [index, hasPunchline] of [true, false, true, true, true].entries()) {
+    for (const [index, hasPunchline] of [true, true, false, true, true, true].entries()) {
       await finishDialogue(page, 'ending-next');
-      if (index === 3) await expect(page.locator('.office-scene')).toHaveClass(/laughing/);
-      if (index === 4) {
+      if (index === 1) await expect(page.getByTestId('ending-next')).toContainText('かおにもかいてある');
+      if (index === 4) await expect(page.locator('.office-scene')).toHaveClass(/laughing/);
+      if (index === 5) {
         await expect(page.locator('.office-scene')).toHaveClass(/nodding/);
         await expect(page.locator('.yasu .head')).toHaveCSS('animation-name', 'nod-twice');
         await expect(page.locator('.yasu .body')).not.toHaveCSS('animation-name', 'nod-twice');
       }
       if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！', { timeout: 10_000 });
       if (hasPunchline) expect(await playedSoundFiles(page)).toContain('punchline-hit.mp3');
-      if (index === 4) await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
+      if (index === 1) await expect(page.getByTestId('punchline').locator('span')).toHaveText('表現が');
+      if (index === 5) await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
       // A landed comeback holds input, so wait it out rather than tapping into it.
       if (hasPunchline) await page.waitForTimeout(1_000);
       await page.getByTestId('ending-next').click();
@@ -273,6 +275,61 @@ test.describe('犯人はヤス', () => {
     await expect(page.getByTestId('end-punchline')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
     await expect(page.getByTestId('end-screen')).toHaveCSS('animation-name', 'end-screen-fade');
     await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 6_000 });
+  });
+
+  test('lets Yasu turn the confession on the boss', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.addInitScript(() => {
+      const playedSounds: string[] = [];
+      Object.defineProperty(window, '__playedSounds', { value: playedSounds });
+      HTMLMediaElement.prototype.play = function play() {
+        playedSounds.push(this.src);
+        return Promise.resolve();
+      };
+    });
+    await page.goto('/');
+    await reachInput(page);
+
+    // ホ is gone from the grid so that ボ can be there instead.
+    await expect(page.getByRole('button', { name: 'ボ', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'ホ', exact: true })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'ボ', exact: true }).click();
+    await page.getByRole('button', { name: 'ス', exact: true }).click();
+    await page.getByTestId('decide').click();
+
+    await advanceDialogue(page, 'boss-next');
+    await expect(page.getByTestId('boss-next')).toContainText('かんぜんはんざい');
+    await advanceDialogue(page, 'boss-next');
+
+    // The gun is out before anything else happens.
+    await expect(page.getByTestId('gun')).toBeVisible();
+    await expect(page.getByTestId('the-end')).toHaveCount(0);
+
+    // The shot floods the room red, and only then does THE END arrive.
+    await expect(page.locator('.redout')).toHaveCSS('animation-name', 'redout', { timeout: 10_000 });
+    expect(await playedSoundFiles(page)).toContain('final-boom.mp3');
+    await expect(page.getByTestId('the-end')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('.redout')).toHaveCSS('opacity', '1');
+    // THE END has to read on top of the flood, not behind it.
+    const stacking = await page.evaluate(() => ({
+      theEnd: Number(getComputedStyle(document.querySelector('.the-end')!).zIndex),
+      redout: Number(getComputedStyle(document.querySelector('.redout')!).zIndex),
+    }));
+    expect(stacking.theEnd).toBeGreaterThan(stacking.redout);
+
+    // The last comeback lands on the ordinary hit, not on the gunshot.
+    const hitsBeforePayoff = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
+    await expect(page.getByTestId('boss-punchline').locator('.end-setup b')).toHaveText(['ボスのいのち'], { timeout: 10_000 });
+    await expect(page.getByTestId('boss-punchline').locator('strong')).toHaveText('ヤスッ！');
+    expect((await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length)
+      .toBe(hitsBeforePayoff + 1);
+
+    // Input stays locked, then it returns to the title on its own.
+    await page.getByTestId('boss-screen').click({ position: { x: 120, y: 100 } });
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('boss-punchline')).toBeVisible();
+    await expect(page.getByTestId('start-button')).toBeVisible({ timeout: 15_000 });
   });
 
   test('keeps the complete kana controls inside a phone viewport', async ({ page }) => {

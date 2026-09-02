@@ -449,3 +449,18 @@ shock on that line; Yasu then pleads for a suspended sentence, and the final
 comeback lands on the plea rather than on the statement. Splitting them gives the
 shock a page of its own to breathe in and puts the comeback on the line that
 actually earns it.
+
+## 2026-09-02 — Naming the boss is a second ending, not a wrong answer
+
+Swapping 「ホ」 for 「ボ」 in the kana grid costs nothing — 「ホ」 spelled no name
+the game accepts — and it lets the player type 「ボス」. Doing so turns the
+confession into evidence and ends the game on Yasu's terms: the gun, the shot,
+the red flood, and 「ボスのいのちヤスッ！」.
+
+The payoff deliberately uses the ordinary comeback cue rather than the gunshot.
+The running gag is what closes both endings, so it has to sound the same in both.
+
+Scene reactions are now keyed off the lines themselves rather than their index in
+ENDING. Inserting 「もじどおり　かおにもかいてある」 moved every later page by one
+and silently shifted the laugh and the nod onto the wrong lines; matching on the
+text means the next inserted page cannot repeat that.
