@@ -481,3 +481,15 @@ separately, so a change to either answer updates the grid automatically. They ar
 thickened with a one-pixel text-shadow because DotGothic16 ships a single weight;
 a synthesized bold would vary by browser, and the point is a nudge, not a label.
 
+The gun now comes out during the dialogue rather than after it. Drawing it on
+「はんにん　ていこうのため　やむなくせいあつ」 puts the weapon and its written
+justification on screen together, which is the joke; drawing it once the room had
+already gone black made it a stage effect instead. 「ひぎしゃ」 became 「はんにん」
+in the same line — he is not being careful about the distinction, and that is the
+point.
+
+`gunDrawn` lives in game.ts rather than in the renderer, so "once drawn, it stays
+up" is a rule the unit tests can hold rather than a condition the renderer has to
+re-derive on every page. The clack fires only on the step carrying the flag, so
+moving the draw to another page moves the sound with it.
+

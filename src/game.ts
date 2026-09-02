@@ -12,6 +12,8 @@ export interface DialogueStep {
   readonly unease?: true;
   /** Yasu's shoulders start going once the line lands, on that same cue. */
   readonly laugh?: true;
+  /** The muzzle is already up as the page opens, on a clack. */
+  readonly gun?: true;
 }
 
 export interface GameState {
@@ -47,9 +49,17 @@ export const ENDING: readonly DialogueStep[] = [
 export const BOSS: readonly DialogueStep[] = [
   { speaker: 'ヤス', text: 'ボス　じはくとして\nろくおんさせてもらいましたよ', unease: true },
   { speaker: 'ヤス', text: 'それ　そのままじじつに\nさせてもらいますわ', laugh: true },
-  { speaker: 'ヤス', text: 'ひぎしゃ　ていこうのため\nやむなくせいあつ' },
+  { speaker: 'ヤス', text: 'はんにん　ていこうのため\nやむなくせいあつ', gun: true },
   { speaker: 'ヤス', text: 'ボス　ありがとう\nそしてさようなら' },
 ];
+
+/** Once Yasu draws, the muzzle stays up for the rest of the route. */
+export function gunDrawn(state: GameState): boolean {
+  if (state.phase === 'boss-end') return true;
+  if (state.phase !== 'boss') return false;
+  const drawnAt = BOSS.findIndex((step) => step.gun);
+  return drawnAt !== -1 && state.bossIndex >= drawnAt;
+}
 
 export const ANSWER = 'ヤス';
 export const BOSS_ANSWER = 'ボス';
