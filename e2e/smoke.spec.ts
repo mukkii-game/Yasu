@@ -206,25 +206,24 @@ test.describe('犯人はヤス', () => {
 
     const shocksBeforeSentence = (await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length;
 
-    for (const [index, hasPunchline] of [true, false, true, true, false].entries()) {
+    for (const [index, hasPunchline] of [true, false, true, true, true].entries()) {
       await finishDialogue(page, 'ending-next');
       if (index === 3) await expect(page.locator('.office-scene')).toHaveClass(/laughing/);
       if (index === 4) {
         await expect(page.locator('.office-scene')).toHaveClass(/nodding/);
         await expect(page.locator('.yasu .head')).toHaveCSS('animation-name', 'nod-twice');
         await expect(page.locator('.yasu .body')).not.toHaveCSS('animation-name', 'nod-twice');
-        // The boast is answered by the correction, not by a comeback of its own.
-        await expect(page.getByTestId('punchline')).toHaveCount(0);
       }
       if (hasPunchline) await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！', { timeout: 10_000 });
       if (hasPunchline) expect(await playedSoundFiles(page)).toContain('punchline-hit.mp3');
+      if (index === 4) await expect(page.getByTestId('punchline').locator('span')).toHaveText('人として');
       // A landed comeback holds input, so wait it out rather than tapping into it.
       if (hasPunchline) await page.waitForTimeout(1_000);
       await page.getByTestId('ending-next').click();
     }
 
-    // The correction lands its shock the moment the line finishes typing, and the
-    // line stays readable while the room shakes.
+    // The sentence lands its shock the moment the line finishes typing, carries no
+    // comeback of its own, and stays readable while the room shakes.
     await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('ending-next')).toContainText('むきちょうえき');
     await expect(page.locator('.office-scene')).toHaveClass(/impact/);
@@ -232,13 +231,17 @@ test.describe('犯人はヤス', () => {
     expect((await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length)
       .toBe(shocksBeforeSentence + 1);
     await expect(page.getByTestId('punchline')).toHaveCount(0);
+    await page.waitForTimeout(1_200);
+    await page.getByTestId('ending-next').click();
 
-    // The comeback then keeps the rhythm and the cues every other one uses.
-    const hitsBeforeSentence = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
+    // Yasu's plea takes the last comeback, on the ordinary rhythm and cues.
+    await finishDialogue(page, 'ending-next');
+    await expect(page.getByTestId('ending-next')).toContainText('しっこうゆうよ');
+    const hitsBeforePlea = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('みとおしが', { timeout: 10_000 });
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
     expect((await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length)
-      .toBe(hitsBeforeSentence + 1);
+      .toBe(hitsBeforePlea + 1);
 
     // Then the room drains of colour and light on the way to the sunset.
     await expect(page.getByTestId('game-screen')).toHaveCSS('animation-name', 'verdict-fade', { timeout: 10_000 });
