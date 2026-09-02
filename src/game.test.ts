@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOSS, ENDING, INTRO, KANA, WRONG, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
+import { BOSS, ENDING, HINT_KANA, INTRO, KANA, WRONG, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText, restart, startGame, submitAnswer } from './game';
 
 function reachInput() {
   let state = startGame(createGame());
@@ -98,20 +98,41 @@ describe('game flow', () => {
     expect(KANA).not.toContain('ホ');
   });
 
-  it('turns 「ボス」 into Yasu\'s own ending', () => {
+  it('hints only the letters either ending needs', () => {
+    expect([...HINT_KANA].sort()).toEqual(['ボ', 'ス', 'ヤ'].sort());
+    HINT_KANA.forEach((character) => expect(KANA).toContain(character));
+  });
+
+  it('turns 「ボス」 into the report Yasu files on you', () => {
     let state = reachInput();
     state = chooseKana(chooseKana(state, 'ボ'), 'ス');
     state = submitAnswer(state);
     expect(state.phase).toBe('boss');
-    expect(dialogueText(currentDialogue(state)!)).toBe('ヤス「ボス　じはくとして\nろくおんさせてもらいましたよ」');
 
-    state = advance(state);
-    expect(dialogueText(currentDialogue(state)!)).toBe('ヤス「これで　かんぜんはんざいです\nありがとう　そしてさようなら」');
+    const spoken = [dialogueText(currentDialogue(state)!)];
+    for (let step = 1; step < BOSS.length; step += 1) {
+      state = advance(state);
+      spoken.push(dialogueText(currentDialogue(state)!));
+    }
+    expect(spoken).toEqual([
+      'ヤス「ボス　じはくとして\nろくおんさせてもらいましたよ」',
+      'ヤス「それ　そのままじじつに\nさせてもらいますわ」',
+      'ヤス「ひぎしゃ　ていこうのため\nやむなくせいあつ」',
+      'ヤス「ボス　ありがとう\nそしてさようなら」',
+    ]);
 
     state = advance(state);
     expect(state.phase).toBe('boss-end');
     expect(currentDialogue(state)).toBeUndefined();
-    expect(BOSS).toHaveLength(2);
+  });
+
+  it('opens the boss route on the unease cue and laughs on it again', () => {
+    // Both cues are declared in the script, so the renderer cannot misplace them.
+    expect(BOSS.filter((step) => step.unease)).toHaveLength(1);
+    expect(BOSS[0].unease).toBe(true);
+    expect(BOSS.filter((step) => step.laugh)).toHaveLength(1);
+    expect(BOSS[1].laugh).toBe(true);
+    expect(BOSS.some((step) => step.punchline)).toBe(false);
   });
 
   it('still rejects a name that is neither ヤス nor ボス', () => {

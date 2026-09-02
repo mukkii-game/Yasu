@@ -84,6 +84,8 @@ button { border: 0; border-radius: 0; font: inherit; }
 .impact .yasu { animation: impact-tremble 55ms steps(2) infinite; }
 .game-screen.fading { animation: verdict-fade 1800ms linear forwards; }
 .laughing .yasu .body { animation: laugh-bob 180ms steps(2) infinite; }
+/* The boss route's laugh is stifled: shoulders only, no bob. */
+.shoulder-laugh .yasu .body { animation: shoulder-shake 110ms steps(2) infinite; }
 .nodding .yasu .head { animation: nod-twice 900ms steps(1) 1 both; }
 
 .gun { position: absolute; z-index: 4; left: 64px; top: 92px; width: 16px; height: 16px; border-radius: 50%; background: var(--black); box-shadow: inset 0 0 0 3px var(--silver), 0 0 0 2px var(--gray); }
@@ -113,6 +115,8 @@ button { border: 0; border-radius: 0; font: inherit; }
 .kana-grid { display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(5, 1fr); gap: 2px; min-height: 0; }
 .kana-grid button, .input-controls button { min-width: 0; padding: 0; border: 1px solid var(--white); color: var(--white); background: var(--navy); font-size: 12px; cursor: pointer; }
 .kana-grid button:active:not(:disabled), .input-controls button:active:not(:disabled) { color: var(--black); background: var(--cyan); }
+/* DotGothic16 ships one weight, so thicken the hint letters a pixel instead. */
+.kana-grid button.hint { text-shadow: 1px 0 currentColor; }
 .kana-grid button:disabled, .input-controls button:disabled { color: var(--gray); border-color: var(--gray); background: var(--black); }
 .input-controls { display: grid; grid-template-columns: 1fr 1.5fr 1.4fr; gap: 3px; }
 .input-controls .decide:not(:disabled) { color: var(--black); border-color: var(--gold); background: var(--gold); animation: blink-border 700ms steps(1) infinite; }
@@ -151,6 +155,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 @keyframes impact-tremble { 0% { transform: translate(-4px, 2px); } 50% { transform: translate(4px, -2px); } }
 @keyframes verdict-fade { from { filter: saturate(1) brightness(1); } to { filter: saturate(0) brightness(0); } }
 @keyframes laugh-bob { 50% { transform: translateY(2px); } }
+@keyframes shoulder-shake { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(1px); } }
 @keyframes nod-twice { 0%, 15%, 40%, 70%, 100% { transform: translateY(0); } 27%, 57% { transform: translateY(6px); } }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes final-pop { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }

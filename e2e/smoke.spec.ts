@@ -294,13 +294,49 @@ test.describe('犯人はヤス', () => {
     await expect(page.getByRole('button', { name: 'ボ', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'ホ', exact: true })).toHaveCount(0);
 
+    // ヤ, ス and ボ are drawn a pixel thicker; nothing else in the grid is.
+    const hinted = await page.evaluate(() => {
+      const shadow = (kana: string) => getComputedStyle(
+        document.querySelector(`[data-kana="${kana}"]`)!,
+      ).textShadow;
+      return { ya: shadow('ヤ'), su: shadow('ス'), bo: shadow('ボ'), plain: shadow('ア') };
+    });
+    expect(hinted.plain).toBe('none');
+    expect(hinted.ya).not.toBe('none');
+    expect(hinted.su).toBe(hinted.ya);
+    expect(hinted.bo).toBe(hinted.ya);
+
+    const uneaseBeforeRoute = (await playedSoundFiles(page))
+      .filter((file) => file === 'anxiety.mp3').length;
+
     await page.getByRole('button', { name: 'ボ', exact: true }).click();
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
 
+    // The route opens on the cue Yasu first walked in on.
+    await expect(page.getByTestId('boss-next')).toContainText('ろくおんさせて');
+    expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
+      .toBe(uneaseBeforeRoute + 1);
     await advanceDialogue(page, 'boss-next');
-    await expect(page.getByTestId('boss-next')).toContainText('かんぜんはんざい');
-    await advanceDialogue(page, 'boss-next');
+
+    // He turns the confession into the report, then his shoulders go on that
+    // same cue.
+    await finishDialogue(page, 'boss-next');
+    await expect(page.getByTestId('boss-next')).toContainText('そのままじじつに');
+    await expect(page.locator('.office-scene.shoulder-laugh .yasu .body'))
+      .toHaveCSS('animation-name', 'shoulder-shake');
+    expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
+      .toBe(uneaseBeforeRoute + 2);
+    await page.getByTestId('boss-next').click();
+
+    // The report he will file, then the sign-off.
+    await finishDialogue(page, 'boss-next');
+    await expect(page.getByTestId('boss-next')).toContainText('やむなくせいあつ');
+    await page.getByTestId('boss-next').click();
+
+    await finishDialogue(page, 'boss-next');
+    await expect(page.getByTestId('boss-next')).toContainText('ボス　ありがとう');
+    await page.getByTestId('boss-next').click();
 
     // The gun is out before anything else happens.
     await expect(page.getByTestId('gun')).toBeVisible();

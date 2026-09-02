@@ -235,7 +235,9 @@ function schedulePunchline(): void {
 
 function completeLine(): void {
   render();
-  if (currentDialogue(state)?.impact) landImpact();
+  const step = currentDialogue(state);
+  if (step?.impact) landImpact();
+  if (step?.laugh) playSound(anxiety);
   schedulePunchline();
 }
 
@@ -260,6 +262,7 @@ function beginTyping(): void {
     return;
   }
   visibleCharacters = 0;
+  if (currentDialogue(state)?.unease) playSound(anxiety);
   render();
   const tick = () => {
     visibleCharacters += 1;

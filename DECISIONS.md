@@ -464,3 +464,20 @@ Scene reactions are now keyed off the lines themselves rather than their index i
 ENDING. Inserting 「もじどおり　かおにもかいてある」 moved every later page by one
 and silently shifted the laugh and the nod onto the wrong lines; matching on the
 text means the next inserted page cannot repeat that.
+
+The boss route now ends on the report rather than on a boast. 「これで　かんぜん
+はんざいです」 said the quiet part out loud; 「ひぎしゃ　ていこうのため　やむなく
+せいあつ」 is the same fact written in the language he will actually file it in,
+which is colder and funnier. The unease cue from Yasu's entrance returns twice —
+once as the route opens, once as his shoulders start going — so the ending is
+scored by the sound the game opened on rather than by a new one.
+
+Both cues live in the script as `unease` and `laugh` flags on the step, not in
+the renderer. That keeps the earlier index-drift fix honest: a page inserted into
+BOSS carries its own cues with it and cannot hand them to a neighbour.
+
+The hint letters are derived from the two accepted answers rather than listed
+separately, so a change to either answer updates the grid automatically. They are
+thickened with a one-pixel text-shadow because DotGothic16 ships a single weight;
+a synthesized bold would vary by browser, and the point is a nudge, not a label.
+

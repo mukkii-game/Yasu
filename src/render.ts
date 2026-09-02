@@ -1,4 +1,4 @@
-import { KANA, currentDialogue, dialogueText, type GameState } from './game';
+import { HINT_KANA, KANA, currentDialogue, dialogueText, type GameState } from './game';
 import yasuSpriteUrl from './assets/yasu.png';
 
 export interface RenderOptions {
@@ -43,8 +43,9 @@ function officeScene(
   laughing: boolean,
   nodding: boolean,
   gun = false,
+  shoulderLaugh = false,
 ): string {
-  return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}${nodding ? ' nodding' : ''}" data-scene-mode="${mode}" aria-hidden="true">
+  return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}${nodding ? ' nodding' : ''}${shoulderLaugh ? ' shoulder-laugh' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
     ${gun ? '<i class="gun" data-testid="gun"></i>' : ''}
     <div class="yasu"><span class="head"><img src="${yasuSpriteUrl}" alt="" draggable="false"><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"><img src="${yasuSpriteUrl}" alt="" draggable="false"></span></div>
@@ -72,7 +73,7 @@ function bossEndScreen(options: RenderOptions): string {
 
 function kanaPanel(state: GameState): string {
   const buttons = KANA.map((character) =>
-    `<button type="button" data-action="kana" data-kana="${character}" aria-label="${character}" ${state.answer.length >= 2 ? 'disabled' : ''}>${character}</button>`,
+    `<button type="button" class="${HINT_KANA.includes(character) ? 'hint' : ''}" data-action="kana" data-kana="${character}" aria-label="${character}" ${state.answer.length >= 2 ? 'disabled' : ''}>${character}</button>`,
   ).join('');
   return `<section class="kana-panel" data-testid="kana-panel" aria-label="犯人の名前を二文字で選ぶ">
     <div class="answer-line" data-testid="answer-slots"><span>はんにんは</span><b>${state.answer[0] ?? '＿'}</b><b>${state.answer[1] ?? '＿'}</b></div>
@@ -118,7 +119,10 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     const nodding = state.phase === 'ending' && step !== undefined
       && step.text.startsWith('まあ しょはんだし')
       && shownText === dialogueText(step) && options.punchlineStage === 0;
-    const scene = officeScene(sceneMode, laughing, nodding);
+    // The boss route's laugh starts only once the line has finished landing.
+    const shoulderLaugh = state.phase === 'boss' && step?.laugh === true
+      && shownText === dialogueText(step);
+    const scene = officeScene(sceneMode, laughing, nodding, false, shoulderLaugh);
     content = state.phase === 'input'
       ? scene + kanaPanel(state)
       : options.revealImpact

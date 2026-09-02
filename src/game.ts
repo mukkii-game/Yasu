@@ -8,6 +8,10 @@ export interface DialogueStep {
   readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！' | '表現がヤスッ！';
   /** The finished line lands with the reveal's shock cue and tremble. */
   readonly impact?: true;
+  /** The page opens on the unease cue Yasu first walked in on. */
+  readonly unease?: true;
+  /** Yasu's shoulders start going once the line lands, on that same cue. */
+  readonly laugh?: true;
 }
 
 export interface GameState {
@@ -41,9 +45,16 @@ export const ENDING: readonly DialogueStep[] = [
 
 /** Naming the boss instead of Yasu turns the confession into evidence. */
 export const BOSS: readonly DialogueStep[] = [
-  { speaker: 'ヤス', text: 'ボス　じはくとして\nろくおんさせてもらいましたよ' },
-  { speaker: 'ヤス', text: 'これで　かんぜんはんざいです\nありがとう　そしてさようなら' },
+  { speaker: 'ヤス', text: 'ボス　じはくとして\nろくおんさせてもらいましたよ', unease: true },
+  { speaker: 'ヤス', text: 'それ　そのままじじつに\nさせてもらいますわ', laugh: true },
+  { speaker: 'ヤス', text: 'ひぎしゃ　ていこうのため\nやむなくせいあつ' },
+  { speaker: 'ヤス', text: 'ボス　ありがとう\nそしてさようなら' },
 ];
+
+export const ANSWER = 'ヤス';
+export const BOSS_ANSWER = 'ボス';
+/** Every letter either ending needs, drawn slightly bolder as a nudge. */
+export const HINT_KANA: readonly string[] = [...new Set([...ANSWER, ...BOSS_ANSWER])];
 
 export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。やっぱめいきゅういりですよ。' };
 export const REVEAL: DialogueStep = { speaker: 'ヤス', text: 'な、なぜわかったんですかっ！？' };
@@ -103,8 +114,8 @@ export function clearAnswer(state: GameState): GameState {
 export function submitAnswer(state: GameState): GameState {
   if (state.phase !== 'input' || state.answer.length !== 2) return state;
   const answer = state.answer.join('');
-  if (answer === 'ヤス') return { ...state, phase: 'reveal' };
-  if (answer === 'ボス') return { ...state, phase: 'boss', bossIndex: 0 };
+  if (answer === ANSWER) return { ...state, phase: 'reveal' };
+  if (answer === BOSS_ANSWER) return { ...state, phase: 'boss', bossIndex: 0 };
   return { ...state, phase: 'wrong', answer: [] };
 }
 
