@@ -38,14 +38,20 @@ let endReturnTimer: number | undefined;
 let revealTimer: number | undefined;
 let custodyTimer: number | undefined;
 let fadeTimer: number | undefined;
+let impactTimer: number | undefined;
 let punchlineStage: 0 | 1 | 2 = 0;
 let endPunchlineStage: 0 | 1 | 2 = 0;
 let revealImpact = false;
-let punchlineImpact = false;
+let impactShake = false;
 let fadeOut = false;
+let punchlineHoldUntil = 0;
 
 /** Matches the verdict-fade animation in style.css. */
 const FADE_MS = 1800;
+/** The reveal's shake, reused when a finished line lands as a shock. */
+const IMPACT_MS = 1000;
+/** How long a landed 「ヤスッ！」 is protected from an impatient tap. */
+const PUNCHLINE_HOLD_MS = 900;
 
 function getAudio(): AudioContext {
   audio ??= new AudioContext();
@@ -178,8 +184,27 @@ function scheduleCustodyTransition(): void {
 
 function render(): void {
   renderApp(root, state, {
-    visibleCharacters, punchlineStage, endPunchlineStage, revealImpact, punchlineImpact, fadeOut,
+    visibleCharacters, punchlineStage, endPunchlineStage, revealImpact, impactShake, fadeOut,
   });
+}
+
+function clearImpactTimer(): void {
+  if (impactTimer !== undefined) window.clearTimeout(impactTimer);
+  impactTimer = undefined;
+  impactShake = false;
+}
+
+/** The correction lands the moment it finishes typing, exactly like the reveal. */
+function landImpact(): void {
+  clearImpactTimer();
+  impactShake = true;
+  playSound(revealShock);
+  render();
+  impactTimer = window.setTimeout(() => {
+    impactTimer = undefined;
+    impactShake = false;
+    render();
+  }, IMPACT_MS);
 }
 
 function fullDialogueLength(): number {
@@ -198,25 +223,25 @@ function schedulePunchline(): void {
     punchlineSecondTimer = window.setTimeout(() => {
       punchlineSecondTimer = undefined;
       punchlineStage = 2;
-      // The sentence lands like the reveal did: same shock cue, same tremble.
-      if (step.impact) {
-        punchlineImpact = true;
-        playSound(revealShock);
-      } else {
-        playSound(punchlineHit);
-      }
+      playSound(punchlineHit);
+      punchlineHoldUntil = Date.now() + PUNCHLINE_HOLD_MS;
       render();
       if (isFinalEndingPage()) scheduleCustodyTransition();
     }, 700);
   }, 1250);
 }
 
+function completeLine(): void {
+  render();
+  if (currentDialogue(state)?.impact) landImpact();
+  schedulePunchline();
+}
+
 function finishTyping(): void {
   if (typeTimer !== undefined) window.clearTimeout(typeTimer);
   typeTimer = undefined;
   visibleCharacters = fullDialogueLength();
-  render();
-  schedulePunchline();
+  completeLine();
 }
 
 function beginTyping(): void {
@@ -224,7 +249,8 @@ function beginTyping(): void {
   clearPunchlineTimers();
   typeTimer = undefined;
   punchlineStage = 0;
-  punchlineImpact = false;
+  punchlineHoldUntil = 0;
+  clearImpactTimer();
   const total = fullDialogueLength();
   if (!total) {
     visibleCharacters = Number.POSITIVE_INFINITY;
@@ -241,7 +267,7 @@ function beginTyping(): void {
     if (visibleCharacters < total) typeTimer = window.setTimeout(tick, 38);
     else {
       typeTimer = undefined;
-      schedulePunchline();
+      completeLine();
     }
   };
   typeTimer = window.setTimeout(tick, 38);
@@ -287,8 +313,8 @@ function setState(next: GameState): void {
   clearCustodyTimer();
   clearEndTimer();
   clearRevealTimer();
+  clearImpactTimer();
   endPunchlineStage = 0;
-  punchlineImpact = false;
   fadeOut = false;
   state = next;
   beginTyping();
@@ -296,7 +322,7 @@ function setState(next: GameState): void {
 }
 
 function advanceOrFinish(): void {
-  if (revealImpact || punchlineImpact) return;
+  if (revealImpact || impactShake) return;
   const step = currentDialogue(state);
   if (step && visibleCharacters < fullDialogueLength()) {
     finishTyping();
@@ -304,6 +330,8 @@ function advanceOrFinish(): void {
   }
   if (step?.punchline) {
     if (punchlineStage < 2) return;
+    // Let 「ヤスッ！」 finish landing before an eager tap can skip past it.
+    if (Date.now() < punchlineHoldUntil) return;
     if (isFinalEndingPage()) return;
   }
   setState(advance(state));

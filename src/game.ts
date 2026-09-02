@@ -5,8 +5,8 @@ export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'endin
 export interface DialogueStep {
   readonly speaker: 'ヤス' | 'あなた';
   readonly text: string;
-  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | '刑期の見積もりがヤスッ！';
-  /** Lands with the reveal's shock cue and tremble instead of the usual pop. */
+  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！';
+  /** The finished line lands with the reveal's shock cue and tremble. */
   readonly impact?: true;
 }
 
@@ -28,11 +28,11 @@ export const ENDING: readonly DialogueStep[] = [
   { speaker: 'あなた', text: 'ヤス、なんで　ごうとうさつじんなんてしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
-  { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ', punchline: '人としてヤスッ！' },
+  { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ' },
   {
     speaker: 'あなた',
     text: 'ごうとうさつじんは\nしけいか　むきちょうえきだぞ？',
-    punchline: '刑期の見積もりがヤスッ！',
+    punchline: 'みとおしがヤスッ！',
     impact: true,
   },
 ];
