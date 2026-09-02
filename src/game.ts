@@ -5,7 +5,9 @@ export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'endin
 export interface DialogueStep {
   readonly speaker: 'ヤス' | 'あなた';
   readonly text: string;
-  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！';
+  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | '刑期の見積もりがヤスッ！';
+  /** Lands with the reveal's shock cue and tremble instead of the usual pop. */
+  readonly impact?: true;
 }
 
 export interface GameState {
@@ -27,6 +29,12 @@ export const ENDING: readonly DialogueStep[] = [
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
   { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ', punchline: '人としてヤスッ！' },
+  {
+    speaker: 'あなた',
+    text: 'ごうとうさつじんは\nしけいか　むきちょうえきだぞ？',
+    punchline: '刑期の見積もりがヤスッ！',
+    impact: true,
+  },
 ];
 
 export const WRONG: DialogueStep = { speaker: 'ヤス', text: 'いや、ちがうでしょう。やっぱめいきゅういりですよ。' };

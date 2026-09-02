@@ -409,3 +409,15 @@ typing rhythm, sound triggers, escort walk, and final fade are essential comedy
 and story beats. Their programmed timing must remain the same on Android, iOS,
 Windows, and macOS, including devices whose accessibility settings request less
 interface motion.
+
+## 2026-09-02 — The sentence beat reuses the reveal's impact rather than a new effect
+
+The closing 「刑期の見積もりが」 / 「ヤスッ！」 is the one punchline that lands on a
+shock instead of a pop, so `DialogueStep` carries an `impact` flag and the
+existing reveal cue and tremble are reused verbatim. Adding a second shock
+treatment would have made the two moments merely similar; sharing one makes the
+callback read as deliberate.
+
+The drain to black is a single `filter` animation losing saturation and
+brightness together, applied to the whole screen rather than to any one element,
+so the room dims as one picture on the way to the sunset.

@@ -82,6 +82,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 .yasu .face-name b { font: inherit; }
 .nervous .yasu { animation: tremble 75ms steps(2) infinite; }
 .impact .yasu { animation: impact-tremble 55ms steps(2) infinite; }
+.game-screen.fading { animation: verdict-fade 1800ms linear forwards; }
 .laughing .yasu .body { animation: laugh-bob 180ms steps(2) infinite; }
 .nodding .yasu .head { animation: nod-twice 900ms steps(1) 1 both; }
 
@@ -138,6 +139,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 @keyframes blink-border { 50% { border-color: var(--white); } }
 @keyframes tremble { 50% { transform: translate(2px, -1px); } }
 @keyframes impact-tremble { 0% { transform: translate(-4px, 2px); } 50% { transform: translate(4px, -2px); } }
+@keyframes verdict-fade { from { filter: saturate(1) brightness(1); } to { filter: saturate(0) brightness(0); } }
 @keyframes laugh-bob { 50% { transform: translateY(2px); } }
 @keyframes nod-twice { 0%, 15%, 40%, 70%, 100% { transform: translateY(0); } 27%, 57% { transform: translateY(3px); } }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
