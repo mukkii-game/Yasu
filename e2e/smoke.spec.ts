@@ -379,7 +379,14 @@ test.describe('犯人はヤス', () => {
     await expect(page.locator('.office-scene .yasu')).toHaveCSS('animation-name', 'none');
     expect(await playedSoundFiles(page)).toContain('comic-pratfall.mp3');
     expect(countOf(await playedSoundFiles(page), 'anxiety.mp3')).toBe(uneaseBeforeRoute);
-    await advanceDialogue(page, 'boss-next');
+    // The laugh lands its own comeback on the ordinary two-beat rhythm.
+    await finishDialogue(page, 'boss-next');
+    await expect(page.getByTestId('punchline').locator('span')).toHaveText('ジョークとして', { timeout: 10_000 });
+    await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
+    expect(await playedSoundFiles(page)).toContain('punchline-hit.mp3');
+    // A landed comeback holds input, so wait it out rather than tapping into it.
+    await page.waitForTimeout(1_000);
+    await page.getByTestId('boss-next').click();
 
     // The recording lands on the player: the cue hits from the first character,
     // not once the line has finished, and he freezes solid under it.

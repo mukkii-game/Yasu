@@ -179,7 +179,9 @@ describe('game flow', () => {
     expect(BOSS[BOSS.length - 2].text).toBe('ボス　いままでありがとう');
     expect(BOSS[BOSS.length - 1].text).toBe('そしてさようなら');
 
-    expect(BOSS.some((step) => step.punchline)).toBe(false);
+    // The laugh gets the route's one comeback; the pages after it play straight.
+    expect(BOSS[0].punchline).toBe('ジョークとしてヤスッ！');
+    expect(BOSS.filter((step) => step.punchline)).toHaveLength(1);
   });
 
   it('still rejects a name that is neither ヤス nor ボス', () => {

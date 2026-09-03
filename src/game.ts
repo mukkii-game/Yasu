@@ -8,7 +8,7 @@ export type SoundCue = 'anxiety' | 'dissonance' | 'pratfall' | 'magazine';
 export interface DialogueStep {
   readonly speaker: 'ヤス' | 'あなた';
   readonly text: string;
-  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！' | '表現がヤスッ！';
+  readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！' | '表現がヤスッ！' | 'ジョークとしてヤスッ！';
   /** The shock cue and tremble land before the line, exactly like the reveal. */
   readonly impact?: true;
   /** Cues that fire the moment the page opens, before the first character. */
@@ -58,7 +58,7 @@ export const ENDING: readonly DialogueStep[] = [
 
 /** Naming the boss instead of Yasu turns the confession into evidence. */
 export const BOSS: readonly DialogueStep[] = [
-  { speaker: 'ヤス', text: 'ボスがはんにん？\nごじょうだんを　はっはっは', laughing: true, cues: ['pratfall'] },
+  { speaker: 'ヤス', text: 'ボスがはんにん？\nごじょうだんを　はっはっは', laughing: true, cues: ['pratfall'], punchline: 'ジョークとしてヤスッ！' },
   { speaker: 'ヤス', text: 'でも　じはくとして\nろくおんさせてもらいました', still: true, cues: ['anxiety'] },
   { speaker: 'ヤス', text: 'これ　そのままじじつに\nさせてもらいますわ', cues: ['dissonance'] },
   { speaker: 'ヤス', text: 'はんにん　ていこうのため\nやむなくせいあつ　ってね', gun: true, cues: ['magazine', 'anxiety'] },
