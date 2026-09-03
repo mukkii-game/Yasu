@@ -46,7 +46,7 @@ export const ENDING: readonly DialogueStep[] = [
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
   { speaker: 'ヤス', text: 'まあ しょはんだし すぐでてこれますよねｗ', punchline: '人としてヤスッ！' },
-  { speaker: 'あなた', text: 'ごうとうさつじんだから\nしけいか　むきちょうえきだぞ' },
+  { speaker: 'あなた', text: 'ごうとうさつじんだから\nしけいか　むきちょうえきだぞ？' },
   {
     speaker: 'ヤス',
     text: 'エッ？　しっこうゆうよ\nつかないんですか！？',

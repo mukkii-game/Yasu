@@ -80,7 +80,7 @@ describe('game flow', () => {
     expect(boast.punchline).toBe('人としてヤスッ！');
 
     const sentence = ENDING[ENDING.length - 2];
-    expect(dialogueText(sentence)).toBe('あなた「ごうとうさつじんだから\nしけいか　むきちょうえきだぞ」');
+    expect(dialogueText(sentence)).toBe('あなた「ごうとうさつじんだから\nしけいか　むきちょうえきだぞ？」');
     expect(sentence.impact).toBeUndefined();
     expect(sentence.punchline).toBeUndefined();
 
