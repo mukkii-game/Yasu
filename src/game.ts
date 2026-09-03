@@ -8,9 +8,9 @@ export interface DialogueStep {
   readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！' | '表現がヤスッ！';
   /** The shock cue and tremble land before the line, exactly like the reveal. */
   readonly impact?: true;
-  /** The line lands, then the unease cue hits and the room jolts — Yasu does not. */
+  /** The line lands, then the unease cue hits. */
   readonly shock?: true;
-  /** Yasu's shoulders are already going as the page opens. */
+  /** He is already laughing as the page opens, the same bob as the reward line. */
   readonly laughing?: true;
   /** He nods once the line has landed. */
   readonly nod?: true;
@@ -50,7 +50,7 @@ export const ENDING: readonly DialogueStep[] = [
 
 /** Naming the boss instead of Yasu turns the confession into evidence. */
 export const BOSS: readonly DialogueStep[] = [
-  { speaker: 'ヤス', text: 'ボスがはんにん？　ごじょうだんを\nはっはっは', laughing: true },
+  { speaker: 'ヤス', text: 'ボスがはんにん？\nごじょうだんを　はっはっは', laughing: true },
   { speaker: 'ヤス', text: 'でも　じはくとして\nろくおんさせてもらいました', shock: true },
   { speaker: 'ヤス', text: 'それ　そのままじじつに\nさせてもらいますわ' },
   { speaker: 'ヤス', text: 'はんにん　ていこうのため\nやむなくせいあつ　ってね', gun: true },

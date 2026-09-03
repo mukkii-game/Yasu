@@ -115,7 +115,7 @@ describe('game flow', () => {
       spoken.push(dialogueText(currentDialogue(state)!));
     }
     expect(spoken).toEqual([
-      'ヤス「ボスがはんにん？　ごじょうだんを\nはっはっは」',
+      'ヤス「ボスがはんにん？\nごじょうだんを　はっはっは」',
       'ヤス「でも　じはくとして\nろくおんさせてもらいました」',
       'ヤス「それ　そのままじじつに\nさせてもらいますわ」',
       'ヤス「はんにん　ていこうのため\nやむなくせいあつ　ってね」',

@@ -10,8 +10,6 @@ export interface RenderOptions {
   readonly revealImpact: boolean;
   /** The finished line is landing its shock: same tremble as the reveal. */
   readonly impactShake: boolean;
-  /** The room is jolting around a motionless Yasu. */
-  readonly bossShock: boolean;
   /** The screen is draining to black on the way to the ending. */
   readonly fadeOut: boolean;
   /** Progress through the boss ending: gun, shot, red, setup, payoff. */
@@ -47,9 +45,9 @@ function officeScene(
   laughing: boolean,
   nodding: boolean,
   gun = false,
-  shoulderLaugh = false,
+  nodOnce = false,
 ): string {
-  return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}${nodding ? ' nodding' : ''}${shoulderLaugh ? ' shoulder-laugh' : ''}" data-scene-mode="${mode}" aria-hidden="true">
+  return `<div class="scene office-scene ${mode}${laughing ? ' laughing' : ''}${nodding ? ' nodding' : ''}${nodOnce ? ' nodding-once' : ''}" data-scene-mode="${mode}" aria-hidden="true">
     <div class="window"><i></i></div>
     ${gun ? '<i class="gun" data-testid="gun"></i>' : ''}
     <div class="yasu"><span class="head"><img src="${yasuSpriteUrl}" alt="" draggable="false"><i class="face-name"><b>ヤ</b><b>ス</b></i></span><span class="body"><img src="${yasuSpriteUrl}" alt="" draggable="false"></span></div>
@@ -115,8 +113,6 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const shaking = options.revealImpact || options.impactShake;
     const sceneMode = shaking ? 'impact'
-      // The jolt belongs to the room, so Yasu holds still inside it.
-      : options.bossShock ? 'plain'
       : comedyMode ? 'settled'
       : state.phase === 'reveal' || state.phase === 'ending' || state.phase === 'boss' ? 'nervous'
       : 'plain';
@@ -124,16 +120,16 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     const shownText = step ? Array.from(dialogueText(step)).slice(0, options.visibleCharacters).join('') : '';
     // Keyed off the lines themselves, so inserting a page cannot silently move
     // these onto the wrong one.
-    const laughing = state.phase === 'ending' && shownText.includes('はっはっは');
+    const laughing = (state.phase === 'ending' && shownText.includes('はっはっは'))
+      || (state.phase === 'boss' && step?.laughing === true);
     const nodding = state.phase === 'ending' && step !== undefined
       && step.text.startsWith('まあ しょはんだし')
       && shownText === dialogueText(step) && options.punchlineStage === 0;
-    // He is already laughing as the page opens, and nods once it has landed.
-    const shoulderLaugh = state.phase === 'boss' && step?.laughing === true;
-    const bossNod = state.phase === 'boss' && step !== undefined && step.nod === true
+    // A single nod once the thanks has landed, not the ending's double take.
+    const nodOnce = state.phase === 'boss' && step !== undefined && step.nod === true
       && shownText === dialogueText(step);
     // He draws on the line that justifies it, not once the screen has gone.
-    const scene = officeScene(sceneMode, laughing, nodding || bossNod, gunDrawn(state), shoulderLaugh);
+    const scene = officeScene(sceneMode, laughing, nodding, gunDrawn(state), nodOnce);
     content = state.phase === 'input'
       ? scene + kanaPanel(state)
       : options.revealImpact
@@ -141,7 +137,7 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
         : scene + dialogue(state, options);
   }
 
-  const screenModifiers = `${options.revealImpact ? ' reveal-impact' : ''}${options.impactShake ? ' impact-shake' : ''}${options.bossShock ? ' boss-shock' : ''}${options.fadeOut ? ' fading' : ''}`;
+  const screenModifiers = `${options.revealImpact ? ' reveal-impact' : ''}${options.impactShake ? ' impact-shake' : ''}${options.fadeOut ? ' fading' : ''}`;
   root.innerHTML = `<main class="game-shell"><div class="screen-frame"><section class="game-screen phase-${state.phase}${screenModifiers}" data-testid="game-screen">
     ${content}
   </section></div></main>`;
