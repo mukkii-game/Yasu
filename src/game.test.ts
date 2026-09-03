@@ -89,6 +89,8 @@ describe('game flow', () => {
     expect(dialogueText(plea)).toBe('ヤス「エッ？　しっこうゆうよ\nつかないんですか！？」');
     expect(plea.punchline).toBe('みとおしがヤスッ！');
     expect(plea.impact).toBe(true);
+    // The gag pages settle him; this one has to keep shaking through it.
+    expect(plea.shiver).toBe(true);
 
     expect(ENDING.filter((step) => step.impact)).toHaveLength(1);
   });
@@ -117,9 +119,9 @@ describe('game flow', () => {
     expect(spoken).toEqual([
       'ヤス「ボスがはんにん？\nごじょうだんを　はっはっは」',
       'ヤス「でも　じはくとして\nろくおんさせてもらいました」',
-      'ヤス「それ　そのままじじつに\nさせてもらいますわ」',
+      'ヤス「これ　そのままじじつに\nさせてもらいますわ」',
       'ヤス「はんにん　ていこうのため\nやむなくせいあつ　ってね」',
-      'ヤス「ボス　ありがとう」',
+      'ヤス「ボス　いままでありがとう」',
       'ヤス「そしてさようなら」',
     ]);
 
@@ -153,15 +155,28 @@ describe('game flow', () => {
   it('scores the boss route from the script, not the renderer', () => {
     expect(BOSS[0].laughing).toBe(true);
     expect(BOSS[0].text.startsWith('ボスがはんにん？')).toBe(true);
+    // The laugh opens on a bright cue, and nothing on him trembles under it.
+    expect(BOSS[0].cues).toEqual(['pratfall']);
+    expect(BOSS[0].still).toBeUndefined();
 
-    // The recording is what lands on the player, so that page carries the jolt.
-    expect(BOSS.filter((step) => step.shock)).toHaveLength(1);
-    expect(BOSS[1].shock).toBe(true);
+    // 「これ　そのまま」 opens on the dissonance.
+    expect(BOSS[2].text.startsWith('これ　そのままじじつに')).toBe(true);
+    expect(BOSS[2].cues).toEqual(['dissonance']);
+
+    // The recording is what lands on the player, so that page carries the jolt
+    // from its first character, and he holds perfectly still under it.
     expect(BOSS[1].text.startsWith('でも　じはくとして')).toBe(true);
+    expect(BOSS[1].cues).toEqual(['anxiety']);
+    expect(BOSS[1].still).toBe(true);
+    expect(BOSS[1].laughing).toBeUndefined();
+
+    // He draws on a magazine release, with the unease under it.
+    const drawn = BOSS.find((step) => step.gun)!;
+    expect(drawn.cues).toEqual(['magazine', 'anxiety']);
 
     expect(BOSS.filter((step) => step.nod)).toHaveLength(1);
     expect(BOSS[BOSS.length - 2].nod).toBe(true);
-    expect(BOSS[BOSS.length - 2].text).toBe('ボス　ありがとう');
+    expect(BOSS[BOSS.length - 2].text).toBe('ボス　いままでありがとう');
     expect(BOSS[BOSS.length - 1].text).toBe('そしてさようなら');
 
     expect(BOSS.some((step) => step.punchline)).toBe(false);

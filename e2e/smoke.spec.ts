@@ -24,6 +24,36 @@ async function playedSoundFiles(page: import('@playwright/test').Page) {
   ).__playedSounds.map((source) => new URL(source).pathname.split('/').pop()));
 }
 
+/** Every play and pause in order, so a cue that must be cut can be checked. */
+async function soundLogFor(page: import('@playwright/test').Page, file: string) {
+  return page.evaluate((wanted) => (
+    window as typeof window & { __soundLog: string[] }
+  ).__soundLog.filter((entry) => entry.endsWith(`:${wanted}`)).map((entry) => entry.split(':')[0]), file);
+}
+
+function countOf(files: readonly (string | undefined)[], file: string) {
+  return files.filter((entry) => entry === file).length;
+}
+
+/** Records play/pause on every audio element, plus the ordinary played list. */
+const SOUND_SPY = () => {
+  const playedSounds: string[] = [];
+  Object.defineProperty(window, '__playedSounds', { value: playedSounds });
+  const soundLog: string[] = [];
+  Object.defineProperty(window, '__soundLog', { value: soundLog });
+  const nameOf = (element: HTMLMediaElement) => new URL(element.src).pathname.split('/').pop();
+  HTMLMediaElement.prototype.play = function play(this: HTMLMediaElement) {
+    playedSounds.push(this.src);
+    soundLog.push(`play:${nameOf(this)}`);
+    return Promise.resolve();
+  };
+  const realPause = HTMLMediaElement.prototype.pause;
+  HTMLMediaElement.prototype.pause = function pause(this: HTMLMediaElement) {
+    soundLog.push(`pause:${nameOf(this)}`);
+    return realPause.call(this);
+  };
+};
+
 test.describe('犯人はヤス', () => {
   test('shows the FC-style title and opens the kana input', async ({ page }) => {
     await page.goto('/');
@@ -176,7 +206,11 @@ test.describe('犯人はヤス', () => {
   });
 
   test('serves every supplied MP3 cue', async ({ request }) => {
-    for (const filename of ['anxiety.mp3', 'punchline-hit.mp3', 'reveal-shock.mp3', 'final-boom.mp3']) {
+    for (const filename of [
+      'anxiety.mp3', 'punchline-hit.mp3', 'reveal-shock.mp3', 'final-boom.mp3',
+      'dissonance.mp3', 'comic-pratfall.mp3', 'magazine-release.mp3', 'leather-steps.mp3',
+      'scene-change.mp3',
+    ]) {
       const response = await request.get(`/audio/${filename}`);
       expect(response.ok()).toBe(true);
       expect(response.headers()['content-type']).toContain('audio/mpeg');
@@ -186,13 +220,8 @@ test.describe('犯人はヤス', () => {
 
   test('lands each comeback exactly once, then walks Yasu off', async ({ page }) => {
     test.setTimeout(90_000);
+    await page.addInitScript(SOUND_SPY);
     await page.addInitScript(() => {
-      const playedSounds: string[] = [];
-      Object.defineProperty(window, '__playedSounds', { value: playedSounds });
-      HTMLMediaElement.prototype.play = function play() {
-        playedSounds.push(this.src);
-        return Promise.resolve();
-      };
       // Every 「ヤスッ！」 that pops, so a re-render replaying one is caught.
       const pops: string[] = [];
       Object.defineProperty(window, '__pops', { value: pops });
@@ -252,6 +281,10 @@ test.describe('犯人はヤス', () => {
       .toBe(shocksBeforeSentence + 1);
     await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('ending-next')).toContainText('しっこうゆうよ');
+    // Once the strike is over he keeps shaking: the gag pages settle him, this
+    // one must not.
+    await expect(page.locator('.office-scene')).toHaveAttribute('data-scene-mode', 'nervous');
+    await expect(page.locator('.office-scene .yasu')).toHaveCSS('animation-name', 'tremble');
     const hitsBeforePlea = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('みとおしが', { timeout: 10_000 });
     await expect(page.getByTestId('punchline').locator('strong')).toHaveText('ヤスッ！');
@@ -277,8 +310,14 @@ test.describe('犯人はヤス', () => {
       };
     });
     expect(escortTiming).toEqual({ left: '41px', duration: '2.4s', computedDuration: '2.4s' });
+    // Leather shoes carry the walk, and the clip is far longer than it.
+    expect(await playedSoundFiles(page)).toContain('leather-steps.mp3');
     await expect(page.getByTestId('end-punchline').locator('.end-setup b')).toHaveText(['このゲーム', 'なにもかも'], { timeout: 10_000 });
     await expect(page.locator('.walkers')).toHaveCount(0);
+    // By the time they are off the screen the footsteps have been cut, so the
+    // clip never runs on under the comeback.
+    await expect.poll(() => soundLogFor(page, 'leather-steps.mp3').then((log) => log.at(-1)))
+      .toBe('pause');
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveCount(0);
     await expect(page.getByTestId('end-punchline').locator('strong')).toHaveText('ヤスッ！');
     expect(await playedSoundFiles(page)).toContain('final-boom.mp3');
@@ -303,14 +342,7 @@ test.describe('犯人はヤス', () => {
 
   test('lets Yasu turn the confession on the boss', async ({ page }) => {
     test.setTimeout(90_000);
-    await page.addInitScript(() => {
-      const playedSounds: string[] = [];
-      Object.defineProperty(window, '__playedSounds', { value: playedSounds });
-      HTMLMediaElement.prototype.play = function play() {
-        playedSounds.push(this.src);
-        return Promise.resolve();
-      };
-    });
+    await page.addInitScript(SOUND_SPY);
     await page.goto('/');
     await reachInput(page);
 
@@ -337,40 +369,54 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
 
-    // He opens laughing it off, with no gun and no cue yet.
+    // He opens laughing it off on the bright cue, with no gun yet. The laugh is
+    // the reward line's shoulder bob and nothing else: no tremble underneath.
     await expect(page.getByTestId('boss-next')).toContainText('ごじょうだんを');
     await expect(page.getByTestId('gun')).toHaveCount(0);
     await expect(page.locator('.office-scene.laughing .yasu .body'))
       .toHaveCSS('animation-name', 'laugh-bob');
-    expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
-      .toBe(uneaseBeforeRoute);
+    await expect(page.locator('.office-scene')).toHaveAttribute('data-scene-mode', 'plain');
+    await expect(page.locator('.office-scene .yasu')).toHaveCSS('animation-name', 'none');
+    expect(await playedSoundFiles(page)).toContain('comic-pratfall.mp3');
+    expect(countOf(await playedSoundFiles(page), 'anxiety.mp3')).toBe(uneaseBeforeRoute);
     await advanceDialogue(page, 'boss-next');
 
-    // The recording lands on the player: the cue returns, with no room shake.
+    // The recording lands on the player: the cue hits from the first character,
+    // not once the line has finished, and he freezes solid under it.
+    await expect(page.getByTestId('boss-next')).toContainText('でも');
+    expect(countOf(await playedSoundFiles(page), 'anxiety.mp3')).toBe(uneaseBeforeRoute + 1);
+    await expect(page.locator('.office-scene')).toHaveAttribute('data-scene-mode', 'plain');
+    await expect(page.locator('.office-scene.laughing')).toHaveCount(0);
+    await expect(page.locator('.office-scene .yasu')).toHaveCSS('animation-name', 'none');
+    await expect(page.locator('.office-scene .yasu .body')).toHaveCSS('animation-name', 'none');
     await finishDialogue(page, 'boss-next');
     await expect(page.getByTestId('boss-next')).toContainText('ろくおんさせて');
     await expect(page.getByTestId('game-screen')).not.toHaveClass(/boss-shock/);
-    expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
-      .toBe(uneaseBeforeRoute + 1);
     await page.getByTestId('boss-next').click();
 
-    // He only trembles here; the laugh is done.
+    // 「これ」, not 「それ」 — and the page opens on the dissonance. He only
+    // trembles here; the laugh is done.
+    await expect(page.getByTestId('boss-next')).toContainText('これ');
+    expect(await playedSoundFiles(page)).toContain('dissonance.mp3');
     await finishDialogue(page, 'boss-next');
-    await expect(page.getByTestId('boss-next')).toContainText('そのままじじつに');
+    await expect(page.getByTestId('boss-next')).toContainText('これ　そのままじじつに');
     await expect(page.locator('.office-scene.laughing')).toHaveCount(0);
     await expect(page.locator('.office-scene')).toHaveAttribute('data-scene-mode', 'nervous');
     await page.getByTestId('boss-next').click();
 
-    // He draws on the line that justifies it, not once the screen has gone.
+    // He draws on the line that justifies it, not once the screen has gone: the
+    // magazine drops out and the unease comes back with it.
     await expect(page.getByTestId('boss-next')).toContainText('はんにん');
     await expect(page.getByTestId('gun')).toBeVisible();
+    expect(await playedSoundFiles(page)).toContain('magazine-release.mp3');
+    expect(countOf(await playedSoundFiles(page), 'anxiety.mp3')).toBe(uneaseBeforeRoute + 2);
     await finishDialogue(page, 'boss-next');
     await expect(page.getByTestId('boss-next')).toContainText('やむなくせいあつ　ってね');
     await page.getByTestId('boss-next').click();
 
     // He nods on the thanks, then signs off; the gun stays up for both.
     await finishDialogue(page, 'boss-next');
-    await expect(page.getByTestId('boss-next')).toContainText('ボス　ありがとう');
+    await expect(page.getByTestId('boss-next')).toContainText('ボス　いままでありがとう');
     await expect(page.locator('.office-scene.nodding-once .yasu .head'))
       .toHaveCSS('animation-name', 'nod-once');
     await expect(page.getByTestId('gun')).toBeVisible();

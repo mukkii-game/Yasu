@@ -2,19 +2,26 @@
 
 export type Phase = 'title' | 'dialogue' | 'input' | 'wrong' | 'reveal' | 'ending' | 'end' | 'boss' | 'boss-end';
 
+/** A recorded cue played from a file, as the page opens. */
+export type SoundCue = 'anxiety' | 'dissonance' | 'pratfall' | 'magazine';
+
 export interface DialogueStep {
   readonly speaker: 'ヤス' | 'あなた';
   readonly text: string;
   readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！' | '表現がヤスッ！';
   /** The shock cue and tremble land before the line, exactly like the reveal. */
   readonly impact?: true;
-  /** The line lands, then the unease cue hits. */
-  readonly shock?: true;
+  /** Cues that fire the moment the page opens, before the first character. */
+  readonly cues?: readonly SoundCue[];
   /** He is already laughing as the page opens, the same bob as the reward line. */
   readonly laughing?: true;
+  /** Nothing on him moves: no laugh, no tremble. */
+  readonly still?: true;
+  /** He keeps trembling on a page that would otherwise have settled. */
+  readonly shiver?: true;
   /** He nods once the line has landed. */
   readonly nod?: true;
-  /** The muzzle is already up as the page opens, on a clack. */
+  /** The muzzle is already up as the page opens. */
   readonly gun?: true;
 }
 
@@ -45,16 +52,17 @@ export const ENDING: readonly DialogueStep[] = [
     text: 'エッ？　しっこうゆうよ\nつかないんですか！？',
     punchline: 'みとおしがヤスッ！',
     impact: true,
+    shiver: true,
   },
 ];
 
 /** Naming the boss instead of Yasu turns the confession into evidence. */
 export const BOSS: readonly DialogueStep[] = [
-  { speaker: 'ヤス', text: 'ボスがはんにん？\nごじょうだんを　はっはっは', laughing: true },
-  { speaker: 'ヤス', text: 'でも　じはくとして\nろくおんさせてもらいました', shock: true },
-  { speaker: 'ヤス', text: 'それ　そのままじじつに\nさせてもらいますわ' },
-  { speaker: 'ヤス', text: 'はんにん　ていこうのため\nやむなくせいあつ　ってね', gun: true },
-  { speaker: 'ヤス', text: 'ボス　ありがとう', nod: true },
+  { speaker: 'ヤス', text: 'ボスがはんにん？\nごじょうだんを　はっはっは', laughing: true, cues: ['pratfall'] },
+  { speaker: 'ヤス', text: 'でも　じはくとして\nろくおんさせてもらいました', still: true, cues: ['anxiety'] },
+  { speaker: 'ヤス', text: 'これ　そのままじじつに\nさせてもらいますわ', cues: ['dissonance'] },
+  { speaker: 'ヤス', text: 'はんにん　ていこうのため\nやむなくせいあつ　ってね', gun: true, cues: ['magazine', 'anxiety'] },
+  { speaker: 'ヤス', text: 'ボス　いままでありがとう', nod: true },
   { speaker: 'ヤス', text: 'そしてさようなら' },
 ];
 

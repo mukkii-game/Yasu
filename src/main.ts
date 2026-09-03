@@ -1,6 +1,6 @@
 import {
   ENDING, advance, chooseKana, clearAnswer, createGame, currentDialogue, deleteKana, dialogueText,
-  restart, startGame, submitAnswer, type GameState,
+  restart, startGame, submitAnswer, type GameState, type SoundCue,
 } from './game';
 import { renderApp } from './render';
 import './style.css';
@@ -15,16 +15,32 @@ const anxiety = new Audio(`${import.meta.env.BASE_URL}audio/anxiety.mp3`);
 const punchlineHit = new Audio(`${import.meta.env.BASE_URL}audio/punchline-hit.mp3`);
 const revealShock = new Audio(`${import.meta.env.BASE_URL}audio/reveal-shock.mp3`);
 const finalBoom = new Audio(`${import.meta.env.BASE_URL}audio/final-boom.mp3`);
+const dissonance = new Audio(`${import.meta.env.BASE_URL}audio/dissonance.mp3`);
+const pratfall = new Audio(`${import.meta.env.BASE_URL}audio/comic-pratfall.mp3`);
+const magazineRelease = new Audio(`${import.meta.env.BASE_URL}audio/magazine-release.mp3`);
+const leatherSteps = new Audio(`${import.meta.env.BASE_URL}audio/leather-steps.mp3`);
 
 [
   { sound: anxiety, volume: 0.65 },
   { sound: punchlineHit, volume: 0.8 },
   { sound: revealShock, volume: 0.85 },
   { sound: finalBoom, volume: 1 },
+  { sound: dissonance, volume: 0.7 },
+  { sound: pratfall, volume: 0.7 },
+  { sound: magazineRelease, volume: 0.8 },
+  { sound: leatherSteps, volume: 0.55 },
 ].forEach(({ sound, volume }) => {
   sound.preload = 'auto';
   sound.volume = volume;
 });
+
+/** A page names its cues; only this table knows which file each one is. */
+const CUE_SOUNDS: Record<SoundCue, HTMLAudioElement> = {
+  anxiety,
+  dissonance,
+  pratfall,
+  magazine: magazineRelease,
+};
 
 let state: GameState = createGame();
 let audio: AudioContext | undefined;
@@ -35,6 +51,7 @@ let punchlineSecondTimer: number | undefined;
 let endTimer: number | undefined;
 let endSecondTimer: number | undefined;
 let endReturnTimer: number | undefined;
+let walkTimer: number | undefined;
 let revealTimer: number | undefined;
 let custodyTimer: number | undefined;
 let fadeTimer: number | undefined;
@@ -53,6 +70,8 @@ let bossStage: 0 | 1 | 2 | 3 | 4 = 0;
 const FADE_MS = 1800;
 /** The reveal's shake, reused when a finished line lands as a shock. */
 const IMPACT_MS = 1000;
+/** Matches the escort-walk animation: the two are off the screen by then. */
+const WALK_MS = 2400;
 /** How long a landed 「ヤスッ！」 is protected from an impatient tap. */
 const PUNCHLINE_HOLD_MS = 900;
 
@@ -66,6 +85,11 @@ function playSound(sound: HTMLAudioElement): void {
   sound.pause();
   sound.currentTime = 0;
   void sound.play().catch(() => undefined);
+}
+
+function stopSound(sound: HTMLAudioElement): void {
+  sound.pause();
+  sound.currentTime = 0;
 }
 
 function textBlip(): void {
@@ -109,26 +133,6 @@ function decisionBlip(): void {
     oscillator.connect(gain).connect(context.destination);
     oscillator.start(now + index * 0.07);
     oscillator.stop(now + index * 0.07 + 0.065);
-  });
-}
-
-function handcuffClack(): void {
-  const context = getAudio();
-  const now = context.currentTime;
-  [
-    { at: 0, frequency: 1760, duration: 0.045, volume: 0.04 },
-    { at: 0.075, frequency: 880, duration: 0.065, volume: 0.045 },
-  ].forEach(({ at, frequency, duration, volume }) => {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(frequency, now + at);
-    oscillator.frequency.exponentialRampToValueAtTime(frequency / 2, now + at + duration);
-    gain.gain.setValueAtTime(volume, now + at);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + at + duration);
-    oscillator.connect(gain).connect(context.destination);
-    oscillator.start(now + at);
-    oscillator.stop(now + at + duration);
   });
 }
 
@@ -245,8 +249,6 @@ function schedulePunchline(): void {
 
 function completeLine(): void {
   render();
-  const step = currentDialogue(state);
-  if (step?.shock) playSound(anxiety);
   schedulePunchline();
 }
 
@@ -272,7 +274,7 @@ function beginTyping(): void {
     return;
   }
   visibleCharacters = 0;
-  if (currentDialogue(state)?.gun) handcuffClack();
+  currentDialogue(state)?.cues?.forEach((cue) => playSound(CUE_SOUNDS[cue]));
   render();
   let sounded = 0;
   const tick = () => {
@@ -296,9 +298,12 @@ function clearEndTimer(): void {
   if (endTimer !== undefined) window.clearTimeout(endTimer);
   if (endSecondTimer !== undefined) window.clearTimeout(endSecondTimer);
   if (endReturnTimer !== undefined) window.clearTimeout(endReturnTimer);
+  if (walkTimer !== undefined) window.clearTimeout(walkTimer);
   endTimer = undefined;
   endSecondTimer = undefined;
   endReturnTimer = undefined;
+  walkTimer = undefined;
+  stopSound(leatherSteps);
 }
 
 function clearRevealTimer(): void {
@@ -324,15 +329,22 @@ function scheduleBossEnd(): void {
     bossTimers.push(window.setTimeout(step, delay));
   };
   at(700, () => { bossStage = 1; playSound(finalBoom); render(); });
-  at(2300, () => { bossStage = 2; render(); });
-  at(3700, () => { bossStage = 3; punchlineLeadBlip(); render(); });
-  at(4400, () => { bossStage = 4; playSound(punchlineHit); render(); });
-  at(8600, () => { setState(restart()); });
+  // The room stays red on its own for a beat before the card appears.
+  at(3100, () => { bossStage = 2; render(); });
+  at(4500, () => { bossStage = 3; punchlineLeadBlip(); render(); });
+  at(5200, () => { bossStage = 4; playSound(punchlineHit); render(); });
+  at(9400, () => { setState(restart()); });
 }
 
 function scheduleEndPunchline(): void {
   clearEndTimer();
-  handcuffClack();
+  playSound(leatherSteps);
+  // The clip runs far longer than the walk, so it is cut the moment the two
+  // of them are off the screen — see .walkers in style.css.
+  walkTimer = window.setTimeout(() => {
+    walkTimer = undefined;
+    stopSound(leatherSteps);
+  }, WALK_MS);
   endTimer = window.setTimeout(() => {
     endTimer = undefined;
     endPunchlineStage = 1;
