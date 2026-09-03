@@ -10,6 +10,8 @@ export interface RenderOptions {
   readonly revealImpact: boolean;
   /** The finished line is landing its shock: same tremble as the reveal. */
   readonly impactShake: boolean;
+  /** The room is jolting around a motionless Yasu. */
+  readonly bossShock: boolean;
   /** The screen is draining to black on the way to the ending. */
   readonly fadeOut: boolean;
   /** Progress through the boss ending: gun, shot, red, setup, payoff. */
@@ -112,7 +114,12 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const shaking = options.revealImpact || options.impactShake;
-    const sceneMode = shaking ? 'impact' : comedyMode ? 'settled' : state.phase === 'reveal' || state.phase === 'ending' ? 'nervous' : 'plain';
+    const sceneMode = shaking ? 'impact'
+      // The jolt belongs to the room, so Yasu holds still inside it.
+      : options.bossShock ? 'plain'
+      : comedyMode ? 'settled'
+      : state.phase === 'reveal' || state.phase === 'ending' || state.phase === 'boss' ? 'nervous'
+      : 'plain';
     const step = currentDialogue(state);
     const shownText = step ? Array.from(dialogueText(step)).slice(0, options.visibleCharacters).join('') : '';
     // Keyed off the lines themselves, so inserting a page cannot silently move
@@ -121,11 +128,12 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
     const nodding = state.phase === 'ending' && step !== undefined
       && step.text.startsWith('まあ しょはんだし')
       && shownText === dialogueText(step) && options.punchlineStage === 0;
-    // The boss route's laugh starts only once the line has finished landing.
-    const shoulderLaugh = state.phase === 'boss' && step?.laugh === true
+    // He is already laughing as the page opens, and nods once it has landed.
+    const shoulderLaugh = state.phase === 'boss' && step?.laughing === true;
+    const bossNod = state.phase === 'boss' && step !== undefined && step.nod === true
       && shownText === dialogueText(step);
     // He draws on the line that justifies it, not once the screen has gone.
-    const scene = officeScene(sceneMode, laughing, nodding, gunDrawn(state), shoulderLaugh);
+    const scene = officeScene(sceneMode, laughing, nodding || bossNod, gunDrawn(state), shoulderLaugh);
     content = state.phase === 'input'
       ? scene + kanaPanel(state)
       : options.revealImpact
@@ -133,7 +141,7 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
         : scene + dialogue(state, options);
   }
 
-  const screenModifiers = `${options.revealImpact ? ' reveal-impact' : ''}${options.impactShake ? ' impact-shake' : ''}${options.fadeOut ? ' fading' : ''}`;
+  const screenModifiers = `${options.revealImpact ? ' reveal-impact' : ''}${options.impactShake ? ' impact-shake' : ''}${options.bossShock ? ' boss-shock' : ''}${options.fadeOut ? ' fading' : ''}`;
   root.innerHTML = `<main class="game-shell"><div class="screen-frame"><section class="game-screen phase-${state.phase}${screenModifiers}" data-testid="game-screen">
     ${content}
   </section></div></main>`;

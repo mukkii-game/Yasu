@@ -6,12 +6,14 @@ export interface DialogueStep {
   readonly speaker: 'ヤス' | 'あなた';
   readonly text: string;
   readonly punchline?: 'なぞときがヤスッ！' | '動機がヤスッ！' | '報酬もヤスッ！' | '人としてヤスッ！' | 'みとおしがヤスッ！' | '表現がヤスッ！';
-  /** The finished line lands with the reveal's shock cue and tremble. */
+  /** The shock cue and tremble land before the line, exactly like the reveal. */
   readonly impact?: true;
-  /** The page opens on the unease cue Yasu first walked in on. */
-  readonly unease?: true;
-  /** Yasu's shoulders start going once the line lands, on that same cue. */
-  readonly laugh?: true;
+  /** The line lands, then the unease cue hits and the room jolts — Yasu does not. */
+  readonly shock?: true;
+  /** Yasu's shoulders are already going as the page opens. */
+  readonly laughing?: true;
+  /** He nods once the line has landed. */
+  readonly nod?: true;
   /** The muzzle is already up as the page opens, on a clack. */
   readonly gun?: true;
 }
@@ -32,7 +34,7 @@ export const INTRO: readonly DialogueStep[] = [
 
 export const ENDING: readonly DialogueStep[] = [
   { speaker: 'あなた', text: 'タイトルにかいてあったよ', punchline: 'なぞときがヤスッ！' },
-  { speaker: 'あなた', text: 'いわゆる　かおにかいてある\nじょうたいだよ', punchline: '表現がヤスッ！' },
+  { speaker: 'あなた', text: 'いわゆる　かおにかいてある\nじょうたいだし', punchline: '表現がヤスッ！' },
   { speaker: 'あなた', text: 'ヤス、なんで　ごうとうさつじんなんてしたんだ' },
   { speaker: 'ヤス', text: 'いやー ラクしてもうかるバイトだってネットでみて', punchline: '動機がヤスッ！' },
   { speaker: 'ヤス', text: 'でももらったほうしゅうは\n３０００円でしたよ　はっはっは', punchline: '報酬もヤスッ！' },
@@ -40,7 +42,7 @@ export const ENDING: readonly DialogueStep[] = [
   { speaker: 'あなた', text: 'ごうとうさつじんだから\nしけいか　むきちょうえきだぞ' },
   {
     speaker: 'ヤス',
-    text: 'エッ？　しっこうゆうよはつかないですか！？',
+    text: 'エッ？　しっこうゆうよ\nつかないんですか！？',
     punchline: 'みとおしがヤスッ！',
     impact: true,
   },
@@ -48,10 +50,12 @@ export const ENDING: readonly DialogueStep[] = [
 
 /** Naming the boss instead of Yasu turns the confession into evidence. */
 export const BOSS: readonly DialogueStep[] = [
-  { speaker: 'ヤス', text: 'ボス　じはくとして\nろくおんさせてもらいましたよ', unease: true },
-  { speaker: 'ヤス', text: 'それ　そのままじじつに\nさせてもらいますわ', laugh: true },
-  { speaker: 'ヤス', text: 'はんにん　ていこうのため\nやむなくせいあつ', gun: true },
-  { speaker: 'ヤス', text: 'ボス　ありがとう\nそしてさようなら' },
+  { speaker: 'ヤス', text: 'ボスがはんにん？　ごじょうだんを\nはっはっは', laughing: true },
+  { speaker: 'ヤス', text: 'でも　じはくとして\nろくおんさせてもらいました', shock: true },
+  { speaker: 'ヤス', text: 'それ　そのままじじつに\nさせてもらいますわ' },
+  { speaker: 'ヤス', text: 'はんにん　ていこうのため\nやむなくせいあつ　ってね', gun: true },
+  { speaker: 'ヤス', text: 'ボス　ありがとう', nod: true },
+  { speaker: 'ヤス', text: 'そしてさようなら' },
 ];
 
 /** Once Yasu draws, the muzzle stays up for the rest of the route. */

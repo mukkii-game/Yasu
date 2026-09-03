@@ -242,12 +242,15 @@ test.describe('犯人はヤス', () => {
       .toBe(shocksBeforeSentence);
     await page.getByTestId('ending-next').click();
 
-    // The shock lands on the plea instead, the moment that line finishes typing.
-    await finishDialogue(page, 'ending-next');
+    // The shock strikes before the plea, exactly as it does at the reveal: the
+    // box drops away, the room shakes, and only then does he speak.
+    await expect(page.getByTestId('game-screen')).toHaveClass(/reveal-impact/);
+    await expect(page.getByTestId('ending-next')).toHaveCount(0);
     await expect(page.locator('.office-scene')).toHaveClass(/impact/);
     await expect(page.locator('.yasu')).toHaveCSS('animation-name', 'impact-tremble');
     expect((await playedSoundFiles(page)).filter((file) => file === 'reveal-shock.mp3').length)
       .toBe(shocksBeforeSentence + 1);
+    await finishDialogue(page, 'ending-next');
     await expect(page.getByTestId('ending-next')).toContainText('しっこうゆうよ');
     const hitsBeforePlea = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
     await expect(page.getByTestId('punchline').locator('span')).toHaveText('みとおしが', { timeout: 10_000 });
@@ -334,33 +337,49 @@ test.describe('犯人はヤス', () => {
     await page.getByRole('button', { name: 'ス', exact: true }).click();
     await page.getByTestId('decide').click();
 
-    // The route opens on the cue Yasu first walked in on, with no gun yet.
-    await expect(page.getByTestId('boss-next')).toContainText('ろくおんさせて');
+    // He opens laughing it off, with no gun and no cue yet.
+    await expect(page.getByTestId('boss-next')).toContainText('ごじょうだんを');
     await expect(page.getByTestId('gun')).toHaveCount(0);
-    expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
-      .toBe(uneaseBeforeRoute + 1);
-    await advanceDialogue(page, 'boss-next');
-
-    // He turns the confession into the report, then his shoulders go on that
-    // same cue.
-    await finishDialogue(page, 'boss-next');
-    await expect(page.getByTestId('boss-next')).toContainText('そのままじじつに');
     await expect(page.locator('.office-scene.shoulder-laugh .yasu .body'))
       .toHaveCSS('animation-name', 'shoulder-shake');
     expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
-      .toBe(uneaseBeforeRoute + 2);
+      .toBe(uneaseBeforeRoute);
+    await advanceDialogue(page, 'boss-next');
+
+    // The recording lands on the player: the room jolts on the unease cue while
+    // Yasu himself holds still.
+    await finishDialogue(page, 'boss-next');
+    await expect(page.getByTestId('boss-next')).toContainText('ろくおんさせて');
+    await expect(page.getByTestId('game-screen')).toHaveClass(/boss-shock/);
+    await expect(page.locator('.office-scene')).toHaveAttribute('data-scene-mode', 'plain');
+    expect((await playedSoundFiles(page)).filter((file) => file === 'anxiety.mp3').length)
+      .toBe(uneaseBeforeRoute + 1);
+    await page.waitForTimeout(1_200);
+    await page.getByTestId('boss-next').click();
+
+    // He only trembles here; the shoulders are done.
+    await finishDialogue(page, 'boss-next');
+    await expect(page.getByTestId('boss-next')).toContainText('そのままじじつに');
+    await expect(page.locator('.office-scene.shoulder-laugh')).toHaveCount(0);
+    await expect(page.locator('.office-scene')).toHaveAttribute('data-scene-mode', 'nervous');
     await page.getByTestId('boss-next').click();
 
     // He draws on the line that justifies it, not once the screen has gone.
     await expect(page.getByTestId('boss-next')).toContainText('はんにん');
     await expect(page.getByTestId('gun')).toBeVisible();
     await finishDialogue(page, 'boss-next');
-    await expect(page.getByTestId('boss-next')).toContainText('やむなくせいあつ');
+    await expect(page.getByTestId('boss-next')).toContainText('やむなくせいあつ　ってね');
     await page.getByTestId('boss-next').click();
 
-    // It stays up through the sign-off rather than going back in the pocket.
+    // He nods on the thanks, then signs off; the gun stays up for both.
     await finishDialogue(page, 'boss-next');
     await expect(page.getByTestId('boss-next')).toContainText('ボス　ありがとう');
+    await expect(page.locator('.office-scene.nodding')).toBeVisible();
+    await expect(page.getByTestId('gun')).toBeVisible();
+    await page.getByTestId('boss-next').click();
+
+    await finishDialogue(page, 'boss-next');
+    await expect(page.getByTestId('boss-next')).toContainText('そしてさようなら');
     await expect(page.getByTestId('gun')).toBeVisible();
     await page.getByTestId('boss-next').click();
 
@@ -369,6 +388,7 @@ test.describe('犯人はヤス', () => {
 
     // The shot floods the room red, and only then does THE END arrive.
     await expect(page.locator('.redout')).toHaveCSS('animation-name', 'redout', { timeout: 10_000 });
+    await expect(page.getByTestId('gun')).toHaveCSS('animation-name', 'muzzle-flash');
     expect(await playedSoundFiles(page)).toContain('final-boom.mp3');
     await expect(page.getByTestId('the-end')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('.redout')).toHaveCSS('opacity', '1');
