@@ -1,0 +1,28 @@
+name: Publish to itch.io
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: itch
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Publishes only an artifact authorized by the protected central workflow.
+    # Pinned to a commit rather than a tag: this is the canary run that has to
+    # pass before ai-dev-infra cuts v3, after which this moves to @v3.
+    uses: mukkii-game/ai-dev-infra/.github/workflows/publish-itch.yml@37f665f326f13647c865171d7bf27a5b1717f690
+    with:
+      itch_target: mukkii/yasu
+    # Named explicitly. `secrets: inherit` would hand the called workflow every
+    # secret this repository holds, not just the one it needs.
+    secrets:
+      butler_api_key: ${{ secrets.BUTLER_API_KEY }}

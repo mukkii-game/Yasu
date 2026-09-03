@@ -67,4 +67,21 @@ assertMapping(pages, 'concurrency', {
 })
 assert.match(pages, /^  workflow_dispatch:\s*$/m)
 
+const itch = workflow('publish-itch.yml')
+// A commit, not a tag: this is the canary that has to publish successfully
+// before ai-dev-infra cuts v3. Update both together when it moves to @v3.
+assertOnlyUses(
+  itch,
+  'mukkii-game/ai-dev-infra/.github/workflows/publish-itch.yml@37f665f326f13647c865171d7bf27a5b1717f690',
+)
+assertMapping(itch, 'permissions', { contents: 'read', actions: 'read' })
+assertMapping(itch, 'concurrency', { group: 'itch', 'cancel-in-progress': 'false' })
+assert.match(itch, /^  workflow_dispatch:\s*$/m)
+// Never on a pull_request trigger: PR code must not be able to reach the key.
+assert.doesNotMatch(itch, /^\s*pull_request(_target)?:/m)
+// The key is named, so the called workflow gets that secret and nothing else.
+assert.match(itch, /^      butler_api_key: \$\{\{ secrets\.BUTLER_API_KEY \}\}$/m)
+// Comments stripped first, so the comment forbidding it does not match itself.
+assert.doesNotMatch(itch.replace(/^\s*#.*$/gm, ''), /secrets:\s*inherit/)
+
 console.log('Workflow caller contracts are valid.')
