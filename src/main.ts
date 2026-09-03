@@ -44,8 +44,6 @@ let payoffPopped = false;
 let endPunchlineStage: 0 | 1 | 2 = 0;
 let revealImpact = false;
 let impactShake = false;
-let bossShock = false;
-let bossShockTimer: number | undefined;
 let fadeOut = false;
 let punchlineHoldUntil = 0;
 let bossTimers: number[] = [];
@@ -188,7 +186,7 @@ function scheduleCustodyTransition(): void {
 
 function render(): void {
   renderApp(root, state, {
-    visibleCharacters, punchlineStage, payoffPopped, endPunchlineStage, revealImpact, impactShake, bossShock, fadeOut, bossStage,
+    visibleCharacters, punchlineStage, payoffPopped, endPunchlineStage, revealImpact, impactShake, fadeOut, bossStage,
   });
 }
 
@@ -216,28 +214,6 @@ function shockThenType(): void {
     revealTimer = undefined;
     revealImpact = false;
     beginTyping();
-  }, IMPACT_MS);
-}
-
-function clearBossShockTimer(): void {
-  if (bossShockTimer !== undefined) window.clearTimeout(bossShockTimer);
-  bossShockTimer = undefined;
-  bossShock = false;
-}
-
-/**
- * The recording lands on you, not on him: the room jolts and the unease cue
- * returns while Yasu himself stands perfectly still.
- */
-function landBossShock(): void {
-  clearBossShockTimer();
-  bossShock = true;
-  playSound(anxiety);
-  render();
-  bossShockTimer = window.setTimeout(() => {
-    bossShockTimer = undefined;
-    bossShock = false;
-    render();
   }, IMPACT_MS);
 }
 
@@ -270,7 +246,7 @@ function schedulePunchline(): void {
 function completeLine(): void {
   render();
   const step = currentDialogue(state);
-  if (step?.shock) landBossShock();
+  if (step?.shock) playSound(anxiety);
   schedulePunchline();
 }
 
@@ -298,10 +274,14 @@ function beginTyping(): void {
   visibleCharacters = 0;
   if (currentDialogue(state)?.gun) handcuffClack();
   render();
+  let sounded = 0;
   const tick = () => {
     visibleCharacters += 1;
     const character = Array.from(dialogueText(currentDialogue(state)!))[visibleCharacters - 1];
-    if (visibleCharacters % 2 === 0 && character?.trim()) textBlip();
+    if (character?.trim()) {
+      sounded += 1;
+      if (sounded % 2 === 0) textBlip();
+    }
     render();
     if (visibleCharacters < total) typeTimer = window.setTimeout(tick, 38);
     else {
@@ -377,7 +357,6 @@ function setState(next: GameState): void {
   clearEndTimer();
   clearRevealTimer();
   clearImpactTimer();
-  clearBossShockTimer();
   clearBossTimers();
   endPunchlineStage = 0;
   bossStage = 0;
@@ -390,7 +369,7 @@ function setState(next: GameState): void {
 }
 
 function advanceOrFinish(): void {
-  if (revealImpact || impactShake || bossShock) return;
+  if (revealImpact || impactShake) return;
   const step = currentDialogue(state);
   if (step && visibleCharacters < fullDialogueLength()) {
     finishTyping();

@@ -82,13 +82,10 @@ button { border: 0; border-radius: 0; font: inherit; }
 .yasu .face-name b { font: inherit; }
 .nervous .yasu { animation: tremble 75ms steps(2) infinite; }
 .impact .yasu { animation: impact-tremble 55ms steps(2) infinite; }
-/* The recording lands on the player, so the room shakes and Yasu does not. */
-.game-screen.boss-shock { animation: impact-tremble 55ms steps(2) infinite; }
 .game-screen.fading { animation: verdict-fade 1800ms linear forwards; }
 .laughing .yasu .body { animation: laugh-bob 180ms steps(2) infinite; }
-/* The boss route's laugh is stifled: shoulders only, no bob. */
-.shoulder-laugh .yasu .body { animation: shoulder-shake 110ms steps(2) infinite; }
 .nodding .yasu .head { animation: nod-twice 900ms steps(1) 1 both; }
+.nodding-once .yasu .head { animation: nod-once 520ms steps(1) 1 both; }
 
 .gun { position: absolute; z-index: 4; left: 84px; top: 92px; width: 16px; height: 16px; border-radius: 50%; background: var(--black); box-shadow: inset 0 0 0 3px var(--silver), 0 0 0 2px var(--gray); }
 .boss-screen.stage-1 .gun, .boss-screen.stage-2 .gun, .boss-screen.stage-3 .gun, .boss-screen.stage-4 .gun { animation: muzzle-flash 260ms steps(2) 1 both; }
@@ -164,7 +161,7 @@ button { border: 0; border-radius: 0; font: inherit; }
 @keyframes impact-tremble { 0% { transform: translate(-4px, 2px); } 50% { transform: translate(4px, -2px); } }
 @keyframes verdict-fade { from { filter: saturate(1) brightness(1); } to { filter: saturate(0) brightness(0); } }
 @keyframes laugh-bob { 50% { transform: translateY(2px); } }
-@keyframes shoulder-shake { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(1px); } }
+@keyframes nod-once { 0%, 20%, 75%, 100% { transform: translateY(0); } 40% { transform: translateY(6px); } }
 @keyframes nod-twice { 0%, 15%, 40%, 70%, 100% { transform: translateY(0); } 27%, 57% { transform: translateY(6px); } }
 @keyframes punch-pop { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes final-pop { from { transform: scale(2.4); opacity: 0; } to { transform: none; opacity: 1; } }

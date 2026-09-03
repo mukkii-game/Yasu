@@ -548,3 +548,15 @@ The muzzle flare and recoil are deliberately tiny: one frame of white, a
 two-pixel kick, settled inside 260 ms. Anything larger reads as an explosion
 rather than a handgun at arm's length.
 
+The typing cue now counts sounding characters rather than every character. It
+fired on every second character and skipped spaces and line breaks, so a line
+spaced like 「はんにん　ていこうのため」 lost a blip wherever a space landed on an
+even count and the rhythm audibly dropped out. Counting only the characters that
+sound keeps it even: a line is now exactly (characters − spaces) ÷ 2 blips,
+whatever its spacing. Tapping to skip the typing still silences the rest, which
+is inherent — the characters never type.
+
+The boss route's laugh is the reward line's bob, not a shoulder shake of its own.
+Two different laughs for the same character read as two different tics; reusing
+the one the game already has makes it recognisably him.
+
