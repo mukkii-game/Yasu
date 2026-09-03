@@ -112,11 +112,16 @@ export function renderApp(root: HTMLElement, state: GameState, options: RenderOp
   } else {
     const comedyMode = state.phase === 'ending' && (state.endingIndex >= 1 || options.punchlineStage > 0);
     const shaking = options.revealImpact || options.impactShake;
+    const step = currentDialogue(state);
+    // A page can pin his motion either way: laughing and 「じはく」 must not
+    // pick up the room's tremble, and the plea must not lose it to the gag.
     const sceneMode = shaking ? 'impact'
+      : step?.still === true ? 'plain'
+      : step?.laughing === true ? 'plain'
+      : step?.shiver === true ? 'nervous'
       : comedyMode ? 'settled'
       : state.phase === 'reveal' || state.phase === 'ending' || state.phase === 'boss' ? 'nervous'
       : 'plain';
-    const step = currentDialogue(state);
     const shownText = step ? Array.from(dialogueText(step)).slice(0, options.visibleCharacters).join('') : '';
     // Keyed off the lines themselves, so inserting a page cannot silently move
     // these onto the wrong one.
