@@ -532,3 +532,19 @@ was always depicting. Nothing now sounds between the comeback and the walk.
 The escort geometry is back to X=41 over 2.4 seconds. That had been tuned by hand
 over several passes and my change to X=152 over 3.2 seconds was not an
 improvement anyone asked for.
+
+The shock now strikes before its line rather than after it. Landing it on a
+finished line made it a reaction to something already said; firing it first — box
+gone, room shaking, then the line — makes the line the consequence, which is how
+the reveal already worked and why the two now read as the same beat.
+
+The boss route separates whose shock it is. Yasu's own pages tremble faintly and
+he laughs, nods or draws on them; the page where the recording is revealed jolts
+the entire screen while Yasu holds still, because that beat belongs to the player
+being told, not to him. Shaking the screen rather than the sprite is what makes
+the difference visible.
+
+The muzzle flare and recoil are deliberately tiny: one frame of white, a
+two-pixel kick, settled inside 260 ms. Anything larger reads as an explosion
+rather than a handgun at arm's length.
+

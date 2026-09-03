@@ -69,7 +69,7 @@ describe('game flow', () => {
     expect(dialogueText(INTRO[2])).toBe('あなた「はんにんは・・・」');
     expect(dialogueText(WRONG)).toBe('ヤス「いや、ちがうでしょう。やっぱめいきゅういりですよ。」');
     expect(dialogueText(ENDING[0])).toBe('あなた「タイトルにかいてあったよ」');
-    expect(dialogueText(ENDING[1])).toBe('あなた「いわゆる　かおにかいてある\nじょうたいだよ」');
+    expect(dialogueText(ENDING[1])).toBe('あなた「いわゆる　かおにかいてある\nじょうたいだし」');
     expect(dialogueText(ENDING[2])).toBe('あなた「ヤス、なんで　ごうとうさつじんなんてしたんだ」');
     expect(dialogueText(ENDING[4])).toBe('ヤス「でももらったほうしゅうは\n３０００円でしたよ　はっはっは」');
   });
@@ -86,7 +86,7 @@ describe('game flow', () => {
 
     // The shock lands on the plea, not on the sentence that sets it up.
     const plea = ENDING[ENDING.length - 1];
-    expect(dialogueText(plea)).toBe('ヤス「エッ？　しっこうゆうよはつかないですか！？」');
+    expect(dialogueText(plea)).toBe('ヤス「エッ？　しっこうゆうよ\nつかないんですか！？」');
     expect(plea.punchline).toBe('みとおしがヤスッ！');
     expect(plea.impact).toBe(true);
 
@@ -115,10 +115,12 @@ describe('game flow', () => {
       spoken.push(dialogueText(currentDialogue(state)!));
     }
     expect(spoken).toEqual([
-      'ヤス「ボス　じはくとして\nろくおんさせてもらいましたよ」',
+      'ヤス「ボスがはんにん？　ごじょうだんを\nはっはっは」',
+      'ヤス「でも　じはくとして\nろくおんさせてもらいました」',
       'ヤス「それ　そのままじじつに\nさせてもらいますわ」',
-      'ヤス「はんにん　ていこうのため\nやむなくせいあつ」',
-      'ヤス「ボス　ありがとう\nそしてさようなら」',
+      'ヤス「はんにん　ていこうのため\nやむなくせいあつ　ってね」',
+      'ヤス「ボス　ありがとう」',
+      'ヤス「そしてさようなら」',
     ]);
 
     state = advance(state);
@@ -148,12 +150,20 @@ describe('game flow', () => {
     expect(gunDrawn(reachInput())).toBe(false);
   });
 
-  it('opens the boss route on the unease cue and laughs on it again', () => {
-    // Both cues are declared in the script, so the renderer cannot misplace them.
-    expect(BOSS.filter((step) => step.unease)).toHaveLength(1);
-    expect(BOSS[0].unease).toBe(true);
-    expect(BOSS.filter((step) => step.laugh)).toHaveLength(1);
-    expect(BOSS[1].laugh).toBe(true);
+  it('scores the boss route from the script, not the renderer', () => {
+    expect(BOSS[0].laughing).toBe(true);
+    expect(BOSS[0].text.startsWith('ボスがはんにん？')).toBe(true);
+
+    // The recording is what lands on the player, so that page carries the jolt.
+    expect(BOSS.filter((step) => step.shock)).toHaveLength(1);
+    expect(BOSS[1].shock).toBe(true);
+    expect(BOSS[1].text.startsWith('でも　じはくとして')).toBe(true);
+
+    expect(BOSS.filter((step) => step.nod)).toHaveLength(1);
+    expect(BOSS[BOSS.length - 2].nod).toBe(true);
+    expect(BOSS[BOSS.length - 2].text).toBe('ボス　ありがとう');
+    expect(BOSS[BOSS.length - 1].text).toBe('そしてさようなら');
+
     expect(BOSS.some((step) => step.punchline)).toBe(false);
   });
 
