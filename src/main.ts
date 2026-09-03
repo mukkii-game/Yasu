@@ -99,7 +99,7 @@ function textBlip(): void {
   const gain = context.createGain();
   oscillator.type = 'square';
   oscillator.frequency.value = visibleCharacters % 4 === 0 ? 392 : 330;
-  gain.gain.setValueAtTime(0.018, now);
+  gain.gain.setValueAtTime(0.026, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
   oscillator.connect(gain).connect(context.destination);
   oscillator.start(now);
@@ -332,7 +332,9 @@ function scheduleBossEnd(): void {
   // The room stays red on its own for a beat before the card appears.
   at(3100, () => { bossStage = 2; render(); });
   at(4500, () => { bossStage = 3; punchlineLeadBlip(); render(); });
-  at(5200, () => { bossStage = 4; playSound(punchlineHit); render(); });
+  // The same boom the arrest ending closes on, not the room's ordinary hit:
+  // this payoff is the one the whole route has been walking toward.
+  at(5200, () => { bossStage = 4; playSound(finalBoom); render(); });
   at(9400, () => { setState(restart()); });
 }
 

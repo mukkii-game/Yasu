@@ -443,8 +443,11 @@ test.describe('犯人はヤス', () => {
     }));
     expect(stacking.theEnd).toBeGreaterThan(stacking.redout);
 
-    // The last comeback lands on the ordinary hit, not on the gunshot.
-    const hitsBeforePayoff = (await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length;
+    // The last comeback lands on the same boom the arrest ending closes on, not
+    // on the room's ordinary hit. The shot has already sounded one by now.
+    const hitsBeforePayoff = countOf(await playedSoundFiles(page), 'punchline-hit.mp3');
+    const boomsBeforePayoff = countOf(await playedSoundFiles(page), 'final-boom.mp3');
+    expect(boomsBeforePayoff).toBe(1);
     await expect(page.getByTestId('boss-punchline').locator('.end-setup b')).toHaveText(['ボスのいのち'], { timeout: 10_000 });
     await expect(page.getByTestId('boss-punchline').locator('strong')).toHaveText('ヤスッ！');
 
@@ -462,8 +465,9 @@ test.describe('犯人はヤス', () => {
       };
     });
     expect(payoffFits).toEqual({ payoff: true, setup: true, theEnd: true });
-    expect((await playedSoundFiles(page)).filter((file) => file === 'punchline-hit.mp3').length)
-      .toBe(hitsBeforePayoff + 1);
+    await expect.poll(() => playedSoundFiles(page).then((files) => countOf(files, 'final-boom.mp3')))
+      .toBe(boomsBeforePayoff + 1);
+    expect(countOf(await playedSoundFiles(page), 'punchline-hit.mp3')).toBe(hitsBeforePayoff);
 
     // Input stays locked, then it returns to the title on its own.
     await page.getByTestId('boss-screen').click({ position: { x: 120, y: 100 } });
