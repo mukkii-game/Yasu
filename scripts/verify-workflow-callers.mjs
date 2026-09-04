@@ -29,17 +29,20 @@ function assertMapping(source, key, expected) {
   assert.deepEqual(topLevelMapping(source, key), expected)
 }
 
+// Every caller tracks the central repository's main. Immutable tags and the
+// canary-before-tag step were dropped: one person and their agents, and a
+// single workflow addition cost three manual merges.
 const ci = workflow('ci.yml')
 assertOnlyUses(
   ci,
-  'mukkii-game/ai-dev-infra/.github/workflows/verify-web.yml@v2',
+  'mukkii-game/ai-dev-infra/.github/workflows/verify-web.yml@main',
 )
 assertMapping(ci, 'permissions', { contents: 'read' })
 
 const guard = workflow('merge-guard.yml')
 assertOnlyUses(
   guard,
-  'mukkii-game/ai-dev-infra/.github/workflows/merge-guard.yml@v2',
+  'mukkii-game/ai-dev-infra/.github/workflows/merge-guard.yml@main',
 )
 assertMapping(guard, 'permissions', {
   contents: 'write',
@@ -53,7 +56,7 @@ assertMapping(guard, 'concurrency', {
 const pages = workflow('deploy-pages.yml')
 assertOnlyUses(
   pages,
-  'mukkii-game/ai-dev-infra/.github/workflows/deploy-pages.yml@v2',
+  'mukkii-game/ai-dev-infra/.github/workflows/deploy-pages.yml@main',
 )
 assertMapping(pages, 'permissions', {
   contents: 'read',
@@ -68,11 +71,9 @@ assertMapping(pages, 'concurrency', {
 assert.match(pages, /^  workflow_dispatch:\s*$/m)
 
 const itch = workflow('publish-itch.yml')
-// A commit, not a tag: this is the canary that has to publish successfully
-// before ai-dev-infra cuts v3. Update both together when it moves to @v3.
 assertOnlyUses(
   itch,
-  'mukkii-game/ai-dev-infra/.github/workflows/publish-itch.yml@37f665f326f13647c865171d7bf27a5b1717f690',
+  'mukkii-game/ai-dev-infra/.github/workflows/publish-itch.yml@main',
 )
 assertMapping(itch, 'permissions', { contents: 'read', actions: 'read' })
 assertMapping(itch, 'concurrency', { group: 'itch', 'cancel-in-progress': 'false' })

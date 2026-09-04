@@ -19,4 +19,4 @@ concurrency:
 jobs:
   deploy:
     # Publishes only an artifact authorized by the protected central workflow.
-    uses: mukkii-game/ai-dev-infra/.github/workflows/deploy-pages.yml@v2
+    uses: mukkii-game/ai-dev-infra/.github/workflows/deploy-pages.yml@main
