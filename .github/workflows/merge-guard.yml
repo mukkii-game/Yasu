@@ -15,4 +15,4 @@ concurrency:
 jobs:
   guard:
     # Security-sensitive logic lives in the protected central workflow.
-    uses: mukkii-game/ai-dev-infra/.github/workflows/merge-guard.yml@v2
+    uses: mukkii-game/ai-dev-infra/.github/workflows/merge-guard.yml@main

@@ -16,13 +16,18 @@ repository.
 
 ## Scope
 
-- Normal game development tasks must not change `.github/**`. CI is owned by the
-  central repository `mukkii-game/ai-dev-infra`; this repository only calls it.
+- CI lives in `mukkii-game/ai-dev-infra`; the workflows here are thin callers
+  and track its `main`. Change the central repository rather than copying its
+  steps into this one.
 
 ## Documentation
 
-- Read `SPEC.md` before changing behaviour, and update it when behaviour changes.
-- Append design decisions worth keeping long-term to `DECISIONS.md`, briefly.
+- The end-to-end suite in `e2e/` is the behavioural spec. `SPEC.md` is the
+  player-facing summary: update it when a rule or a line of dialogue changes,
+  not for every tuning pass.
+- `DECISIONS.md` holds the handful of decisions that still shape the code.
+  Append only a decision that would surprise the next agent; git history has
+  the rest.
 
 ## Autonomy
 

@@ -17,9 +17,7 @@ concurrency:
 jobs:
   publish:
     # Publishes only an artifact authorized by the protected central workflow.
-    # Pinned to a commit rather than a tag: this is the canary run that has to
-    # pass before ai-dev-infra cuts v3, after which this moves to @v3.
-    uses: mukkii-game/ai-dev-infra/.github/workflows/publish-itch.yml@37f665f326f13647c865171d7bf27a5b1717f690
+    uses: mukkii-game/ai-dev-infra/.github/workflows/publish-itch.yml@main
     with:
       itch_target: mukkii/yasu
     # Named explicitly. `secrets: inherit` would hand the called workflow every
